@@ -4,13 +4,13 @@ from Bio.PDB.DSSP import DSSP
 import pandas as pd
 import numpy as np
 
-import GeoAtom as atm
-import GeoDensity as den
-import GeoCalcs as calcs
+from PsuGeometry import GeoAtom as atm
+from PsuGeometry import GeoDensity as den
+from PsuGeometry import GeoCalcs as calcs
 
 
 class GeoPdb:
-    def __init__(self,pdbCode,pdbDataPath):
+    def __init__(self,pdbCode,pdbDataPath,edDataPath):
         pdbCode = pdbCode.lower()
         print('PSU: init',pdbCode)
         self.pdbCode = pdbCode
@@ -19,7 +19,7 @@ class GeoPdb:
         self.hasDSSP = False
         self.hasPDB = False
         self.atoms = []
-        self.geoDen = den.GeoDensity(pdbCode,'50')
+        self.geoDen = den.GeoDensity(pdbCode,'50',pdbDataPath,edDataPath)
         self.hasDensity = self.geoDen.valid
         self.dataFrame = None
 
@@ -36,7 +36,6 @@ class GeoPdb:
                                                atom.values['chain'], atom.values['rid'], atom.values['dssp'], atom.values['aa'],
                                                atom.values['atom'], atom.values['atomNo'], atom.values['electrons'], atom.values['element'],atom.values['x'], atom.values['y'], atom.values['z'], atom.values['bfactor'], atom.values['occupant'],atom.values['occupancy'],
                                                atom.values['2FoFc'], atom.values['FoFc'], atom.values['Fo'], atom.values['Fc'])  # switching ijk to crs
-            print(str(self.dataFrame[1:2]))
 
     #########################################################################################################################
     ## PRIVATE FUNCTIONS FOR THE CLASS

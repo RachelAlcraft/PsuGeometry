@@ -4,9 +4,9 @@ import seaborn as sns
 import io
 import base64
 
-import GeoAtom as atm
-import GeoDensity as den
-import GeoCalcs as calcs
+from PsuGeometry import GeoAtom as atm
+from PsuGeometry import GeoDensity as den
+from PsuGeometry import GeoCalcs as calcs
 
 
 class GeoReport:
@@ -236,26 +236,31 @@ class GeoReport:
 
 
     def printCsvToHtml(self, reportsList,pdbList,title,cols,printPath,fileName):
-        html = '<!DOCTYPE html><html lang="en"><head><title>PSU-' + fileName + '-GEO</title></head>'
+        html = '<!DOCTYPE html><html lang="en"><head><title>PSU-' + fileName + '-GEO</title>'
+        #html += '<style> body {background-color:WhiteSmoke;} table,th,td {border:1px solid LightSteelBlue;background-color:WhiteSmoke;}</style></head>'
+        html += '<style> body {background-color:SeaShell;} td {border:1px solid RosyBrown;background-color:SeaShell;}</style></head>'
         html += '<body><h1>' + title + '</h1>'
         html += '<h2>PSU: Geometric Correlations</h2>'
-        html += '<table><tr><td>PdbCode</td><td>Resolution</td><td>Pdb Link</td><td>Pdbe Link</td></tr>'
+        html += '<hr/>'
+
+        if len(pdbList) > 0:
+            html += '<table><tr><td>PdbCode</td><td>Resolution</td><td>Pdb Link</td><td>Pdbe Link</td></tr>'
+            for apdb in pdbList:
+                html += '<tr>'
+                html += '<td>' + apdb.pdbCode + '</td>'
+                html += '<td>' + str(apdb.atoms[0].values['resolution']) + '</td>'
+                html += "<td><a href='https://www.rcsb.org/structure/" + apdb.pdbCode + "' title='PDB Link' target='_blank'>Link to PDB</a></td>"
+                html += "<td><a href='https://www.ebi.ac.uk/pdbe/entry/pdb/" + apdb.pdbCode + "' title='PDB Link' target='_blank'>Link to PDBe</a></td>"
+                html += '</tr>'
+            html += '</table>'
 
 
-        for apdb in pdbList:
-            html += '<tr>'
-            html += '<td>' + apdb.pdbCode + '</td>'
-            html += '<td>' + str(apdb.atoms[0].values['resolution']) + '</td>'
-            html += "<td><a href='https://www.rcsb.org/structure/" + apdb.pdbCode + "' title='PDB Link' target='_blank'>Link to PDB</a></td>"
-            html += "<td><a href='https://www.ebi.ac.uk/pdbe/entry/pdb/" + apdb.pdbCode + "' title='PDB Link' target='_blank'>Link to PDBe</a></td>"
-            html += '</tr>'
-
-        html += '</table>'
+        html += '<hr/>'
 
         reportPath = printPath + fileName + ".html"
 
         count = 0
-        html += '<table>'
+        html += '<table style="width:90%">'
         for report in reportsList:
 
             title = report[0]
@@ -295,7 +300,7 @@ class GeoReport:
                     vmax = report[9]
                     html += self.oneHTMLCorrelation(sptitle,data,geoX,geoY,hue,palette,centre,vmin,vmax)
 
-        html += '</tr></table><body>'
+        html += '</tr></table><hr/><p>Produced by PsuGeometry, written by Rachel Alcraft </p><body>'
 
         # and print
         f = open(reportPath, "w+")
@@ -323,6 +328,20 @@ class GeoReport:
         encoded = base64.b64encode(img.getvalue())
         html = '<img width = 95% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8'))
         plt.close('all')
+        dfdesc = data[xName].describe()
+        rows = len(dfdesc.index)
+        colsNames = list(dfdesc.index)
+        html += "<table>"
+        html += "<tr>"
+        for r in range(0, rows):
+            html += "<td>" + str(colsNames[r]) + "</td>"
+        html += "</tr>"
+        html += "<tr>"
+        for r in range(0, rows):
+            html += "<td>" + str(round(dfdesc[r],4)) + "</td>"
+        html += "</tr>"
+        html += "</table>"
+
         return html
 
     def createScatterPlot(self,title, geoX, geoY, hue, data, palette, centre,vmin,vmax):

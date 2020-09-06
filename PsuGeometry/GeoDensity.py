@@ -13,11 +13,13 @@ import pandas as pd
 
 class GeoDensity:
 
-    def __init__(self,pdbCode,normalisation):
+    def __init__(self,pdbCode,normalisation,pdbDataPath,edDataPath):
         # this defines the data we allow in the atom
         # Structure information
         self.pdbCode = pdbCode
         self.norm = normalisation
+        pdb_eda.densityAnalysis.ccp4folder =edDataPath
+        pdb_eda.densityAnalysis.pdbfolder = pdbDataPath
         self.analyser = pdb_eda.densityAnalysis.fromPDBid(pdbCode)
         self.factor = 0
         self.tranlation = 0
