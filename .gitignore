@@ -133,3 +133,4 @@ dmypy.json
 
 # avoid odt only want pdf
 *.odt
+*.odt#
