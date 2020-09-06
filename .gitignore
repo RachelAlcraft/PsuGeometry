@@ -130,3 +130,6 @@ dmypy.json
 
 # avoid Pycharm
 .idea/*
+
+# avoid odt only want pdf
+*.odt
