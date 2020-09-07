@@ -92,6 +92,8 @@ class GeoAtom:
             return 79
         elif 'C' in atom:
             return 6
+        elif 'K' in atom:
+            return 19
         elif 'F' in atom:
             return 9
         elif 'S' in atom:
@@ -132,6 +134,8 @@ class GeoAtom:
             return 'AU'
         elif 'C' in atom:
             return 'C'
+        elif 'K' in atom:
+            return 'K'
         elif 'F' in atom:
             return 'F'
         elif 'S' in atom:

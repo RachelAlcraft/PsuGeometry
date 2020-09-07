@@ -106,6 +106,15 @@ class GeoDensity:
         '''
         a,b,c = matrix.shape
         maxMat = matrix.max()
+
+        divisor = 8
+        if a < 120:
+            divisor = 8
+        elif a < 150:
+            divisor = 8
+        elif a < 190:
+            divisor = 8
+
         #print(a,b,c)
         xRange = range(x,x+1)
         yRange = range(y,y+1)
@@ -134,7 +143,7 @@ class GeoDensity:
                         goingUp = True
                     else:
                         if goingUp: # then we are now going back down
-                            if abs(lastCoordsVal[3]) > maxMat/8:
+                            if abs(lastCoordsVal[3]) > maxMat/divisor:
                                 peakList.append(lastCoordsVal)
                             goingUp = False
 
@@ -150,8 +159,12 @@ class GeoDensity:
         a,b,c = matrix.shape
         maxMat = matrix.max()
         divisor = 4
-        if a < 150:
+        if a < 120:
             divisor = 8
+        elif a < 150:
+            divisor = 7
+        elif a < 190:
+            divisor = 5
         #print(a,b,c)
         xRange = range(x,x+1)
         yRange = range(y,y+1)

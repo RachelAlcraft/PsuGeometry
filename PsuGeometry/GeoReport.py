@@ -153,9 +153,10 @@ class GeoReport:
                 atomData = apdb.dataFrame
                 atomData = atomData.sort_values(by='2FoFc', ascending=True)
                 title = 'General Data Report'
-                cols = 2
+                cols = 3
                 printList = []
                 printList.append(['', atomData, 'atomNo', 'aa','', 'aa', 'tab20', False, 0, 0])
+                printList.append(['', atomData, 'atomNo', 'dssp', '', 'aa', 'tab20', False, 0, 0])
                 printList.append(['', atomData, '2FoFc', 'bfactor','', 'element', 'tab20', False, 0, 0])
                 printList.append(['', atomData, 'atomNo', 'bfactor','', 'element', 'tab20', False, 0, 0])
                 printList.append(['', atomData, 'atomNo', '2FoFc','', 'element', 'tab20', False, 0, 0])
@@ -165,17 +166,19 @@ class GeoReport:
                 printList.append(['', atomData, 'z', 'x','', 'atomNo', 'plasma_r', False, 0, 0])
                 self.printCsvToHtml(printList, [apdb], title, cols, printPath, fileName + '_' + apdb.pdbCode)
 
-        elif reportName == 'DensityPerPdb' or reportName == 'DensityPeaksPerPdb': # this can only be done per pdb
+        elif reportName == 'Slow_DensityPointsPerPdb' or reportName == 'Slow_DensityPeaksPerPdb': # this can only be done per pdb
             for apdb in self.pdbs:
                 if apdb.hasDensity:
                     print('\tPSU:', reportName, 'for', apdb.pdbCode)
                     allPoints = True
-                    if reportName == 'DensityPeaksPerPdb':
+                    title = 'Density and Atom Points Comparison'
+                    if reportName == 'Slow_DensityPeaksPerPdb':
                         allPoints = False
+                        title = 'Density and Atom Peaks Comparison'
                     peaksData = apdb.geoDen.getPeaks(allPoints)
                     atomData = apdb.dataFrame
                     atomData['FoFc2'] = atomData['FoFc'] ** 2
-                    title = 'Density and Atom Comparison'
+
                     cols = 3
                     printList = []
                     printList.append(['Density CR Fo', peaksData, 'c', 'r', '', 'peakFo', 'gist_gray_r', False, 0, 0])
@@ -222,6 +225,12 @@ class GeoReport:
                     printList.append(['PDB XY bfactor', atomData, 'x', 'y','', 'bfactor', 'cubehelix_r', False, 0, 0])
                     printList.append(['PDB YZ bfactor', atomData, 'y', 'z','', 'bfactor', 'cubehelix_r', False, 0, 0])
                     printList.append(['PDB ZX bfactor', atomData, 'z', 'x','', 'bfactor', 'cubehelix_r', False, 0, 0])
+                    printList.append(['PDB XY atom nos', atomData, 'x', 'y', '', 'atomNo', 'gist_ncar', False, 0, 0])
+                    printList.append(['PDB YZ atom nos', atomData, 'y', 'z', '', 'atomNo', 'gist_ncar', False, 0, 0])
+                    printList.append(['PDB ZX atom nos', atomData, 'z', 'x', '', 'atomNo', 'gist_ncar', False, 0, 0])
+                    printList.append(['PDB XY amino acids', atomData, 'x', 'y', '', 'aa', 'tab20', False, 0, 0])
+                    printList.append(['PDB YZ amino acids', atomData, 'y', 'z', '', 'aa', 'tab20', False, 0, 0])
+                    printList.append(['PDB ZX amino acids', atomData, 'z', 'x', '', 'aa', 'tab20', False, 0, 0])
                     printList.append(['PDB bfactor vs FoFc^2', atomData, 'bfactor', 'FoFc2','', 'electrons', 'viridis_r', False, 0, 0])
                     printList.append(['PDB Fc vs Fc', atomData, 'Fc', 'Fo','', 'electrons', 'viridis_r', False, 0, 0])
                     printList.append(['PDB electrons vs 2FoFc', atomData, 'electrons', '2FoFc','', 'element', 'tab10', False, 0, 0])
@@ -236,31 +245,34 @@ class GeoReport:
 
 
     def printCsvToHtml(self, reportsList,pdbList,title,cols,printPath,fileName):
-        html = '<!DOCTYPE html><html lang="en"><head><title>PSU-' + fileName + '-GEO</title>'
-        #html += '<style> body {background-color:WhiteSmoke;} table,th,td {border:1px solid LightSteelBlue;background-color:WhiteSmoke;}</style></head>'
-        html += '<style> body {background-color:SeaShell;} td {border:1px solid RosyBrown;background-color:SeaShell;}</style></head>'
-        html += '<body><h1>' + title + '</h1>'
-        html += '<h2>PSU: Geometric Correlations</h2>'
+        html = '<!DOCTYPE html><html lang="en"><head><title>PSU-' + fileName + '-GEO</title>\n'
+        #html += '<style> body {background-color:SeaShell;} table {table-layout:fixed;display:table;margin:0 auto;}td {border:1px solid RosyBrown;background-color:SeaShell;}</style>'
+        #html += '<style> body {background-color:HoneyDew;} table {background-color:HoneyDew;} .innertable td {border:1px solid MistyRose;background-color:MintCream;}</style>'
+        html += '<style> body {text-align:center;background-color:HoneyDew;} img {width:95% } table {table-layout:fixed;display:table;margin:0 auto;background-color:HoneyDew;} td {border:0.5px solid MistyRose;background-color:MintCream;}</style>'
+        html += '</head>\n'
+        html += '<body><h1>' + title + '</h1>\n'
+        html += '<h2>PSU: Geometric Correlations</h2>\n'
         html += '<hr/>'
 
         if len(pdbList) > 0:
-            html += '<table><tr><td>PdbCode</td><td>Resolution</td><td>Pdb Link</td><td>Pdbe Link</td></tr>'
+            html += '<table><tr><td>PdbCode</td><td>Resolution</td><td>Pdb Link</td><td>PDBe Link</td></tr>\n'
             for apdb in pdbList:
-                html += '<tr>'
-                html += '<td>' + apdb.pdbCode + '</td>'
-                html += '<td>' + str(apdb.atoms[0].values['resolution']) + '</td>'
-                html += "<td><a href='https://www.rcsb.org/structure/" + apdb.pdbCode + "' title='PDB Link' target='_blank'>Link to PDB</a></td>"
-                html += "<td><a href='https://www.ebi.ac.uk/pdbe/entry/pdb/" + apdb.pdbCode + "' title='PDB Link' target='_blank'>Link to PDBe</a></td>"
-                html += '</tr>'
-            html += '</table>'
+                html += '<tr>\n'
+                html += '<td>' + apdb.pdbCode + '</td>\n'
+                html += '<td>' + str(apdb.atoms[0].values['resolution']) + '</td>\n'
+                html += "<td><a href='https://www.rcsb.org/structure/" + apdb.pdbCode + "' title='PDB Link' target='_blank'>Link to PDB</a></td>\n"
+                html += "<td><a href='https://www.ebi.ac.uk/pdbe/entry/pdb/" + apdb.pdbCode + "' title='PDB Link' target='_blank'>Link to PDBe</a></td>\n"
+                html += '</tr>\n'
+            html += '</table>\n'
 
 
-        html += '<hr/>'
+        html += '<hr/>\n'
 
         reportPath = printPath + fileName + ".html"
 
         count = 0
-        html += '<table style="width:90%">'
+        #html += '<table style="width:90%">\n'
+        html += '<table>\n'
         for report in reportsList:
 
             title = report[0]
@@ -279,7 +291,7 @@ class GeoReport:
                 if count == 0:
                     html += '<tr>'
                 elif count % cols == 0:
-                    html += '</tr><tr>'
+                    html += '</tr>\n<tr>'
 
                 count += 1
 
@@ -300,7 +312,7 @@ class GeoReport:
                     vmax = report[9]
                     html += self.oneHTMLCorrelation(sptitle,data,geoX,geoY,hue,palette,centre,vmin,vmax)
 
-        html += '</tr></table><hr/><p>Produced by PsuGeometry, written by Rachel Alcraft </p><body>'
+        html += '</tr></table><hr/><p>Produced by PsuGeometry, written by Rachel Alcraft </p></body>\n'
 
         # and print
         f = open(reportPath, "w+")
@@ -309,11 +321,11 @@ class GeoReport:
         f.close()
 
     def oneHTMLCorrelation(self,title,data,geoX,geoY,hue,palette,centre,vmin,vmax):
-        html = '<td>' + self.createScatterPlot(title, geoX, geoY, hue, data, palette, centre,vmin,vmax) + '</td>'
+        html = '<td>' + self.createScatterPlot(title, geoX, geoY, hue, data, palette, centre,vmin,vmax) + '</td>\n'
         return (html)
 
     def oneHTMLHistogram(self,title,data,geoX):
-        html = '<td>' + self.createHistogram(geoX, data, title) + '</td>'
+        html = '<td>' + self.createHistogram(geoX, data, title) + '</td>\n'
         return (html)
 
     def createHistogram(self,xName, data, title):
@@ -326,21 +338,28 @@ class GeoReport:
         fig.savefig(img, format='png', bbox_inches='tight')
         img.seek(0)
         encoded = base64.b64encode(img.getvalue())
-        html = '<img width = 95% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8'))
+        #html = '<img width=100% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
+        html = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
         plt.close('all')
         dfdesc = data[xName].describe()
         rows = len(dfdesc.index)
         colsNames = list(dfdesc.index)
-        html += "<table>"
+        html += "<table class='innertable'>\n"
+        html += "<tr>\n"
+        for r in range(0, rows):
+            html += "<td>" + str(colsNames[r]) + "</td>\n"
+        html += "</tr>\n"
         html += "<tr>"
         for r in range(0, rows):
-            html += "<td>" + str(colsNames[r]) + "</td>"
-        html += "</tr>"
-        html += "<tr>"
-        for r in range(0, rows):
-            html += "<td>" + str(round(dfdesc[r],4)) + "</td>"
-        html += "</tr>"
-        html += "</table>"
+            html += "<td>"
+            try:
+                html += str(round(dfdesc[r],4))
+            except:
+                html += str(dfdesc[r])
+            html += "</td>\n"
+
+        html += "</tr>\n"
+        html += "</table>\n"
 
         return html
 
@@ -366,7 +385,13 @@ class GeoReport:
             if palette == 'gist_gray_r':
                 lw = 0 # this gives a crystollagraphic image look
 
-            data = data.sort_values(by=hue, ascending=True)
+            if hue == 'aa':
+                try:
+                    data = data.sort_values(by='2FoFc', ascending=True)
+                except:
+                    data = data.sort_values(by=hue, ascending=True)
+            else:
+                data = data.sort_values(by=hue, ascending=True)
             im = sns.scatterplot(x=geoX, y=geoY, hue=hue, data=data, alpha=0.65, palette=palette,edgecolor='aliceblue',linewidth=lw)
             plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)  # Put the legend out of the figure
 
@@ -381,6 +406,7 @@ class GeoReport:
         fig.savefig(img, format='png', bbox_inches='tight')
         img.seek(0)
         encoded = base64.b64encode(img.getvalue())
-        html = '<img width = 95% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8'))
+        #html = '<img width=100% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
+        html = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
         plt.close('all')
         return html
