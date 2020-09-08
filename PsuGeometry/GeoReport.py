@@ -250,7 +250,7 @@ class GeoReport:
         #html += '<style> body {background-color:SeaShell;} table {table-layout:fixed;display:table;margin:0 auto;}td {border:1px solid RosyBrown;background-color:SeaShell;}</style>'
         #html += '<style> body {background-color:HoneyDew;} table {background-color:HoneyDew;} .innertable td {border:1px solid MistyRose;background-color:MintCream;}</style>'
         html += '<style> body {text-align:center;background-color:LightSteelBlue ;} img {width:95% }'
-        html += 'table {width:95%;table-layout:fixed;display:table;margin:0 auto;background-color:LightSteelBlue ;}'
+        html += 'table {font-size:0.8vw;width:95%;table-layout:fixed;display:table;margin:0 auto;background-color:LightSteelBlue ;}'
         html += ' td {border:1px solid MistyRose;background-color:AliceBlue;}</style>'
         html += '</head>\n'
         html += '<body><h1>' + title + '</h1>\n'
@@ -356,7 +356,7 @@ class GeoReport:
         for r in range(0, rows):
             html += "<td>"
             try:
-                html += str(round(dfdesc[r],4))
+                html += str(round(dfdesc[r],2))
             except:
                 html += str(dfdesc[r])
             html += "</td>\n"

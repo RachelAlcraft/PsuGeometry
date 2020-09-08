@@ -31,17 +31,17 @@ class GeoDensity:
                 minm = self.analyser.densityObj.density.min()
                 maxm = self.analyser.densityObj.density.max()
                 med = np.median(self.analyser.densityObj.density)
-                print('PSU:density min=', minm, 'med=', med, 'max=', maxm)
+                print('PSU: density min=', minm, 'med=', med, 'max=', maxm)
                 # med = np.mean(self.analyser.densityObj.density)
 
                 self.translation = -1 * self.analyser.densityObj.density.min()
                 self.factor =  50 / (med + self.translation)
-                print('PSU:normalisation trans=',self.translation,'factor=',self.factor)
-                print('PSU:normalisation min=', 0, 'med=', (med + self.translation) * self.factor, 'max=', (maxm + self.translation) * self.factor)
+                print('PSU: normalisation trans=',self.translation,'factor=',self.factor)
+                print('PSU: normalisation min=', 0, 'med=', (med + self.translation) * self.factor, 'max=', (maxm + self.translation) * self.factor)
 
             print('PSU: created density for', self.pdbCode)
         except:
-            print('PSU:!!! there is no density for', self.pdbCode)
+            print('PSU: !there is no density for', self.pdbCode)
             self.valid = False
 
     def getDensityXYZ(self,x,y,z): # this is not the intyerpolated density
@@ -67,13 +67,13 @@ class GeoDensity:
 
     def getPeaks(self,allPoints=False):
         if allPoints:
-            print("PSU:Warning, the Density points function can take some minutes")
+            print("PSU: Warning, the Density points function can take some minutes")
         else:
-            print("PSU:Warning, the Density peaks function can take some minutes")
+            print("PSU: Warning, the Density peaks function can take some minutes")
         matrix = self.analyser.densityObj.density
         maxMat = matrix.max()
         a, b, c = self.analyser.densityObj.density.shape
-        print('\t\tPSU:Peaks=',a,'/',end=',')
+        print('\t\tPSU: Peaks=',a,'/',end=',')
         finalPeakList = []
         for i in range(0,a):
             peaked = True
@@ -101,7 +101,7 @@ class GeoDensity:
 
         densityData = pd.DataFrame(columns=('pdb_code', 'c', 'r', 's', 'x', 'y', 'z', 'peak2FoFc','peakFoFc','peakFo','peakFc'))
         print('', end='\n')
-        print('\t\tPSU:Density complete, points=', len(finalPeakList), end='\n')
+        print('\t\tPSU: Density complete, points=', len(finalPeakList), end='\n')
         for peak in finalPeakList:
             nextrow = len(densityData)
             densityData.loc[nextrow] = (
