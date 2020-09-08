@@ -1,7 +1,7 @@
 
 pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
-printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/Jask/'
+printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results/jask/'
 
 
 # hand crafted report for 2bw4 non planar omega

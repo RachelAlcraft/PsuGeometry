@@ -21,14 +21,24 @@ class GeoDensity:
         pdb_eda.densityAnalysis.ccp4folder =edDataPath
         pdb_eda.densityAnalysis.pdbfolder = pdbDataPath
         self.analyser = pdb_eda.densityAnalysis.fromPDBid(pdbCode)
-        self.factor = 0
-        self.tranlation = 0
+        self.factor = 1
+        self.translation = 0
         try:
             alpha = self.analyser.densityObj.header.alpha
-            med = np.median(self.analyser.densityObj.density.ravel())
-            self.translation = -1 * self.analyser.densityObj.density.min()
-            self.factor =  50 / (med + self.translation)
             self.valid = True
+            if self.norm == 'fifty':
+                # med = np.median(self.analyser.densityObj.density.ravel())
+                minm = self.analyser.densityObj.density.min()
+                maxm = self.analyser.densityObj.density.max()
+                med = np.median(self.analyser.densityObj.density)
+                print('PSU:density min=', minm, 'med=', med, 'max=', maxm)
+                # med = np.mean(self.analyser.densityObj.density)
+
+                self.translation = -1 * self.analyser.densityObj.density.min()
+                self.factor =  50 / (med + self.translation)
+                print('PSU:normalisation trans=',self.translation,'factor=',self.factor)
+                print('PSU:normalisation min=', 0, 'med=', (med + self.translation) * self.factor, 'max=', (maxm + self.translation) * self.factor)
+
             print('PSU: created density for', self.pdbCode)
         except:
             print('PSU:!!! there is no density for', self.pdbCode)

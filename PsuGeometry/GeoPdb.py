@@ -19,7 +19,7 @@ class GeoPdb:
         self.hasDSSP = False
         self.hasPDB = False
         self.atoms = []
-        self.geoDen = den.GeoDensity(pdbCode,'50',pdbDataPath,edDataPath)
+        self.geoDen = den.GeoDensity(pdbCode,'fifty',pdbDataPath,edDataPath)
         self.hasDensity = self.geoDen.valid
         self.dataFrame = None
 

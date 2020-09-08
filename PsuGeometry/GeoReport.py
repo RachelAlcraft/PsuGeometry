@@ -245,10 +245,13 @@ class GeoReport:
 
 
     def printCsvToHtml(self, reportsList,pdbList,title,cols,printPath,fileName):
+        width=str(100/cols)
         html = '<!DOCTYPE html><html lang="en"><head><title>PSU-' + fileName + '-GEO</title>\n'
         #html += '<style> body {background-color:SeaShell;} table {table-layout:fixed;display:table;margin:0 auto;}td {border:1px solid RosyBrown;background-color:SeaShell;}</style>'
         #html += '<style> body {background-color:HoneyDew;} table {background-color:HoneyDew;} .innertable td {border:1px solid MistyRose;background-color:MintCream;}</style>'
-        html += '<style> body {text-align:center;background-color:HoneyDew;} img {width:95% } table {table-layout:fixed;display:table;margin:0 auto;background-color:HoneyDew;} td {border:0.5px solid MistyRose;background-color:MintCream;}</style>'
+        html += '<style> body {text-align:center;background-color:LightSteelBlue ;} img {width:95% }'
+        html += 'table {width:95%;table-layout:fixed;display:table;margin:0 auto;background-color:LightSteelBlue ;}'
+        html += ' td {border:1px solid MistyRose;background-color:AliceBlue;}</style>'
         html += '</head>\n'
         html += '<body><h1>' + title + '</h1>\n'
         html += '<h2>PSU: Geometric Correlations</h2>\n'
@@ -303,14 +306,14 @@ class GeoReport:
                     sptitle = title
 
                 if geoY == '': # then it is 1d
-                    html += self.oneHTMLHistogram(sptitle,data,geoX)
+                    html += self.oneHTMLHistogram(sptitle,data,geoX,width)
                 else:
                     hue = report[5]
                     palette = report[6]
                     centre = report[7]
                     vmin = report[8]
                     vmax = report[9]
-                    html += self.oneHTMLCorrelation(sptitle,data,geoX,geoY,hue,palette,centre,vmin,vmax)
+                    html += self.oneHTMLCorrelation(sptitle,data,geoX,geoY,hue,palette,centre,vmin,vmax,width)
 
         html += '</tr></table><hr/><p>Produced by PsuGeometry, written by Rachel Alcraft </p></body>\n'
 
@@ -320,12 +323,12 @@ class GeoReport:
         print('PSU: saved file to',reportPath)
         f.close()
 
-    def oneHTMLCorrelation(self,title,data,geoX,geoY,hue,palette,centre,vmin,vmax):
-        html = '<td>' + self.createScatterPlot(title, geoX, geoY, hue, data, palette, centre,vmin,vmax) + '</td>\n'
+    def oneHTMLCorrelation(self,title,data,geoX,geoY,hue,palette,centre,vmin,vmax,width):
+        html = '<td width=' + width + '%>' + self.createScatterPlot(title, geoX, geoY, hue, data, palette, centre,vmin,vmax) + '</td>\n'
         return (html)
 
-    def oneHTMLHistogram(self,title,data,geoX):
-        html = '<td>' + self.createHistogram(geoX, data, title) + '</td>\n'
+    def oneHTMLHistogram(self,title,data,geoX,width):
+        html = '<td width=' + width + '%>'  + self.createHistogram(geoX, data, title) + '</td>\n'
         return (html)
 
     def createHistogram(self,xName, data, title):
@@ -339,7 +342,7 @@ class GeoReport:
         img.seek(0)
         encoded = base64.b64encode(img.getvalue())
         #html = '<img width=100% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
-        html = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
+        html = '<p><img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
         plt.close('all')
         dfdesc = data[xName].describe()
         rows = len(dfdesc.index)
@@ -359,7 +362,7 @@ class GeoReport:
             html += "</td>\n"
 
         html += "</tr>\n"
-        html += "</table>\n"
+        html += "</table></p>\n"
 
         return html
 

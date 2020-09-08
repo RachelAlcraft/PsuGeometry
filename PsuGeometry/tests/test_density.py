@@ -17,6 +17,7 @@ pdbList = ['1ejg','1us0','1tt8','1i1w','1ucs','1yk4','1yk4','1hje','1r6j','2bw4'
 
 
 for pdb in pdbList:
+    pdb = pdb.lower()
     geoPdb = geop.GeoPdb(pdb, pdbDataPath, edDataPath)
     georep = geor.GeoReport([geoPdb])
     if geoPdb.atoms[0].values['resolution'] < 1.7:
@@ -24,4 +25,4 @@ for pdb in pdbList:
     else:
         georep.printReport('Slow_DensityPointsPerPdb', printPath, geoPdb.pdbCode + '_den')
     geoPdb = None
-    geoRep = None
+    georep = None
