@@ -8,6 +8,7 @@ printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results/jask
 from PsuGeometry import GeoReport as geor
 from PsuGeometry import GeoPdb as geop
 import pandas as pd
+from PsuGeometry import GeoQuery as que
 
 pdbList = ['1ejg', '1ucs', '1us0', '1yk4', '1r6j', '1hje', '3al1', '2b97', '1gci', '1x6z']
 saveToCsv = False
@@ -68,21 +69,20 @@ else: # then load the csv files up to produce the reports
     allDataGly = allData.query('aa=="GLY"') #TAU
     allDataPro = allData.query('aa =="PRO"') # TAU
     printList = []
-    printList.append(['Resolutions', allData, 'pdbCode', 'resolution', '', 'pdbCode', 'Accent', False, 0, 0])
-    printList.append(['PDBs', allData, 'pdbCode', ''])
-    printList.append(['Amino Acids', allData, 'pdbCode', 'aa', '', 'aa', 'Accent', False, 0, 0])
-    #printList.append(['Amino Acids', allData, 'aa', ''])
-    printList.append(['C-1:N exc PRO', allDataexcPro, 'C-1:N', ''])
-    printList.append(['N:CA exc GLY PRO', allDataexcGlyPro, 'N:CA', ''])
-    printList.append(['CA:C exc GLY', allDataexcGly, 'CA:C', ''])
-    printList.append(['C:O', allData, 'C:O', ''])
-    printList.append(['N:CA:C exc GLY PRO', allDataexcGlyPro, 'N:CA:C', ''])
-    printList.append(['N:CA:C GLY', allDataGly, 'N:CA:C', ''])
-    printList.append(['N:CA:C PRO', allDataPro, 'N:CA:C', ''])
-    printList.append(['TAU', allData, 'N:CA:C', '','aa'])
-    printList.append(['C-1:N exc PRO', allDataexcPro, 'C-1:N', '','pdbCode'])
-    printList.append(['N:CA exc GLY PRO', allDataexcGlyPro, 'N:CA', '','pdbCode'])
-    printList.append(['CA:C exc GLY', allDataexcGly, 'CA:C', '','pdbCode'])
-    printList.append(['C:O', allData, 'C:O', '','pdbCode'])
+    printList.append(que.GeoQuery(allData, 'pdbCode', geoY='resolution',title='Resolutions',  hue='pdbCode', palette='Accent'))
+    printList.append(que.GeoQuery(allData, 'pdbCode',title='PDBs'))
+    printList.append(que.GeoQuery(allData, 'pdbCode', geoY='aa', title='Amino Acids', hue='aa', palette='Accent'))
+    printList.append(que.GeoQuery(allDataexcPro, 'C-1:N',title='C-1:N exc PRO'))
+    printList.append(que.GeoQuery(allDataexcGlyPro, 'N:CA',title='N:CA exc GLY PRO'))
+    printList.append(que.GeoQuery(allDataexcGly, 'CA:C',title='CA:C exc GLY'))
+    printList.append(que.GeoQuery(allData, 'C:O',title='C:O'))
+    printList.append(que.GeoQuery(allDataexcGlyPro, 'N:CA:C',title='N:CA:C exc GLY PRO'))
+    printList.append(que.GeoQuery(allDataGly, 'N:CA:C',title='N:CA:C GLY'))
+    printList.append(que.GeoQuery(allDataPro, 'N:CA:C',title='N:CA:C PRO'))
+    printList.append(que.GeoQuery(allData,'N:CA:C',splitKey='aa',title='TAU'))
+    printList.append(que.GeoQuery(allDataexcPro, 'C-1:N',title='C-1:N exc PRO', splitKey='pdbCode'))
+    printList.append(que.GeoQuery(allDataexcGlyPro, 'N:CA',title='N:CA exc GLY PRO', splitKey='pdbCode'))
+    printList.append(que.GeoQuery(allDataexcGly, 'CA:C',title='CA:C exc GLY', splitKey='pdbCode'))
+    printList.append(que.GeoQuery(allData, 'C:O',title='C:O', splitKey='pdbCode'))
     # Print the report
     georep.printCsvToHtml(printList, [], 'Jaskolski Pdbs', 3, printPath, 'jaskolski')
