@@ -250,6 +250,7 @@ class GeoPdb:
                         # hue could be an average or an
                         for hue in hues:
                             geoData.loc[thisRow, hue] = reshues[hue]
+
         return geoData
 
 

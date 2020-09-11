@@ -37,7 +37,7 @@ class GeoReport:
         elif reportName == 'OmegaCis':
             calcList = ['CA-1:CA','CA:CA+1','CA:C:N+1:CA+1','CA-1:C-1:N:CA','N:CA:C']
         elif reportName == 'RachelsChoice':
-            calcList = ['N:O','CB:O','N:CA:C:N+1']
+            calcList = ['N:O','CB:O','N:CA:C:N+1','C-1:N:CA:C']
         dfs = []
         for apdb in self.pdbs:
             data = apdb.getGeoemtryCsv(calcList, hueList)
@@ -65,25 +65,83 @@ class GeoReport:
         elif reportName == 'RachelsChoice':
             atomData = self.getReportCsv(reportName)
             title = "Rachel's Choice of Correlations"
-            cols = 5
+            cols = 4
             printList = []
-            printList.append(que.GeoQuery(atomData, 'N:CA:C:N+1',geoY='N:O',title='2FoFc',splitKey='pdbCode', palette='plasma_r'))
-            printList.append(que.GeoQuery(atomData, 'N:CA:C:N+1',geoY='N:O',title='BFactor', hue='bfactor', palette='plasma'))
-            printList.append(que.GeoQuery(atomData, 'N:CA:C:N+1',geoY='N:O',title='Amino Acid', hue='aa', palette='gist_ncar'))
-            printList.append(que.GeoQuery(atomData, 'N:CA:C:N+1',geoY='N:O',title='rid',hue='rid', palette='gist_rainbow'))
-            printList.append(que.GeoQuery(atomData, 'N:CA:C:N+1',geoY='N:O',title='FoFc',hue='FoFc', palette='Spectral', centre=True))
 
-            printList.append(que.GeoQuery(atomData, 'N:CA:C:N+1', geoY='CB:O', title='2FoFc', splitKey='pdbCode', palette='plasma_r'))
-            printList.append(que.GeoQuery(atomData, 'N:CA:C:N+1', geoY='CB:O', title='BFactor', hue='bfactor', palette='plasma'))
-            printList.append(que.GeoQuery(atomData, 'N:CA:C:N+1', geoY='CB:O', title='Amino Acid', hue='aa', palette='gist_ncar'))
-            printList.append(que.GeoQuery(atomData, 'N:CA:C:N+1', geoY='CB:O', title='rid', hue='rid', palette='gist_rainbow'))
-            printList.append(que.GeoQuery(atomData, 'N:CA:C:N+1', geoY='CB:O', title='FoFc', hue='FoFc', palette='Spectral', centre=True))
+            printList.append(que.GeoQuery(None, 'C-1:N:CA:C', geoY='N:CA:C:N+1', title='', hue='dssp',palette='Set1',newData=True))
+            printList.append(que.GeoQuery(None, 'C-1:N:CA:C', geoY='N:CA:C:N+1', title='', hue='2FoFc', palette='cubehelix_r',newData=True))
+            printList.append(que.GeoQuery(None, 'C-1:N:CA:C', geoY='N:CA:C:N+1', title='', hue='aa', palette='Set1',newData=True))
+            printList.append(que.GeoQuery(None, 'C-1:N:CA:C', geoY='N:CA:C:N+1', title='', hue='pdbCode', palette='Set1',newData=True))
 
-            printList.append(que.GeoQuery(atomData, 'N:O', geoY='CB:O', title='2FoFc', splitKey='pdbCode', palette='plasma_r'))
-            printList.append(que.GeoQuery(atomData, 'N:O', geoY='CB:O', title='BFactor', hue='bfactor', palette='plasma'))
-            printList.append(que.GeoQuery(atomData, 'N:O', geoY='CB:O', title='Amino Acid', hue='aa', palette='gist_ncar'))
-            printList.append(que.GeoQuery(atomData, 'N:O', geoY='CB:O', title='rid', hue='rid', palette='gist_rainbow'))
-            printList.append(que.GeoQuery(atomData, 'N:O', geoY='CB:O', title='FoFc', hue='FoFc', palette='Spectral',centre=True))
+            printList.append(que.GeoQuery(None, 'N:CA:CB:CG', geoY='CA:CB:CG:CD', title='', hue='dssp', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA:CB:CG', geoY='CA:CB:CG:CD', title='', hue='2FoFc', palette='cubehelix_r',newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA:CB:CG', geoY='CA:CB:CG:CD', title='', hue='aa', palette='Set1',newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA:CB:CG', geoY='CA:CB:CG:CD', title='', hue='pdbCode', palette='Set1',newData=True))
+
+            printList.append(que.GeoQuery(None, 'N:CA', geoY='CA:C', title='', hue='dssp', palette='Set1',newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA', geoY='CA:C', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA', geoY='CA:C', title='', hue='aa', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA', geoY='CA:C', title='', hue='pdbCode', palette='Set1', newData=True))
+
+            printList.append(que.GeoQuery(None, 'CA:CA+1', geoY='CA-1:CA', title='', hue='dssp', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'CA:CA+1', geoY='CA-1:CA', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(que.GeoQuery(None, 'CA:CA+1', geoY='CA-1:CA', title='', hue='aa', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'CA:CA+1', geoY='CA-1:CA', title='', hue='pdbCode', palette='Set1', newData=True))
+
+            printList.append(que.GeoQuery(None, 'CA:C:N+1:CA+1', geoY='N:CA:C', title='', hue='dssp', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'CA:C:N+1:CA+1', geoY='N:CA:C', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(que.GeoQuery(None, 'CA:C:N+1:CA+1', geoY='N:CA:C', title='', hue='aa', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'CA:C:N+1:CA+1', geoY='N:CA:C', title='', hue='pdbCode', palette='Set1', newData=True))
+
+            printList.append(que.GeoQuery(None, 'N:O', geoY='CB:O', title='', hue='dssp', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'N:O', geoY='CB:O', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(que.GeoQuery(None, 'N:O', geoY='CB:O', title='', hue='aa', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'N:O', geoY='CB:O', title='', hue='pdbCode', palette='Set1', newData=True))
+
+            printList.append(que.GeoQuery(None, 'N:CA:C:N+1', geoY='N:O', title='', hue='dssp', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA:C:N+1', geoY='N:O', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA:C:N+1', geoY='N:O', title='', hue='aa', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA:C:N+1', geoY='N:O', title='', hue='pdbCode', palette='Set1', newData=True))
+
+            printList.append(que.GeoQuery(None, 'N:CA:C:N+1', geoY='CB:O', title='', hue='dssp', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA:C:N+1', geoY='CB:O', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA:C:N+1', geoY='CB:O', title='', hue='aa', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA:C:N+1', geoY='CB:O', title='', hue='pdbCode', palette='Set1', newData=True))
+
+            printList.append(que.GeoQuery(None, 'N:CA:C:N+1', geoY='N:CA:C:O', title='', hue='dssp', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA:C:N+1', geoY='N:CA:C:O', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA:C:N+1', geoY='N:CA:C:O', title='', hue='aa', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA:C:N+1', geoY='N:CA:C:O', title='', hue='pdbCode', palette='Set1', newData=True))
+
+            printList.append(que.GeoQuery(None, 'N:CA:C:N+1', geoY='CA-1:CA:CA+1', title='', hue='dssp', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA:C:N+1', geoY='CA-1:CA:CA+1', title='', hue='2FoFc', palette='cubehelix_r',newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA:C:N+1', geoY='CA-1:CA:CA+1', title='', hue='aa', palette='Set1',newData=True))
+            printList.append(que.GeoQuery(None, 'N:CA:C:N+1', geoY='CA-1:CA:CA+1', title='', hue='pdbCode', palette='Set1',newData=True))
+
+            printList.append(que.GeoQuery(None, 'C-1:N:CA:C', geoY='C-1:C', title='', hue='dssp', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'C-1:N:CA:C', geoY='C-1:C', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(que.GeoQuery(None, 'C-1:N:CA:C', geoY='C-1:C', title='', hue='aa', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'C-1:N:CA:C', geoY='C-1:C', title='', hue='pdbCode', palette='Set1', newData=True))
+
+            printList.append(que.GeoQuery(None, 'C-1:N:CA:C', geoY='C-1:CB', title='', hue='dssp', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'C-1:N:CA:C', geoY='C-1:CB', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(que.GeoQuery(None, 'C-1:N:CA:C', geoY='C-1:CB', title='', hue='aa', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'C-1:N:CA:C', geoY='C-1:CB', title='', hue='pdbCode', palette='Set1', newData=True))
+
+            printList.append(que.GeoQuery(None, 'CA:C:N+1:CA+1', geoY='CA-1:C-1:N:CA', title='', hue='dssp', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'CA:C:N+1:CA+1', geoY='CA-1:C-1:N:CA', title='', hue='2FoFc', palette='cubehelix_r',newData=True))
+            printList.append(que.GeoQuery(None, 'CA:C:N+1:CA+1', geoY='CA-1:C-1:N:CA', title='', hue='aa', palette='Set1',newData=True))
+            printList.append(que.GeoQuery(None, 'CA:C:N+1:CA+1', geoY='CA-1:C-1:N:CA', title='', hue='pdbCode', palette='Set1',newData=True))
+
+            printList.append(que.GeoQuery(None, 'CA-2:CA-1:CA', geoY='CA:CA+1:CA+2', title='', hue='dssp', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'CA-2:CA-1:CA', geoY='CA:CA+1:CA+2', title='', hue='2FoFc', palette='cubehelix_r',newData=True))
+            printList.append(que.GeoQuery(None, 'CA-2:CA-1:CA', geoY='CA:CA+1:CA+2', title='', hue='aa', palette='Set1',newData=True))
+            printList.append(que.GeoQuery(None, 'CA-2:CA-1:CA', geoY='CA:CA+1:CA+2', title='', hue='pdbCode', palette='Set1',newData=True))
+
+            printList.append(que.GeoQuery(None, 'C-1:N:CA', geoY='CA:C:N+1', title='', hue='dssp', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'C-1:N:CA', geoY='CA:C:N+1', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(que.GeoQuery(None, 'C-1:N:CA', geoY='CA:C:N+1', title='', hue='aa', palette='Set1', newData=True))
+            printList.append(que.GeoQuery(None, 'C-1:N:CA', geoY='CA:C:N+1', title='', hue='pdbCode', palette='Set1', newData=True))
 
             self.printCsvToHtml(printList, self.pdbs, title, cols, printPath, fileName)
 
@@ -93,10 +151,10 @@ class GeoReport:
             title = 'Sp2 Planarity'
             cols = 4
             printList = []
-            printList.append(que.GeoQuery(atomData,'N+1:O:C:CA',title='Dihedral'))
-            printList.append(que.GeoQuery(atomData,'CA:C:O',title='CA:C:O'))
-            printList.append(que.GeoQuery(atomData,'O:C:N+1',title='O:C:N+1'))
-            printList.append(que.GeoQuery(atomData,'N+1:C:CA',title='N+1:C:CA'))
+            printList.append(que.GeoQuery(atomData,'N+1:O:C:CA',title='AbsVal Dihedral',hue='rid',operation='ABS'))
+            printList.append(que.GeoQuery(atomData,'CA:C:O',title='CA:C:O',hue='rid'))
+            printList.append(que.GeoQuery(atomData,'O:C:N+1',title='O:C:N+1',hue='rid'))
+            printList.append(que.GeoQuery(atomData,'N+1:C:CA',title='N+1:C:CA',hue='rid'))
 
             printList.append(que.GeoQuery(atomData, 'N+1:O:C:CA', geoY='CA:C:O',hue='dssp'))
             printList.append(que.GeoQuery(atomData, 'N+1:O:C:CA', geoY='O:C:N+1'))
@@ -109,7 +167,6 @@ class GeoReport:
             for apdb in self.pdbs:
                 print('\tPSU:', reportName, 'for', apdb.pdbCode)
                 atomData = apdb.dataFrame
-                atomData = atomData.sort_values(by='2FoFc', ascending=True)
                 title = 'General Data Report'
                 cols = 3
                 printList = []
@@ -246,6 +303,7 @@ class GeoReport:
                 splitList = alldata[splitKey].unique()
 
             for split in splitList:
+                geoqSplit = geoq
                 if count == 0:
                     html += '<tr>'
                 elif count % cols == 0:
@@ -256,19 +314,18 @@ class GeoReport:
                 if split != '':
                     data = alldata[alldata[splitKey] == split]
                     sptitle = title + ' ' + split
-                else:
-                    data = alldata
-                    sptitle = title
+                    geoqSplit.data = data
+                    geoqSplit.title = title + ' ' + split
 
                 if geoY == '': # then it is 1d
-                    html += self.oneHTMLHistogram(sptitle,data,geoX,width)
+                    html += self.oneHTMLHistogram(geoqSplit,width)
                 else:
                     hue = geoq.hue
                     palette = geoq.palette
                     centre = geoq.centre
                     vmin = geoq.vmin
                     vmax = geoq.vmax
-                    html += self.oneHTMLCorrelation(sptitle,data,geoX,geoY,hue,palette,centre,vmin,vmax,width)
+                    html += self.oneHTMLCorrelation(geoqSplit,width)
 
         html += '</tr></table><hr/><p>Produced by PsuGeometry, written by Rachel Alcraft </p></body>\n'
 
@@ -278,19 +335,55 @@ class GeoReport:
         print('PSU: saved file to',reportPath)
         f.close()
 
-    def oneHTMLCorrelation(self,title,data,geoX,geoY,hue,palette,centre,vmin,vmax,width):
-        html = '<td width=' + width + '%>' + self.createScatterPlot(title, geoX, geoY, hue, data, palette, centre,vmin,vmax) + '</td>\n'
+    def oneHTMLCorrelation(self,geoQ,width):
+        html = '<td width=' + width + '%>' + self.createScatterPlot(geoQ) + '</td>\n'
         return (html)
 
-    def oneHTMLHistogram(self,title,data,geoX,width):
-        html = '<td width=' + width + '%>'  + self.createHistogram(geoX, data, title) + '</td>\n'
+    def oneHTMLHistogram(self,geoQ,width):
+        html = '<td width=' + width + '%>'  + self.createHistogram(geoQ) + '</td>\n'
         return (html)
 
-    def createHistogram(self,xName, data, title):
+    def createHistogram(self,geoQ):
         fig, ax = plt.subplots()
+        if geoQ.newData:
+            calcList = [geoQ.geoX]
+            hueList = [geoQ.hue]
+            dfs = []
+            for apdb in self.pdbs:
+                data = apdb.getGeoemtryCsv(calcList, hueList)
+                dfs.append(data)
+            geoQ.data = pd.concat(dfs, ignore_index=True)
+
+        data = geoQ.data.sort_values(by=geoQ.geoX,ascending=True)
+        title = geoQ.title
+
+        if geoQ.operation == 'ABS':
+            data = data[data[geoQ.geoX] == abs(data[geoQ.geoX])]
+        elif geoQ.operation == 'SQUARE':
+            data = data[data[geoQ.geoX] == data[geoQ.geoX]**2]
+
+        firstVal = data.head(1)[geoQ.geoX].values[0]
+        lastVal = data.tail(1)[geoQ.geoX].values[0]
+        firstHue = data.head(1)[geoQ.hue].values[0]
+        lastHue = data.tail(1)[geoQ.hue].values[0]
+
+        try:
+            firstVal = round(firstVal, 2)
+            lastVal = round(lastVal,2)
+        except:
+            pass
+        try:
+            firstHue = round(firstHue, 2)
+            lastHue = round(lastHue,2)
+        except:
+            pass
+        title += '\nFirst:' + geoQ.hue + ' ' + str(firstHue) + '='  + str(firstVal)
+        title += '\nLast:' + geoQ.hue + ' ' + str(lastHue) + '='  + str(lastVal)
+
 
         # sns.distplot(data[xName], norm_hist=True, bins=50, kde=False)
-        plt.hist(data[xName], EdgeColor='k', bins=50)
+        plt.hist(data[geoQ.geoX], EdgeColor='k', bins=50)
+
         plt.title(title)
         img = io.BytesIO()
         fig.savefig(img, format='png', bbox_inches='tight')
@@ -299,7 +392,7 @@ class GeoReport:
         #html = '<img width=100% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
         html = '<p><img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
         plt.close('all')
-        dfdesc = data[xName].describe()
+        dfdesc = geoQ.data[geoQ.geoX].describe()
         rows = len(dfdesc.index)
         colsNames = list(dfdesc.index)
         html += "<table class='innertable'>\n"
@@ -321,39 +414,52 @@ class GeoReport:
 
         return html
 
-    def createScatterPlot(self,title, geoX, geoY, hue, data, palette, centre,vmin,vmax):
+    def createScatterPlot(self,geoQ):
+
+        if geoQ.newData:
+            calcList = [geoQ.geoX,geoQ.geoY]
+            hueList = [geoQ.hue]
+            dfs = []
+            for apdb in self.pdbs:
+                datatmp = apdb.getGeoemtryCsv(calcList, hueList)
+                dfs.append(datatmp)
+            geoQ.data = pd.concat(dfs, ignore_index=True)
+
         fig, ax = plt.subplots()
-        if centre:
-            data[hue + '2'] = data[hue]**2
-            data = data.sort_values(by=hue+'2', ascending=True)
-            maxh = max(data[hue].max(), -1 * data[hue].min())
+        if geoQ.centre:
+            geoQ.data[geoQ.hue + '2'] = geoQ.data[geoQ.hue]**2
+            data = geoQ.data.sort_values(by=geoQ.hue+'2', ascending=True)
+            maxh = max(data[geoQ.hue].max(), -1 * data[geoQ.hue].min())
             minh = maxh * -1
-            g = ax.scatter(data[geoX], data[geoY], c=data[hue], cmap=palette, vmin=minh, vmax=maxh)
+            g = ax.scatter(data[geoQ.geoX], data[geoQ.geoY], c=data[geoQ.hue], cmap=geoQ.palette, vmin=minh, vmax=maxh)
             fig.colorbar(g)
-            ax.set_xlabel(geoX)
-            ax.set_ylabel(geoY)
-        elif vmin < vmax:
-            data = data.sort_values(by=hue, ascending=True)
-            g = ax.scatter(data[geoX], data[geoY], c=data[hue], cmap=palette, vmin=vmin, vmax=vmax)
+            ax.set_xlabel(geoQ.geoX)
+            ax.set_ylabel(geoQ.geoY)
+        elif geoQ.vmin < geoQ.vmax:
+            data = geoQ.data.sort_values(by=geoQ.hue, ascending=True)
+            g = ax.scatter(data[geoQ.geoX], data[geoQ.geoY], c=data[geoQ.hue], cmap=geoQ.palette, vmin=geoQ.vmin, vmax=geoQ.vmax)
             fig.colorbar(g)
-            ax.set_xlabel(geoX)
-            ax.set_ylabel(geoY)
+            ax.set_xlabel(geoQ.geoX)
+            ax.set_ylabel(geoQ.geoY)
         else:
+
             lw = 0.5
-            if palette == 'gist_gray_r':
+            if geoQ.palette == 'gist_gray_r':
                 lw = 0 # this gives a crystollagraphic image look
 
-            if hue == 'aa':
+            if geoQ.hue == 'aa':
                 try:
-                    data = data.sort_values(by='2FoFc', ascending=True)
+                    geoQ.data = geoQ.data.sort_values(by='2FoFc', ascending=True)
                 except:
-                    data = data.sort_values(by=hue, ascending=True)
+                    geoQ.data = geoQ.data.sort_values(by=geoQ.hue, ascending=True)
             else:
-                data = data.sort_values(by=hue, ascending=True)
-            im = sns.scatterplot(x=geoX, y=geoY, hue=hue, data=data, alpha=0.65, palette=palette,edgecolor='aliceblue',linewidth=lw)
+                geoQ.data = geoQ.data.sort_values(by=geoQ.hue, ascending=True)
+
+            im = sns.scatterplot(x=geoQ.geoX, y=geoQ.geoY, hue=geoQ.hue, data=geoQ.data, alpha=0.65, palette=geoQ.palette,edgecolor='aliceblue',linewidth=lw)
             plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)  # Put the legend out of the figure
 
-        count = len(data.index)
+        count = len(geoQ.data.index)
+        title = geoQ.title
         if title == '':
             title += 'Count=' + str(count)
         else:
