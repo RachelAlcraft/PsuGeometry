@@ -18,6 +18,6 @@ for pdb in pdbList:
     #if geoPdb.atoms[0].values['resolution'] < 1.7:
     georep.printReport('Slow_DensityPeaksPerPdb', printPath, geoPdb.pdbCode + '_pkden')
     #else:
-    georep.printReport('Slow_DensityPointsPerPdb', printPath, geoPdb.pdbCode + '_poden')
+    #georep.printReport('Slow_DensityPointsPerPdb', printPath, geoPdb.pdbCode + '_poden')
     geoPdb = None
     geoRep = None

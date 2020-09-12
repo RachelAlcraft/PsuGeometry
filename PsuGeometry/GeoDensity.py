@@ -80,7 +80,7 @@ class GeoDensity:
             for j in range(0, b):
                 peakList = []
                 if allPoints:
-                    peakList = self.getRowPoints(matrix, maxMat, i, j, -1)
+                    peakList = self.getRowPoints(matrix, i, j, -1)
                 else:
                     peakList = self.getRowPeaks(matrix,i,j,-1)
                 for peak in peakList:
@@ -115,7 +115,8 @@ class GeoDensity:
         Gets the peaks for a row
         '''
         a,b,c = matrix.shape
-        maxMat = matrix.max()
+        #medMat = np.median(matrix)
+        medMat = matrix.max()
 
         divisor = 8
         if a < 120:
@@ -153,7 +154,7 @@ class GeoDensity:
                         goingUp = True
                     else:
                         if goingUp: # then we are now going back down
-                            if abs(lastCoordsVal[3]) > maxMat/divisor:
+                            if abs(lastCoordsVal[3]) > medMat/divisor:
                                 peakList.append(lastCoordsVal)
                             goingUp = False
 
@@ -162,19 +163,20 @@ class GeoDensity:
                     lastCoordsVal = i, j, k, val
         return (peakList)
 
-    def getRowPoints(self,matrix,maxMat,x,y,z):
+    def getRowPoints(self,matrix,x,y,z):
         '''
         Gets the peaks for a row
         '''
         a,b,c = matrix.shape
         maxMat = matrix.max()
-        divisor = 4
+        #medMat = np.median(matrix)
+        divisor = 10
         if a < 120:
             divisor = 8
         elif a < 150:
-            divisor = 7
+            divisor = 6
         elif a < 190:
-            divisor = 5
+            divisor = 4
         #print(a,b,c)
         xRange = range(x,x+1)
         yRange = range(y,y+1)
