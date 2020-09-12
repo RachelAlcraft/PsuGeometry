@@ -4,11 +4,11 @@ Author: Rachel Alcraft
 Date: 01/09/2020
 Description:
 Loads the matrices via the pdb_eda library and performs a simple normalisaiton (for the future make this configurable)
-!!! Currently not the interpolated density as this is just a simple use of the library
 '''
 import pdb_eda
 import numpy as np
 import pandas as pd
+import math
 
 
 class GeoDensity:
@@ -45,10 +45,14 @@ class GeoDensity:
             self.valid = False
 
     def getDensityXYZ(self,x,y,z): # this is not the intyerpolated density
-        tFoFc = self.analyser.densityObj.getPointDensityFromXyz([x,y,z])
+        tFoFcx = self.analyser.densityObj.getPointDensityFromXyz([x,y,z])
+        tFoFc = self.getInterpolatedDensity(x,y,z,False)
+        print(tFoFcx,tFoFc)
         tFoFc += self.translation
         tFoFc *= self.factor
-        FoFc = self.analyser.diffDensityObj.getPointDensityFromXyz([x, y, z])
+        FoFcx = self.analyser.diffDensityObj.getPointDensityFromXyz([x, y, z])
+        FoFc = self.getInterpolatedDensity(x, y, z, True)
+        print(FoFcx, FoFc)
         FoFc *= self.factor
         Fo = tFoFc - FoFc
         Fc = tFoFc - 2*FoFc
@@ -216,3 +220,89 @@ class GeoDensity:
 
 
         return (isPeak)
+
+    def getInterpolatedDensity(self,x,y,z,isDiff):
+        noninterp = self.analyser.densityObj.getPointDensityFromXyz([x, y, z])
+        nonc,nonr,nons = self.analyser.densityObj.header.xyz2crsCoord([x,y,z])
+        nininterpc = self.analyser.densityObj.getPointDensityFromCrs([nonc,nonr,nons])
+
+        matrix = self.analyser.densityObj
+        if isDiff:
+            matrix = self.analyser.diffDensityObj
+
+        c,r,s = self.Copy_xyz2crsCoord([x,y,z])
+        cl,cu = math.floor(c), math.ceil(c)
+        rl,ru = math.floor(r), math.ceil(r)
+        sl,su = math.floor(s), math.ceil(s)
+        points = []
+        A = matrix.getPointDensityFromCrs([cl,rl,sl])
+        B = matrix.getPointDensityFromCrs([cu,rl,sl])
+        C = matrix.getPointDensityFromCrs([cl,rl,su])
+        D = matrix.getPointDensityFromCrs([cu,rl,su])
+        E = matrix.getPointDensityFromCrs([cl,ru,sl])
+        F = matrix.getPointDensityFromCrs([cu,ru,sl])
+        G = matrix.getPointDensityFromCrs([cl,ru,su])
+        H = matrix.getPointDensityFromCrs([cu,ru,su])
+
+        points.append([[cl,rl,sl,A],[cu,rl,sl,B]])
+        points.append([[cl,rl,su,C],[cu,rl,su,D]])
+        points.append([[cl,ru,sl,E],[cu,ru,sl,F]])
+        points.append([[cl,ru,su,G],[cu,ru,su,H]])
+
+        interps = self.getInterpolatedDensityAndPoints(points,[c,r,s])
+        #print(c,r,s)
+        #print(interps)
+        #print(A,B,C,D,E,F,G,H)
+
+        return interps[3]
+
+    def Copy_xyz2crsCoord(self, xyzCoord):
+        """
+        Copied from the pdb_eda library and adapted to interpolate
+        Convert the xyz coordinates into crs coordinates.
+        :param xyzCoord: xyz coordinates.
+        :type xyzCoord: A :py:obj:`list` of :py:obj:`float`
+        :return: crs coordinates.
+        :rtype: A :py:obj:`list` of :py:obj:`int`.
+        """
+        if self.analyser.densityObj.header.alpha == self.analyser.densityObj.header.beta == self.analyser.densityObj.header.gamma == 90:
+            crsGridPos = [(((xyzCoord[i] - self.analyser.densityObj.header.origin[i]) / self.analyser.densityObj.header.gridLength[i])) for i in range(3)]
+        else:
+            fraction = np.dot(self.analyser.densityObj.header.deOrthoMat, xyzCoord)
+            crsGridPos = [((fraction[i] * self.analyser.densityObj.header.xyzInterval[i])) - self.analyser.densityObj.header.crsStart[self.analyser.densityObj.header.map2xyz[i]] for i in range(3)]
+        return [crsGridPos[self.analyser.densityObj.header.map2crs[i]] for i in range(3)]
+
+    def getInterpolatedDensityAndPoints(self,points,centre):
+        '''
+        points is a list of pairs, where each pair is the x,y,z followed by the value to interpolate
+        '''
+        if len(points) == 1: # end of the recursion, return
+            p1 = points[0][0]
+            p2 = points[0][1]
+            fr = self.getFraction(centre,p1,p2)
+            v = p1[3] + fr * (p2[3] - p1[3])
+            x = p1[0] + fr * (p2[0] - p1[0])
+            y = p1[1] + fr * (p2[1] - p1[1])
+            z = p1[2] + fr * (p2[2] - p1[2])
+            return ([x,y,z,v])
+        else:#split recursion down further
+            half = int(len(points)/2)
+            pointsA = points[:half]
+            pointsB = points[half:]
+            newA = self.getInterpolatedDensityAndPoints(pointsA,centre)
+            newB = self.getInterpolatedDensityAndPoints(pointsB,centre)
+            return self.getInterpolatedDensityAndPoints([[newA,newB]],centre)
+
+
+    def getFraction(self, centre, p1, p2):
+        # The angle beta is found from the cosine rule
+        # cos beta  equates x/a to (a^2 + c^2 - b^2) / 2ac
+        a = math.sqrt((centre[0] - p1[0]) ** 2 + (centre[1] - p1[1]) ** 2 + (centre[2] - p1[2]) ** 2)
+        b = math.sqrt((centre[0] - p2[0]) ** 2 + (centre[1] - p2[1]) ** 2 + (centre[2] - p2[2]) ** 2)
+        c = math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2 + (p1[2] - p2[2]) ** 2)
+        if c == 0:
+            fraction = 0
+        else:
+            x = (a ** 2 + c ** 2 - b ** 2) / (2 * c)
+            fraction = x / c
+        return (fraction)

@@ -15,14 +15,14 @@ pdbList = ['6jvv','6rr2','6E6O','6S2M','6shk','6fgz','6ctd','6fwf','6q53']
 #pdbList = ['4ZM7','4REK','4ZM7','5D8V','5NW3','5qkw','6jvv','6rr2','6E6O','6S2M','6shk','6fgz','6ctd','6fwf','6q53']
 ### split list in 2 for memory purposes
 
-#pdbList = ['6q53']
+#pdbList = ['6shk']
 pdbList = ['1ejg','6q53']
 
 for pdb in pdbList:
     pdb = pdb.lower()
     geoPdb = geop.GeoPdb(pdb, pdbDataPath, edDataPath)
     georep = geor.GeoReport([geoPdb])
-    if geoPdb.atoms[0].values['resolution'] < 1.9:
+    if geoPdb.atoms[0].values['resolution'] < 2:
         georep.printReport('Slow_DensityPeaksPerPdb', printPath, geoPdb.pdbCode + '_den')
     else:
         georep.printReport('Slow_DensityPointsPerPdb', printPath, geoPdb.pdbCode + '_den')
