@@ -33,25 +33,23 @@ class GeoPlot:
         if self.geoY == '':
             self.plot = 'histogram'
 
-    def getPlot(self,fig, ax):
-        if self.plot == 'histogram':
-            return self.plotHistogram(True,fig, ax)
-        elif self.plot == 'scatter':
-            return self.plotScatter(True,fig, ax)
-        elif self.plot == 'probability':
-            return self.plotProbability(True,fig, ax)
+    #def getPlot(self,fig, ax):
+    #    if self.plot == 'histogram':
+    #        return self.plotHistogram(True,fig, ax)
+    #    elif self.plot == 'scatter':
+    #        return self.plotScatter(True,fig, ax)
+    #    elif self.plot == 'probability':
+    #        return self.plotProbability(True,fig, ax)
 
     def plotToAxes(self,fig, ax):
         if self.plot == 'histogram':
-            return self.plotHistogram(False,fig, ax)
+            return self.plotHistogram(fig, ax)
         elif self.plot == 'scatter':
-            return self.plotScatter(False,fig, ax)
+            return self.plotScatter(fig, ax)
         elif self.plot == 'probability':
-            return self.plotProbability(False,fig, ax)
+            return self.plotProbability(fig, ax)
 
-    def plotHistogram(self,returnData,fig, ax):
-        #fig, ax = plt.subplots()
-
+    def plotHistogram(self,fig, ax):
         data = self.data.sort_values(by=self.geoX, ascending=True)
         title = self.title
 
@@ -82,37 +80,37 @@ class GeoPlot:
         plt.hist(data[self.geoX], EdgeColor='k', bins=50,color='tomato')
 
         plt.title(title)
-        if returnData:
-            img = io.BytesIO()
-            fig.savefig(img, format='png', bbox_inches='tight')
-            img.seek(0)
-            encoded = base64.b64encode(img.getvalue())
-            # html = '<img width=100% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
-            html = '<p><img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
-            plt.close('all')
-            dfdesc = self.data[self.geoX].describe()
-            rows = len(dfdesc.index)
-            colsNames = list(dfdesc.index)
-            html += "<table class='innertable'>\n"
-            html += "<tr>\n"
-            for r in range(0, rows):
-                html += "<td>" + str(colsNames[r]) + "</td>\n"
-            html += "</tr>\n"
-            html += "<tr>"
-            for r in range(0, rows):
-                html += "<td>"
-                try:
-                    html += str(round(dfdesc[r], 2))
-                except:
-                    html += str(dfdesc[r])
-                html += "</td>\n"
+        #if returnData:
+        #    img = io.BytesIO()
+        #    fig.savefig(img, format='png', bbox_inches='tight')
+        #    img.seek(0)
+        #    encoded = base64.b64encode(img.getvalue())
+        #    # html = '<img width=100% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
+        #    html = '<p><img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
+        #    plt.close('all')
+        dfdesc = self.data[self.geoX].describe()
+        rows = len(dfdesc.index)
+        colsNames = list(dfdesc.index)
+        html = "<table class='innertable'>\n"
+        html += "<tr>\n"
+        for r in range(0, rows):
+            html += "<td>" + str(colsNames[r]) + "</td>\n"
+        html += "</tr>\n"
+        html += "<tr>"
+        for r in range(0, rows):
+            html += "<td>"
+            try:
+                html += str(round(dfdesc[r], 2))
+            except:
+                html += str(dfdesc[r])
+            html += "</td>\n"
 
-            html += "</tr>\n"
-            html += "</table></p>\n"
+        html += "</tr>\n"
+        html += "</table></p>\n"
 
         return html
 
-    def plotScatter(self,returnData,fig, ax):
+    def plotScatter(self,fig, ax):
 
         #fig, ax = plt.subplots()
         if self.categorical or self.hue == 'dssp':
@@ -161,9 +159,9 @@ class GeoPlot:
             else:
                 self.data = self.data.sort_values(by=self.hue, ascending=True)
 
-            alpha=0.77
+            alpha=0.8
             if self.title=='Dummy':
-                alpha = 0.4
+                alpha = 0.3
 
             im = sns.scatterplot(x=self.geoX, y=self.geoY, hue=self.hue, data=self.data, alpha=alpha,
                                  palette=self.palette, edgecolor='aliceblue', linewidth=lw)
@@ -177,15 +175,16 @@ class GeoPlot:
             title += '\nCount=' + str(count)
 
         plt.title(title)
-        if returnData:
-            img = io.BytesIO()
-            fig.savefig(img, format='png', bbox_inches='tight')
-            img.seek(0)
-            encoded = base64.b64encode(img.getvalue())
-            # html = '<img width=100% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
-            html = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
-            plt.close('all')
-            return html
+        return ''
+        #if returnData:
+        #    img = io.BytesIO()
+        #    fig.savefig(img, format='png', bbox_inches='tight')
+        #    img.seek(0)
+        #    encoded = base64.b64encode(img.getvalue())
+        #    # html = '<img width=100% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
+        #    html = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
+        #    plt.close('all')
+        #    return html
 
     def getPlotImage(self,fig, ax):
         #fig, ax = plt.subplots()
@@ -193,6 +192,7 @@ class GeoPlot:
         fig.savefig(img, format='png', bbox_inches='tight')
         img.seek(0)
         encoded = base64.b64encode(img.getvalue())
+        plt.close('all')
         return encoded
 
     def getAxes(self):
@@ -202,7 +202,7 @@ class GeoPlot:
         yMax = max(self.data[self.geoY])
         return ([xMin,xMax,yMin,yMax])
 
-    def plotProbability(self,returnData,fig, ax):
+    def plotProbability(self,fig, ax):
 
         # These shold be settings
         contours = 12
@@ -253,16 +253,17 @@ class GeoPlot:
             title += '\nCount=' + str(count)
 
         plt.title(title)
+        return ''
 
-        if returnData:
-            img = io.BytesIO()
-            fig.savefig(img, format='png', bbox_inches='tight')
-            img.seek(0)
-            encoded = base64.b64encode(img.getvalue())
+        #if returnData:
+        #    img = io.BytesIO()
+        #    fig.savefig(img, format='png', bbox_inches='tight')
+        #    img.seek(0)
+        #    encoded = base64.b64encode(img.getvalue())
 
-            html = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
-            plt.close('all')
-            return html
+        #    html = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
+        #    plt.close('all')
+        #    return html
 
 
     def kde2D_scipy(self,bandwidth, axes, bins):

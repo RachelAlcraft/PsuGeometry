@@ -16,7 +16,7 @@ pdbList = ['6jvv','6rr2','6E6O','6S2M','6shk','6fgz','6ctd','6fwf','6q53']
 ### split list in 2 for memory purposes
 
 #pdbList = ['6shk']
-pdbList = ['1ejg','6q53']
+pdbList = ['2cnq']
 
 for pdb in pdbList:
     pdb = pdb.lower()

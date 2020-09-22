@@ -35,16 +35,16 @@ if not runIndividualReports:
 
     #georep.printReport('Sp2Planarity',printPath,geoName+ '_sp2')
     #georep.printReport('BackboneOutliers', printPath,geoName+ '_bbone')
-    georep.printReport('RachelsChoice', printPath,geoName + '_rae')
+    #georep.printReport('RachelsChoice', printPath,geoName + '_rae')
 
 else:
     for pdb in pdbList:
         pdb = pdb.lower()
         geoPdb = geop.GeoPdb(pdb, pdbDataPath, edDataPath)
         georep = geor.GeoReport([geoPdb])
-        #georep.printReport('Sp2Planarity',printPath,geoPdb.pdbCode + '_sp2')
+        georep.printReport('Sp2Planarity',printPath,geoPdb.pdbCode + '_sp2')
         #georep.printReport('BackboneOutliers', printPath,geoPdb.pdbCode + '_bbone')
-        georep.printReport('RachelsChoice', printPath,geoPdb.pdbCode + '_rae')
+        #georep.printReport('RachelsChoice', printPath,geoPdb.pdbCode + '_rae')
         #georep.printReport('DataPerPdb', printPath,geoPdb.pdbCode + '_data')
         geoPdb = None
         geoRep = None

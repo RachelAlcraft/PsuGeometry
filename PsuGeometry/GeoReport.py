@@ -14,8 +14,10 @@ import numpy as np
 
 class GeoReport:
 
-    def __init__(self,listPdbs):
+    def __init__(self,listPdbs,pdbDataPath='',edDataPath=''):
         self.pdbs = listPdbs
+        self.pdbDataPath = pdbDataPath
+        self.edDataPath = edDataPath
 
 
     def getGeoemtryCsv(self,calcList, hueList):
@@ -68,6 +70,7 @@ class GeoReport:
             self.printCsvToHtml(printList, self.pdbs, title, cols, printPath, fileName)
         elif reportName == 'RachelsChoice' or reportName == 'RachelsChoiceNonXRay' :
             atomData = self.getReportCsv(reportName)
+            # We want the dummy trace correlation plot so we can see if there are areas of interest
             title = "Rachel's Choice of Correlations"
             cols = 4
             printList = []
@@ -400,9 +403,10 @@ class GeoReport:
                 html = '<td width=' + width + '%>' + 'No Data:' + geoPl.geoX + ' ' + geoPl.geoY  + '</td>\n'
             else:
                 fig, ax = plt.subplots()
-                geoPl.plotToAxes(fig, ax)
+                ret = geoPl.plotToAxes(fig, ax)
                 encoded = geoPl.getPlotImage(fig, ax)
                 htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
+                htmlstring += ret
 
                 html = '<td width=' + width + '%>' + htmlstring + '</td>\n'
         except:
@@ -422,8 +426,8 @@ class GeoReport:
             if geoPlB.newData:
                 geoPlB.getNewData(self.pdbs)
 
-            geoPlA.plotToAxes(fig, ax)
-            geoPlB.plotToAxes(fig, ax)
+            retA = geoPlA.plotToAxes(fig, ax)
+            retB = geoPlB.plotToAxes(fig, ax)
             encoded = geoPlA.getPlotImage(fig, ax)
 
             htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
@@ -435,7 +439,6 @@ class GeoReport:
         except:
             html = '<td width=' + width + '%>' + 'Error:' + geoPlA.geoX + ' ' + geoPlA.geoY + '</td>\n'
 
-        plt.close('all')
         return (html)
 
 
