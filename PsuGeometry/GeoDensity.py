@@ -47,12 +47,12 @@ class GeoDensity:
     def getDensityXYZ(self,x,y,z): # this is not the intyerpolated density
         tFoFcx = self.analyser.densityObj.getPointDensityFromXyz([x,y,z])
         tFoFc = self.getInterpolatedDensity(x,y,z,False)
-        print(tFoFcx,tFoFc)
+        #print(tFoFcx,tFoFc)
         tFoFc += self.translation
         tFoFc *= self.factor
         FoFcx = self.analyser.diffDensityObj.getPointDensityFromXyz([x, y, z])
         FoFc = self.getInterpolatedDensity(x, y, z, True)
-        print(FoFcx, FoFc)
+        #print(FoFcx, FoFc)
         FoFc *= self.factor
         Fo = tFoFc - FoFc
         Fc = tFoFc - 2*FoFc
@@ -274,7 +274,8 @@ class GeoDensity:
 
     def getInterpolatedDensityAndPoints(self,points,centre):
         '''
-        points is a list of pairs, where each pair is the x,y,z followed by the value to interpolate
+        points is a list of pairs, where each pair is x,y,z followed by the value to interpolate
+        List must be 2^x long
         '''
         if len(points) == 1: # end of the recursion, return
             p1 = points[0][0]

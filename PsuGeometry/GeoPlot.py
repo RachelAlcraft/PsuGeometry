@@ -7,6 +7,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import io
 import base64
+import PIL
+
+from PsuGeometry import GeoReport as geor
+from PsuGeometry import GeoPdb as geop
+
 
 class GeoPlot:
     def __init__(self,data,geoX,geoY='',title='',hue='2FoFc',splitKey='',palette='viridis_r',
@@ -28,16 +33,24 @@ class GeoPlot:
         if self.geoY == '':
             self.plot = 'histogram'
 
-    def getPlot(self):
+    def getPlot(self,fig, ax):
         if self.plot == 'histogram':
-            return self.getHistogram()
+            return self.plotHistogram(True,fig, ax)
         elif self.plot == 'scatter':
-            return self.getScatter()
+            return self.plotScatter(True,fig, ax)
         elif self.plot == 'probability':
-            return self.getProbability()
+            return self.plotProbability(True,fig, ax)
 
-    def getHistogram(self):
-        fig, ax = plt.subplots()
+    def plotToAxes(self,fig, ax):
+        if self.plot == 'histogram':
+            return self.plotHistogram(False,fig, ax)
+        elif self.plot == 'scatter':
+            return self.plotScatter(False,fig, ax)
+        elif self.plot == 'probability':
+            return self.plotProbability(False,fig, ax)
+
+    def plotHistogram(self,returnData,fig, ax):
+        #fig, ax = plt.subplots()
 
         data = self.data.sort_values(by=self.geoX, ascending=True)
         title = self.title
@@ -69,38 +82,39 @@ class GeoPlot:
         plt.hist(data[self.geoX], EdgeColor='k', bins=50,color='tomato')
 
         plt.title(title)
-        img = io.BytesIO()
-        fig.savefig(img, format='png', bbox_inches='tight')
-        img.seek(0)
-        encoded = base64.b64encode(img.getvalue())
-        # html = '<img width=100% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
-        html = '<p><img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
-        plt.close('all')
-        dfdesc = self.data[self.geoX].describe()
-        rows = len(dfdesc.index)
-        colsNames = list(dfdesc.index)
-        html += "<table class='innertable'>\n"
-        html += "<tr>\n"
-        for r in range(0, rows):
-            html += "<td>" + str(colsNames[r]) + "</td>\n"
-        html += "</tr>\n"
-        html += "<tr>"
-        for r in range(0, rows):
-            html += "<td>"
-            try:
-                html += str(round(dfdesc[r], 2))
-            except:
-                html += str(dfdesc[r])
-            html += "</td>\n"
+        if returnData:
+            img = io.BytesIO()
+            fig.savefig(img, format='png', bbox_inches='tight')
+            img.seek(0)
+            encoded = base64.b64encode(img.getvalue())
+            # html = '<img width=100% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
+            html = '<p><img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
+            plt.close('all')
+            dfdesc = self.data[self.geoX].describe()
+            rows = len(dfdesc.index)
+            colsNames = list(dfdesc.index)
+            html += "<table class='innertable'>\n"
+            html += "<tr>\n"
+            for r in range(0, rows):
+                html += "<td>" + str(colsNames[r]) + "</td>\n"
+            html += "</tr>\n"
+            html += "<tr>"
+            for r in range(0, rows):
+                html += "<td>"
+                try:
+                    html += str(round(dfdesc[r], 2))
+                except:
+                    html += str(dfdesc[r])
+                html += "</td>\n"
 
-        html += "</tr>\n"
-        html += "</table></p>\n"
+            html += "</tr>\n"
+            html += "</table></p>\n"
 
         return html
 
-    def getScatter(self):
+    def plotScatter(self,returnData,fig, ax):
 
-        fig, ax = plt.subplots()
+        #fig, ax = plt.subplots()
         if self.categorical or self.hue == 'dssp':
             gradients = {}
             grads = self.data.sort_values(by=self.hue, ascending=True)[self.hue].unique()
@@ -147,7 +161,11 @@ class GeoPlot:
             else:
                 self.data = self.data.sort_values(by=self.hue, ascending=True)
 
-            im = sns.scatterplot(x=self.geoX, y=self.geoY, hue=self.hue, data=self.data, alpha=0.65,
+            alpha=0.77
+            if self.title=='Dummy':
+                alpha = 0.4
+
+            im = sns.scatterplot(x=self.geoX, y=self.geoY, hue=self.hue, data=self.data, alpha=alpha,
                                  palette=self.palette, edgecolor='aliceblue', linewidth=lw)
             plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)  # Put the legend out of the figure
 
@@ -159,17 +177,32 @@ class GeoPlot:
             title += '\nCount=' + str(count)
 
         plt.title(title)
+        if returnData:
+            img = io.BytesIO()
+            fig.savefig(img, format='png', bbox_inches='tight')
+            img.seek(0)
+            encoded = base64.b64encode(img.getvalue())
+            # html = '<img width=100% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
+            html = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
+            plt.close('all')
+            return html
+
+    def getPlotImage(self,fig, ax):
+        #fig, ax = plt.subplots()
         img = io.BytesIO()
         fig.savefig(img, format='png', bbox_inches='tight')
         img.seek(0)
         encoded = base64.b64encode(img.getvalue())
-        # html = '<img width=100% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
-        html = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
-        plt.close('all')
-        return html
+        return encoded
 
+    def getAxes(self):
+        xMin = min(self.data[self.geoX])
+        xMax = max(self.data[self.geoX])
+        yMin = min(self.data[self.geoY])
+        yMax = max(self.data[self.geoY])
+        return ([xMin,xMax,yMin,yMax])
 
-    def getProbability(self):
+    def plotProbability(self,returnData,fig, ax):
 
         # These shold be settings
         contours = 12
@@ -186,7 +219,8 @@ class GeoPlot:
             minY = min(self.data[self.geoY])
             maxY = max(self.data[self.geoY])
 
-        fig, ax = plt.subplots()
+
+        #fig, ax = plt.subplots()
         plt.axis([minX, maxX, minY, maxY])
         xgrid, ygrid, zgrid = self.kde2D_scipy(kde,[minX,maxX,minY,maxY], bins)
         ax.grid(True, which='major', axis='both', linestyle='-', color=(0.8, 0.8, 0.8), alpha=0.3)
@@ -219,14 +253,16 @@ class GeoPlot:
             title += '\nCount=' + str(count)
 
         plt.title(title)
-        img = io.BytesIO()
-        fig.savefig(img, format='png', bbox_inches='tight')
-        img.seek(0)
-        encoded = base64.b64encode(img.getvalue())
 
-        html = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
-        plt.close('all')
-        return html
+        if returnData:
+            img = io.BytesIO()
+            fig.savefig(img, format='png', bbox_inches='tight')
+            img.seek(0)
+            encoded = base64.b64encode(img.getvalue())
+
+            html = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
+            plt.close('all')
+            return html
 
 
     def kde2D_scipy(self,bandwidth, axes, bins):
@@ -258,11 +294,36 @@ class GeoPlot:
         else:
             return huelist
 
+    def getNewData(self,pdbs):
+        if self.plot == 'histogram':
+            calcList = [self.geoX]
+        else:
+            calcList = [self.geoX, self.geoY]
+        hueList = [self.hue]
+        dfs = []
+        for apdb in pdbs:
+            data = apdb.getGeoemtryCsv(calcList, hueList)
+            dfs.append(data)
+        self.data = pd.concat(dfs, ignore_index=True)
 
 
 
-
-
+class GeoOverlay:
+    def __init__(self,plotA, plotB, title,pdbDataPath='',edDataPath=''):
+        self.title = title
+        if title!='Dummy':
+            self.plotA = plotA
+            self.plotB = plotB
+        else:#In this case we have only the main plot, so we create the dummy plot
+            self.plotB = plotA
+            geoDummy = geop.GeoPdb('PSU', pdbDataPath, edDataPath)
+            dummyReport = geor.GeoReport([geoDummy])
+            geoList = []
+            geoList.append(self.plotB.geoX)
+            if self.plotB.geoY != '':
+                geoList.append(self.plotB.geoY)
+            dummydata = dummyReport.getGeoemtryCsv(geoList, ['pdbCode'])
+            self.plotA = GeoPlot(dummydata, self.plotB.geoX, geoY=self.plotB.geoY, title='Dummy', hue='pdbCode', palette='Greys')
 
 
 

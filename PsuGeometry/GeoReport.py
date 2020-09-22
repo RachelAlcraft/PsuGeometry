@@ -8,6 +8,8 @@ from PsuGeometry import GeoAtom as atm
 from PsuGeometry import GeoDensity as den
 from PsuGeometry import GeoCalcs as calcs
 from PsuGeometry import GeoPlot as geop
+from PIL import Image
+import numpy as np
 
 
 class GeoReport:
@@ -34,9 +36,11 @@ class GeoReport:
             calcList = ['N:CA:C','C:CA:CB','N:CA:CB']
         elif reportName == 'BackboneOutliers':
             calcList = ['C-1:N','N:CA','CA:C','C:N+1','C-1:N:CA','N:CA:C','CA:C:N+1']
+        elif reportName == 'MainChainHistograms':
+            calcList = ['C-1:N','N:CA','CA:C','C:N+1','C-1:N:CA','N:CA:C','CA:C:N+1','C:O','CA-1:CA','CA:CA+1','CA:C:N+1:CA+1','C-1:N:CA:C','N:CA:C:N+1']
         elif reportName == 'OmegaCis':
             calcList = ['CA-1:CA','CA:CA+1','CA:C:N+1:CA+1','CA-1:C-1:N:CA','N:CA:C']
-        elif reportName == 'RachelsChoice':
+        elif reportName == 'RachelsChoice' or reportName == 'RachelsChoiceNonXRay':
             calcList = ['N:O','CB:O','N:CA:C:N+1','C-1:N:CA:C']
         dfs = []
         for apdb in self.pdbs:
@@ -62,89 +66,117 @@ class GeoReport:
             printList.append(geop.GeoPlot(atomData, 'N:CA:C', geoY='CA:C:N+1', title='Angles'))
             printList.append(geop.GeoPlot(atomData, 'C-1:N:CA', geoY='CA:C:N+1', title='Angles'))
             self.printCsvToHtml(printList, self.pdbs, title, cols, printPath, fileName)
-        elif reportName == 'RachelsChoice':
+        elif reportName == 'RachelsChoice' or reportName == 'RachelsChoiceNonXRay' :
             atomData = self.getReportCsv(reportName)
             title = "Rachel's Choice of Correlations"
             cols = 4
             printList = []
 
+            densityHue = '2FoFc'
+            if reportName == 'RachelsChoiceNonXRay':
+                densityHue = 'bfactor'
+
             printList.append(geop.GeoPlot(None, 'C-1:N:CA:C', geoY='N:CA:C:N+1', title='', hue='dssp',palette='Set1',newData=True))
-            printList.append(geop.GeoPlot(None, 'C-1:N:CA:C', geoY='N:CA:C:N+1', title='', hue='2FoFc', palette='cubehelix_r',newData=True))
+            printList.append(geop.GeoPlot(None, 'C-1:N:CA:C', geoY='N:CA:C:N+1', title='', hue=densityHue, palette='cubehelix_r',newData=True))
             printList.append(geop.GeoPlot(None, 'C-1:N:CA:C', geoY='N:CA:C:N+1', title='', hue='aa', palette='nipy_spectral',newData=True,categorical=True))
             printList.append(geop.GeoPlot(None, 'C-1:N:CA:C', geoY='N:CA:C:N+1', title='', hue='pdbCode', palette='Set1',newData=True,categorical=True))
 
             printList.append(geop.GeoPlot(None, 'N:CA:CB:CG', geoY='CA:CB:CG:CD', title='', hue='dssp', palette='Set1', newData=True))
-            printList.append(geop.GeoPlot(None, 'N:CA:CB:CG', geoY='CA:CB:CG:CD', title='', hue='2FoFc', palette='cubehelix_r',newData=True))
+            printList.append(geop.GeoPlot(None, 'N:CA:CB:CG', geoY='CA:CB:CG:CD', title='', hue=densityHue, palette='cubehelix_r',newData=True))
             printList.append(geop.GeoPlot(None, 'N:CA:CB:CG', geoY='CA:CB:CG:CD', title='', hue='aa', palette='nipy_spectral',newData=True,categorical=True))
             printList.append(geop.GeoPlot(None, 'N:CA:CB:CG', geoY='CA:CB:CG:CD', title='', hue='pdbCode', palette='Set1',newData=True,categorical=True))
 
             printList.append(geop.GeoPlot(None, 'N:CA', geoY='CA:C', title='', hue='dssp', palette='Set1',newData=True))
-            printList.append(geop.GeoPlot(None, 'N:CA', geoY='CA:C', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(geop.GeoPlot(None, 'N:CA', geoY='CA:C', title='', hue=densityHue, palette='cubehelix_r', newData=True))
             printList.append(geop.GeoPlot(None, 'N:CA', geoY='CA:C', title='', hue='aa', palette='nipy_spectral', newData=True,categorical=True))
             printList.append(geop.GeoPlot(None, 'N:CA', geoY='CA:C', title='', hue='pdbCode', palette='Set1', newData=True,categorical=True))
 
             printList.append(geop.GeoPlot(None, 'CA:CA+1', geoY='CA-1:CA', title='', hue='dssp', palette='Set1', newData=True))
-            printList.append(geop.GeoPlot(None, 'CA:CA+1', geoY='CA-1:CA', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(geop.GeoPlot(None, 'CA:CA+1', geoY='CA-1:CA', title='', hue=densityHue, palette='cubehelix_r', newData=True))
             printList.append(geop.GeoPlot(None, 'CA:CA+1', geoY='CA-1:CA', title='', hue='aa', palette='nipy_spectral', newData=True,categorical=True))
             printList.append(geop.GeoPlot(None, 'CA:CA+1', geoY='CA-1:CA', title='', hue='pdbCode', palette='Set1', newData=True,categorical=True))
 
             printList.append(geop.GeoPlot(None, 'CA:C:N+1:CA+1', geoY='N:CA:C', title='', hue='dssp', palette='Set1', newData=True))
-            printList.append(geop.GeoPlot(None, 'CA:C:N+1:CA+1', geoY='N:CA:C', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(geop.GeoPlot(None, 'CA:C:N+1:CA+1', geoY='N:CA:C', title='', hue=densityHue, palette='cubehelix_r', newData=True))
             printList.append(geop.GeoPlot(None, 'CA:C:N+1:CA+1', geoY='N:CA:C', title='', hue='aa', palette='nipy_spectral', newData=True,categorical=True))
             printList.append(geop.GeoPlot(None, 'CA:C:N+1:CA+1', geoY='N:CA:C', title='', hue='pdbCode', palette='Set1', newData=True,categorical=True))
 
             printList.append(geop.GeoPlot(None, 'N:O', geoY='CB:O', title='', hue='dssp', palette='Set1', newData=True))
-            printList.append(geop.GeoPlot(None, 'N:O', geoY='CB:O', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(geop.GeoPlot(None, 'N:O', geoY='CB:O', title='', hue=densityHue, palette='cubehelix_r', newData=True))
             printList.append(geop.GeoPlot(None, 'N:O', geoY='CB:O', title='', hue='aa', palette='nipy_spectral', newData=True,categorical=True))
             printList.append(geop.GeoPlot(None, 'N:O', geoY='CB:O', title='', hue='pdbCode', palette='Set1', newData=True,categorical=True))
 
             printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='N:O', title='', hue='dssp', palette='Set1', newData=True))
-            printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='N:O', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='N:O', title='', hue=densityHue, palette='cubehelix_r', newData=True))
             printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='N:O', title='', hue='aa', palette='nipy_spectral', newData=True,categorical=True))
             printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='N:O', title='', hue='pdbCode', palette='Set1', newData=True,categorical=True))
 
             printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='CB:O', title='', hue='dssp', palette='Set1', newData=True))
-            printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='CB:O', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='CB:O', title='', hue=densityHue, palette='cubehelix_r', newData=True))
             printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='CB:O', title='', hue='aa', palette='nipy_spectral', newData=True,categorical=True))
             printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='CB:O', title='', hue='pdbCode', palette='Set1', newData=True,categorical=True))
 
             printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='N:CA:C:O', title='', hue='dssp', palette='Set1', newData=True))
-            printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='N:CA:C:O', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='N:CA:C:O', title='', hue=densityHue, palette='cubehelix_r', newData=True))
             printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='N:CA:C:O', title='', hue='aa', palette='nipy_spectral', newData=True,categorical=True))
             printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='N:CA:C:O', title='', hue='pdbCode', palette='Set1', newData=True,categorical=True))
 
             printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='CA-1:CA:CA+1', title='', hue='dssp', palette='Set1', newData=True))
-            printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='CA-1:CA:CA+1', title='', hue='2FoFc', palette='cubehelix_r',newData=True))
+            printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='CA-1:CA:CA+1', title='', hue=densityHue, palette='cubehelix_r',newData=True))
             printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='CA-1:CA:CA+1', title='', hue='aa', palette='nipy_spectral',newData=True,categorical=True))
             printList.append(geop.GeoPlot(None, 'N:CA:C:N+1', geoY='CA-1:CA:CA+1', title='', hue='pdbCode', palette='Set1',newData=True,categorical=True))
 
             printList.append(geop.GeoPlot(None, 'C-1:N:CA:C', geoY='C-1:C', title='', hue='dssp', palette='Set1', newData=True))
-            printList.append(geop.GeoPlot(None, 'C-1:N:CA:C', geoY='C-1:C', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(geop.GeoPlot(None, 'C-1:N:CA:C', geoY='C-1:C', title='', hue=densityHue, palette='cubehelix_r', newData=True))
             printList.append(geop.GeoPlot(None, 'C-1:N:CA:C', geoY='C-1:C', title='', hue='aa', palette='nipy_spectral', newData=True,categorical=True))
             printList.append(geop.GeoPlot(None, 'C-1:N:CA:C', geoY='C-1:C', title='', hue='pdbCode', palette='Set1', newData=True,categorical=True))
 
             printList.append(geop.GeoPlot(None, 'C-1:N:CA:C', geoY='C-1:CB', title='', hue='dssp', palette='Set1', newData=True))
-            printList.append(geop.GeoPlot(None, 'C-1:N:CA:C', geoY='C-1:CB', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(geop.GeoPlot(None, 'C-1:N:CA:C', geoY='C-1:CB', title='', hue=densityHue, palette='cubehelix_r', newData=True))
             printList.append(geop.GeoPlot(None, 'C-1:N:CA:C', geoY='C-1:CB', title='', hue='aa', palette='nipy_spectral', newData=True,categorical=True))
             printList.append(geop.GeoPlot(None, 'C-1:N:CA:C', geoY='C-1:CB', title='', hue='pdbCode', palette='Set1', newData=True,categorical=True))
 
             printList.append(geop.GeoPlot(None, 'CA:C:N+1:CA+1', geoY='CA-1:C-1:N:CA', title='', hue='dssp', palette='Set1', newData=True))
-            printList.append(geop.GeoPlot(None, 'CA:C:N+1:CA+1', geoY='CA-1:C-1:N:CA', title='', hue='2FoFc', palette='cubehelix_r',newData=True))
+            printList.append(geop.GeoPlot(None, 'CA:C:N+1:CA+1', geoY='CA-1:C-1:N:CA', title='', hue=densityHue, palette='cubehelix_r',newData=True))
             printList.append(geop.GeoPlot(None, 'CA:C:N+1:CA+1', geoY='CA-1:C-1:N:CA', title='', hue='aa', palette='nipy_spectral',newData=True,categorical=True))
             printList.append(geop.GeoPlot(None, 'CA:C:N+1:CA+1', geoY='CA-1:C-1:N:CA', title='', hue='pdbCode', palette='Set1',newData=True,categorical=True))
 
             printList.append(geop.GeoPlot(None, 'CA-2:CA-1:CA', geoY='CA:CA+1:CA+2', title='', hue='dssp', palette='Set1', newData=True))
-            printList.append(geop.GeoPlot(None, 'CA-2:CA-1:CA', geoY='CA:CA+1:CA+2', title='', hue='2FoFc', palette='cubehelix_r',newData=True))
+            printList.append(geop.GeoPlot(None, 'CA-2:CA-1:CA', geoY='CA:CA+1:CA+2', title='', hue=densityHue, palette='cubehelix_r',newData=True))
             printList.append(geop.GeoPlot(None, 'CA-2:CA-1:CA', geoY='CA:CA+1:CA+2', title='', hue='aa', palette='nipy_spectral',newData=True,categorical=True))
             printList.append(geop.GeoPlot(None, 'CA-2:CA-1:CA', geoY='CA:CA+1:CA+2', title='', hue='pdbCode', palette='Set1',newData=True,categorical=True))
 
             printList.append(geop.GeoPlot(None, 'C-1:N:CA', geoY='CA:C:N+1', title='', hue='dssp', palette='Set1', newData=True))
-            printList.append(geop.GeoPlot(None, 'C-1:N:CA', geoY='CA:C:N+1', title='', hue='2FoFc', palette='cubehelix_r', newData=True))
+            printList.append(geop.GeoPlot(None, 'C-1:N:CA', geoY='CA:C:N+1', title='', hue=densityHue, palette='cubehelix_r', newData=True))
             printList.append(geop.GeoPlot(None, 'C-1:N:CA', geoY='CA:C:N+1', title='', hue='aa', palette='nipy_spectral', newData=True,categorical=True))
             printList.append(geop.GeoPlot(None, 'C-1:N:CA', geoY='CA:C:N+1', title='', hue='pdbCode', palette='Set1', newData=True,categorical=True))
 
             self.printCsvToHtml(printList, self.pdbs, title, cols, printPath, fileName)
 
+        elif reportName == 'MainChainHistograms': # Sp2Planarity, DensityAtomCompare, OmegaCis
+            atomData = self.getReportCsv(reportName)
+            title = 'Sp2 Planarity'
+            cols = 3
+            printList = []
+
+            printList.append(geop.GeoPlot(atomData,'C-1:N',title='C-1:N',hue='rid'))
+            printList.append(geop.GeoPlot(atomData,'N:CA',title='O:C:N+1',hue='rid'))
+            printList.append(geop.GeoPlot(atomData,'CA:C',title='N+1:C:CA',hue='rid'))
+
+            printList.append(geop.GeoPlot(atomData, 'C:O', title='C:0', hue='rid'))
+            printList.append(geop.GeoPlot(atomData, 'CA-1:CA', title='CA-1:CA', hue='rid'))
+            printList.append(geop.GeoPlot(atomData, 'CA:CA+1', title='CA:CA+1', hue='rid'))
+
+            printList.append(geop.GeoPlot(atomData, 'C-1:N:CA', title='Tau-1', hue='rid'))
+            printList.append(geop.GeoPlot(atomData, 'N:CA:C', title='Tau', hue='rid'))
+            printList.append(geop.GeoPlot(atomData, 'CA:C:N+1', title='Tau+1', hue='rid'))
+
+
+            printList.append(geop.GeoPlot(atomData, 'C-1:N:CA:C', title='PHI', hue='rid'))
+            printList.append(geop.GeoPlot(atomData, 'N:CA:C:N+1', title='PSI', hue='rid'))
+            printList.append(geop.GeoPlot(atomData, 'CA:C:N+1:CA+1', title='AbsVal OMEGA', hue='rid', operation='ABS'))
+
+            self.printCsvToHtml(printList, self.pdbs, title, cols, printPath, fileName)
 
         elif reportName == 'Sp2Planarity': # Sp2Planarity, DensityAtomCompare, OmegaCis
             atomData = self.getReportCsv(reportName)
@@ -293,38 +325,47 @@ class GeoReport:
         html += '<table>\n'
         row = 1
         for geoPl in queryList:
+            if not type(geoPl) is geop.GeoOverlay:
+                #html += self.twoPlots(geoPl.plotA,geoPl.plotB,width)
 
-            title = geoPl.title
-            alldata = geoPl.data
-            geoX = geoPl.geoX
-            geoY = geoPl.geoY
-            splitKey = geoPl.splitKey
-            splitList = ['']
-            if splitKey != '':
-                splitList = alldata[splitKey].unique()
-
-            for split in splitList:
-                geoqSplit = geoPl
-                if count == 0:
-                    html += '<tr><td colspan=' + '"' + str(cols) + '"' + '>Row ' + str(row) + '</td></tr>\n'
-                    row += 1
-                    html += '<tr>'
-                elif count % cols == 0:
-                    html += '</tr>\n'
-                    html += '<tr><td colspan=' + '"' + str(cols) + '"' + '>Row ' + str(row) + '</td></tr>\n'
-                    row += 1
-                    html += '<tr>'
+                title = geoPl.title
+                alldata = geoPl.data
+                geoX = geoPl.geoX
+                geoY = geoPl.geoY
+                splitKey = geoPl.splitKey
+                splitList = ['']
+                if splitKey != '':
+                    splitList = alldata[splitKey].unique()
+            else:
+                splitList = ['']
 
 
-                count += 1
+            if True:
 
-                if split != '':
-                    data = alldata[alldata[splitKey] == split]
-                    geoqSplit.data = data
-                    geoqSplit.title = title + ' ' + split
+                for split in splitList:
+                    geoqSplit = geoPl
+                    if count == 0:
+                        html += '<tr><td colspan=' + '"' + str(cols) + '"' + '>Row ' + str(row) + '</td></tr>\n'
+                        row += 1
+                        html += '<tr>'
+                    elif count % cols == 0:
+                        html += '</tr>\n'
+                        html += '<tr><td colspan=' + '"' + str(cols) + '"' + '>Row ' + str(row) + '</td></tr>\n'
+                        row += 1
+                        html += '<tr>'
 
-                html += self.onePlot(geoqSplit,width)
 
+                    count += 1
+
+                    if split != '':
+                        data = alldata[alldata[splitKey] == split]
+                        geoqSplit.data = data
+                        geoqSplit.title = title + ' ' + split
+
+                    if type(geoqSplit) is geop.GeoOverlay:
+                        html += self.twoPlotsOverlay(geoPl.plotA,geoPl.plotB,width)
+                    else:
+                        html += self.onePlot(geoqSplit, width)
 
         html += '</tr></table><hr/><p>Produced by PsuGeometry, written by Rachel Alcraft </p></body>\n'
 
@@ -335,26 +376,66 @@ class GeoReport:
         f.close()
 
     def onePlot(self,geoPl,width):
-        if geoPl.newData:
-            if geoPl.plot == 'histogram':
+        try:
+            if geoPl.newData:
+                if geoPl.plot == 'histogram':
 
-                calcList = [geoPl.geoX]
-                hueList = [geoPl.hue]
-                dfs = []
-                for apdb in self.pdbs:
-                    data = apdb.getGeoemtryCsv(calcList, hueList)
-                    dfs.append(data)
-                geoPl.data = pd.concat(dfs, ignore_index=True)
+                    calcList = [geoPl.geoX]
+                    hueList = [geoPl.hue]
+                    dfs = []
+                    for apdb in self.pdbs:
+                        data = apdb.getGeoemtryCsv(calcList, hueList)
+                        dfs.append(data)
+                    geoPl.data = pd.concat(dfs, ignore_index=True)
+                else:
+                    calcList = [geoPl.geoX, geoPl.geoY]
+                    hueList = [geoPl.hue]
+                    dfs = []
+                    for apdb in self.pdbs:
+                        datatmp = apdb.getGeoemtryCsv(calcList, hueList)
+                        dfs.append(datatmp)
+                    geoPl.data = pd.concat(dfs, ignore_index=True)
+
+            if geoPl.data.empty:
+                html = '<td width=' + width + '%>' + 'No Data:' + geoPl.geoX + ' ' + geoPl.geoY  + '</td>\n'
             else:
-                calcList = [geoPl.geoX, geoPl.geoY]
-                hueList = [geoPl.hue]
-                dfs = []
-                for apdb in self.pdbs:
-                    datatmp = apdb.getGeoemtryCsv(calcList, hueList)
-                    dfs.append(datatmp)
-                geoPl.data = pd.concat(dfs, ignore_index=True)
+                fig, ax = plt.subplots()
+                geoPl.plotToAxes(fig, ax)
+                encoded = geoPl.getPlotImage(fig, ax)
+                htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
 
-        html = '<td width=' + width + '%>' + geoPl.getPlot() + '</td>\n'
+                html = '<td width=' + width + '%>' + htmlstring + '</td>\n'
+        except:
+            html = '<td width=' + width + '%>' + 'Error:' + geoPl.geoX + ' ' + geoPl.geoY + '</td>\n'
+
+        return (html)
+
+
+    def twoPlotsOverlay(self,geoPlA,geoPlB,width):
+        '''
+        https://stackoverflow.com/questions/6871201/plot-two-histograms-on-single-chart-with-matplotlib
+        '''
+        try:
+            fig, ax = plt.subplots()
+            if geoPlA.newData:
+                geoPlA.getNewData(self.pdbs)
+            if geoPlB.newData:
+                geoPlB.getNewData(self.pdbs)
+
+            geoPlA.plotToAxes(fig, ax)
+            geoPlB.plotToAxes(fig, ax)
+            encoded = geoPlA.getPlotImage(fig, ax)
+
+            htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
+
+            if geoPlA.data.empty:
+                html = '<td width=' + width + '%>' + 'No Data:' + geoPlA.geoX + ' ' + geoPlA.geoY  + '</td>\n'
+            else:
+                html = '<td width=' + width + '%>' + htmlstring + '</td>\n'
+        except:
+            html = '<td width=' + width + '%>' + 'Error:' + geoPlA.geoX + ' ' + geoPlA.geoY + '</td>\n'
+
+        plt.close('all')
         return (html)
 
 
