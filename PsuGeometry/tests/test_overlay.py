@@ -12,7 +12,7 @@ pdbList = ['5xsg','6j60','6uos','6kj2','6bzm','6m9j','6cf4','6axz'] # high res c
 #pdbList = ['2chh','2cnq','2ggc','3ccd','3rwn']
 
 # Create the dummy report object
-geoDummy = geop.GeoPdb('PSU', pdbDataPath,edDataPath)
+geoDummy = geop.GeoPdb('ghost', pdbDataPath,edDataPath)
 dummyReport = geor.GeoReport([geoDummy])
 
 #Create the main report object
@@ -33,14 +33,15 @@ dummydata = dummyReport.getGeoemtryCsv(geoList, hueList)
 
 #Create the geoplots
 geoData = geopl.GeoPlot(data,'N:O',geoY='CB:O',title='Main',hue='pdbCode',palette='gist_ncar')
-geoDummy = geopl.GeoPlot(dummydata,'N:O',geoY='CB:O',title='Dummy',hue='pdbCode',palette='Greys')
-#geoOverlay = geopl.GeoOverlay(geoDummy,geoData,title='Overlay')
-geoOverlay = geopl.GeoOverlay(geoData,'',title='Dummy',pdbDataPath=pdbDataPath,edDataPath=edDataPath)
+geoDummy = geopl.GeoPlot(dummydata,'N:O',geoY='CB:O',title='ghost',hue='pdbCode',palette='Greys')
+geoOverlay = geopl.GeoOverlay(geoDummy,geoData,title='Overlay')
+geoOverlay2 = geopl.GeoOverlay(geoData,'',title='ghost',pdbDataPath=pdbDataPath,edDataPath=edDataPath)
 
 printList = []
 printList.append(geoData)
 printList.append(geoDummy)
 printList.append(geoOverlay)
+printList.append(geoOverlay2)
 
 # And finally create the reort with a file name of choice
 georep.printCsvToHtml(printList,georep.pdbs,'Testing the overlay',2,printPath,'overlay')

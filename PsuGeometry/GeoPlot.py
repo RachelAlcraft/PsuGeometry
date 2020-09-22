@@ -312,19 +312,19 @@ class GeoPlot:
 class GeoOverlay:
     def __init__(self,plotA, plotB, title,pdbDataPath='',edDataPath=''):
         self.title = title
-        if title!='Dummy':
+        if title!='ghost':
             self.plotA = plotA
             self.plotB = plotB
         else:#In this case we have only the main plot, so we create the dummy plot
             self.plotB = plotA
-            geoDummy = geop.GeoPdb('PSU', pdbDataPath, edDataPath)
+            geoDummy = geop.GeoPdb('ghost', pdbDataPath, edDataPath)
             dummyReport = geor.GeoReport([geoDummy])
             geoList = []
             geoList.append(self.plotB.geoX)
             if self.plotB.geoY != '':
                 geoList.append(self.plotB.geoY)
             dummydata = dummyReport.getGeoemtryCsv(geoList, ['pdbCode'])
-            self.plotA = GeoPlot(dummydata, self.plotB.geoX, geoY=self.plotB.geoY, title='Dummy', hue='pdbCode', palette='Greys')
+            self.plotA = GeoPlot(dummydata, self.plotB.geoX, geoY=self.plotB.geoY, title='ghost', hue='pdbCode', palette='Greys')
 
 
 

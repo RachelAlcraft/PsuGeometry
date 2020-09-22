@@ -380,6 +380,7 @@ class GeoReport:
 
     def onePlot(self,geoPl,width):
         try:
+        #if True:
             if geoPl.newData:
                 if geoPl.plot == 'histogram':
 
@@ -419,7 +420,8 @@ class GeoReport:
         '''
         https://stackoverflow.com/questions/6871201/plot-two-histograms-on-single-chart-with-matplotlib
         '''
-        try:
+        #try:
+        if True:
             fig, ax = plt.subplots()
             if geoPlA.newData:
                 geoPlA.getNewData(self.pdbs)
@@ -436,8 +438,8 @@ class GeoReport:
                 html = '<td width=' + width + '%>' + 'No Data:' + geoPlA.geoX + ' ' + geoPlA.geoY  + '</td>\n'
             else:
                 html = '<td width=' + width + '%>' + htmlstring + '</td>\n'
-        except:
-            html = '<td width=' + width + '%>' + 'Error:' + geoPlA.geoX + ' ' + geoPlA.geoY + '</td>\n'
+        #except:
+        #    html = '<td width=' + width + '%>' + 'Error:' + geoPlA.geoX + ' ' + geoPlA.geoY + '</td>\n'
 
         return (html)
 

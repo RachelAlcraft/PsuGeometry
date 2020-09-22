@@ -22,9 +22,9 @@ class GeoPdb:
         self.geoDen = den.GeoDensity(pdbCode,'fifty',pdbDataPath,edDataPath)
         self.hasDensity = self.geoDen.valid
         self.dataFrame = None
-        self.dummy = False
-        if self.pdbCode == 'psu':
-            self.dummy = True
+        self.ghost = False
+        if self.pdbCode == 'ghost':
+            self.ghost = True
             self.pdbCode =  '2q1j'
 
         if self.__gatherAtoms():
@@ -40,8 +40,8 @@ class GeoPdb:
                                                atom.values['chain'], atom.values['rid'], atom.values['dssp'], atom.values['aa'],
                                                atom.values['atom'], atom.values['atomNo'], atom.values['electrons'], atom.values['element'],atom.values['x'], atom.values['y'], atom.values['z'], atom.values['bfactor'], atom.values['occupant'],atom.values['occupancy'],
                                                atom.values['2FoFc'], atom.values['FoFc'], atom.values['Fo'], atom.values['Fc'])  # switching ijk to crs
-        if self.dummy == True:
-            self.pdbCode = 'psu'
+        if self.ghost == True:
+            self.pdbCode = 'ghost'
 
     #########################################################################################################################
     ## PRIVATE FUNCTIONS FOR THE CLASS
