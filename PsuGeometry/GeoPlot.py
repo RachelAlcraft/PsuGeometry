@@ -77,7 +77,12 @@ class GeoPlot:
         title += '\nLast:' + self.hue + ' ' + str(lastHue) + '=' + str(lastVal)
 
         # sns.distplot(data[xName], norm_hist=True, bins=50, kde=False)
-        plt.hist(data[self.geoX], EdgeColor='k', bins=50,color='tomato')
+        histCol = 'tomato'
+        alpha=1
+        if self.title == 'ghost':
+            histCol = 'gainsboro'
+            alpha=0.5
+        plt.hist(data[self.geoX], EdgeColor='k', bins=50,color=histCol,alpha=alpha)
 
         plt.title(title)
         #if returnData:
@@ -88,27 +93,30 @@ class GeoPlot:
         #    # html = '<img width=100% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
         #    html = '<p><img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
         #    plt.close('all')
-        dfdesc = self.data[self.geoX].describe()
-        rows = len(dfdesc.index)
-        colsNames = list(dfdesc.index)
-        html = "<table class='innertable'>\n"
-        html += "<tr>\n"
-        for r in range(0, rows):
-            html += "<td>" + str(colsNames[r]) + "</td>\n"
-        html += "</tr>\n"
-        html += "<tr>"
-        for r in range(0, rows):
-            html += "<td>"
-            try:
-                html += str(round(dfdesc[r], 2))
-            except:
-                html += str(dfdesc[r])
-            html += "</td>\n"
+        if self.title != 'ghost':
+            dfdesc = self.data[self.geoX].describe()
+            rows = len(dfdesc.index)
+            colsNames = list(dfdesc.index)
+            html = "<table class='innertable'>\n"
+            html += "<tr>\n"
+            for r in range(0, rows):
+                html += "<td>" + str(colsNames[r]) + "</td>\n"
+            html += "</tr>\n"
+            html += "<tr>"
+            for r in range(0, rows):
+                html += "<td>"
+                try:
+                    html += str(round(dfdesc[r], 2))
+                except:
+                    html += str(dfdesc[r])
+                html += "</td>\n"
 
-        html += "</tr>\n"
-        html += "</table></p>\n"
+            html += "</tr>\n"
+            html += "</table></p>\n"
 
-        return html
+            return html
+        else:
+            return ''
 
     def plotScatter(self,fig, ax):
 
@@ -160,8 +168,8 @@ class GeoPlot:
                 self.data = self.data.sort_values(by=self.hue, ascending=True)
 
             alpha=0.8
-            if self.title=='Dummy':
-                alpha = 0.3
+            if self.title=='ghost':
+                alpha = 0.4
 
             im = sns.scatterplot(x=self.geoX, y=self.geoY, hue=self.hue, data=self.data, alpha=alpha,
                                  palette=self.palette, edgecolor='aliceblue', linewidth=lw)
@@ -317,14 +325,15 @@ class GeoOverlay:
             self.plotB = plotB
         else:#In this case we have only the main plot, so we create the dummy plot
             self.plotB = plotA
-            geoDummy = geop.GeoPdb('ghost', pdbDataPath, edDataPath)
-            dummyReport = geor.GeoReport([geoDummy])
+            geoPdbs = geop.GeoPdbs(pdbDataPath, edDataPath)
+            geoGhost = geoPdbs.getPdb('ghost')
+            ghostReport = geor.GeoReport([geoGhost])
             geoList = []
             geoList.append(self.plotB.geoX)
             if self.plotB.geoY != '':
                 geoList.append(self.plotB.geoY)
-            dummydata = dummyReport.getGeoemtryCsv(geoList, ['pdbCode'])
-            self.plotA = GeoPlot(dummydata, self.plotB.geoX, geoY=self.plotB.geoY, title='ghost', hue='pdbCode', palette='Greys')
+            ghostdata = ghostReport.getGeoemtryCsv(geoList, ['pdbCode'])
+            self.plotA = GeoPlot(ghostdata, self.plotB.geoX, geoY=self.plotB.geoY, title='ghost', hue='pdbCode', palette='Greys')
 
 
 

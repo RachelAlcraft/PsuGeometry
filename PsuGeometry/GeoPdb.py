@@ -8,40 +8,83 @@ from PsuGeometry import GeoAtom as atm
 from PsuGeometry import GeoDensity as den
 from PsuGeometry import GeoCalcs as calcs
 
+# global store of pdb structures for reuse in memory
+pdbs = {}
+
+
+'''
+singleton object to manage only loading pdbs once
+https://python-3-patterns-idioms-test.readthedocs.io/en/latest/Singleton.html
+'''
+class GeoPdbs:
+    class __GeoPdbs:
+        def __init__(self,pdbDirectory,edDirectory):
+            self.pdbs = {}
+            self.pdbDirectory = pdbDirectory
+            self.edDirectory = edDirectory
+        def __getPdb__(self,pdbCode):
+            return self.pdbs[pdbCode]
+        def __existsPdb__(self,pdbCode):
+            return pdbCode in self.pdbs
+        def __addPdb__(self,pdbCode,pdb):
+            self.pdbs[pdbCode] = pdb
+    instance=None
+    def __init__(self,pdbDirectory,edDirectory):
+        if not GeoPdbs.instance:
+            GeoPdbs.instance = GeoPdbs.__GeoPdbs(pdbDirectory,edDirectory)
+        else:
+            GeoPdbs.instance.pdbDirectory = pdbDirectory
+            GeoPdbs.instance.edDirectory = edDirectory
+
+    def getPdb(self, pdbCode):
+        if self.instance.__existsPdb__(pdbCode):
+            return self.instance.__getPdb__(pdbCode)
+        else:
+            gp = GeoPdb(pdbCode,self.instance.pdbDirectory,self.instance.edDirectory)
+            self.instance.__addPdb__(pdbCode,gp)
+            return gp
+
+
+
 
 class GeoPdb:
     def __init__(self,pdbCode,pdbDataPath,edDataPath):
         pdbCode = pdbCode.lower()
         print('PSU: init',pdbCode)
-        self.pdbCode = pdbCode
-        self.pdbDataPath= pdbDataPath
-        self.hasDensity = False
-        self.hasDSSP = False
-        self.hasPDB = False
-        self.atoms = []
-        self.geoDen = den.GeoDensity(pdbCode,'fifty',pdbDataPath,edDataPath)
-        self.hasDensity = self.geoDen.valid
-        self.dataFrame = None
-        self.ghost = False
-        if self.pdbCode == 'ghost':
-            self.ghost = True
-            self.pdbCode =  '2q1j'
+        if pdbCode in pdbs:
+            self = pdbs[pdbCode]
+            print(self.pdbCode)
+        else:
+            self.pdbCode = pdbCode
+            self.pdbDataPath= pdbDataPath
+            self.hasDensity = False
+            self.hasDSSP = False
+            self.hasPDB = False
+            self.atoms = []
+            self.geoDen = den.GeoDensity(pdbCode,'fifty',pdbDataPath,edDataPath)
+            self.hasDensity = self.geoDen.valid
+            self.dataFrame = None
+            self.ghost = False
+            if self.pdbCode == 'ghost':
+                self.ghost = True
+                self.pdbCode =  '2q1j'
 
-        if self.__gatherAtoms():
-            self.__applyDssp()
-            #print("Gathered atoms")
-            self.dataFrame = pd.DataFrame(columns=('pdbCode', 'resolution',
+            if self.__gatherAtoms():
+                self.__applyDssp()
+                #print("Gathered atoms")
+                self.dataFrame = pd.DataFrame(columns=('pdbCode', 'resolution',
                                                   'chain', 'rid', 'dssp', 'aa',
                                                   'atom', 'atomNo', 'electrons','element', 'x', 'y', 'z','bfactor','occupant', 'occupancy',
                                                   '2FoFc', 'FoFc', 'Fo', 'Fc'))
-            for atom in self.atoms:
-                nextrow = len(self.dataFrame)
-                self.dataFrame.loc[nextrow] = (atom.values['pdbCode'], atom.values['resolution'],
+                for atom in self.atoms:
+                    nextrow = len(self.dataFrame)
+                    self.dataFrame.loc[nextrow] = (atom.values['pdbCode'], atom.values['resolution'],
                                                atom.values['chain'], atom.values['rid'], atom.values['dssp'], atom.values['aa'],
                                                atom.values['atom'], atom.values['atomNo'], atom.values['electrons'], atom.values['element'],atom.values['x'], atom.values['y'], atom.values['z'], atom.values['bfactor'], atom.values['occupant'],atom.values['occupancy'],
                                                atom.values['2FoFc'], atom.values['FoFc'], atom.values['Fo'], atom.values['Fc'])  # switching ijk to crs
-        if self.ghost == True:
-            self.pdbCode = 'ghost'
+            if self.ghost == True:
+                self.pdbCode = 'ghost'
+            pdbs[self.pdbCode] = self
 
     #########################################################################################################################
     ## PRIVATE FUNCTIONS FOR THE CLASS

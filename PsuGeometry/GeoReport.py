@@ -433,6 +433,7 @@ class GeoReport:
             encoded = geoPlA.getPlotImage(fig, ax)
 
             htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
+            htmlstring += retA + retB
 
             if geoPlA.data.empty:
                 html = '<td width=' + width + '%>' + 'No Data:' + geoPlA.geoX + ' ' + geoPlA.geoY  + '</td>\n'
