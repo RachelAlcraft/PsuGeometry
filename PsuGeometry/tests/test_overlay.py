@@ -15,6 +15,10 @@ pdbList = ['5xsg','6j60','6uos','6kj2','6bzm','6m9j','6cf4','6axz'] # high res c
 geoDummy = geop.GeoPdb('ghost', pdbDataPath,edDataPath)
 dummyReport = geor.GeoReport([geoDummy])
 
+'''
+Currently deprecated as I have added the isGhost which is the only use of overlay
+'''
+
 #Create the main report object
 geoList = []
 for pdb in pdbList:

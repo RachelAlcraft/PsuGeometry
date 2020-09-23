@@ -8,17 +8,56 @@ from PsuGeometry import GeoAtom as atm
 from PsuGeometry import GeoDensity as den
 from PsuGeometry import GeoCalcs as calcs
 from PsuGeometry import GeoPlot as geop
+from PsuGeometry import GeoPdb as geopdb
 from PIL import Image
 import numpy as np
 
 
 class GeoReport:
 
-    def __init__(self,listPdbs,pdbDataPath='',edDataPath=''):
-        self.pdbs = listPdbs
+    def __init__(self,listPdbs,pdbDataPath,edDataPath,outDataPath):
+        self.pdbs = []
         self.pdbDataPath = pdbDataPath
         self.edDataPath = edDataPath
+        self.outDataPath = outDataPath
+        pdbmanager = geopdb.GeoPdbs(pdbDataPath,edDataPath)
+        for pdbCode in listPdbs:
+            self.pdbs.append(pdbmanager.getPdb(pdbCode))
+        self.plots = []
 
+    def addHistogram(self,geoX='',data=None,title='',ghost=False,operation='',splitKey='',hue=''):
+        isNew = False
+        if data is None:
+            isNew=True
+        if hue=='':
+            hue='pdbCode'
+        gp = geop.GeoPlot(data,geoX,geoY='',title=title,newData=isNew,operation=operation,splitKey=splitKey,plot='histogram',hue=hue)
+        if not ghost:
+            self.plots.append(gp)
+        else:
+            self.plots.append(geop.GeoOverlay(gp,'',title='ghost', pdbDataPath=self.pdbDataPath, edDataPath=self.edDataPath))
+
+    def addScatter(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',centre=False,vmin=0,vmax=0,categorical=False):
+        isNew = False
+        if data is None:
+            isNew = True
+        gp = geop.GeoPlot(data, geoX, geoY=geoY, title=title, newData=isNew, operation=operation,splitKey=splitKey,hue=hue,palette=palette,centre=centre,vmin=vmin,vmax=vmax,categorical=categorical,plot='scatter')
+        if not ghost:
+            self.plots.append(gp)
+        else:
+            self.plots.append(
+                geop.GeoOverlay(gp, '', title='ghost', pdbDataPath=self.pdbDataPath, edDataPath=self.edDataPath))
+
+    def addProbability(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',centre=False,vmin=0,vmax=0,categorical=False):
+        isNew = False
+        if data is None:
+            isNew = True
+        gp = geop.GeoPlot(data, geoX, geoY=geoY, title=title, newData=isNew, operation=operation,splitKey=splitKey,hue=hue,palette=palette,centre=centre,vmin=vmin,vmax=vmax,categorical=categorical,plot='probability')
+        if not ghost:
+            self.plots.append(gp)
+        else:
+            self.plots.append(
+                geop.GeoOverlay(gp, '', title='ghost', pdbDataPath=self.pdbDataPath, edDataPath=self.edDataPath))
 
     def getGeoemtryCsv(self,calcList, hueList):
         dfs = []
@@ -67,7 +106,7 @@ class GeoReport:
             printList.append(geop.GeoPlot(atomData, 'C-1:N:CA', geoY='N:CA:C', title='Angles'))
             printList.append(geop.GeoPlot(atomData, 'N:CA:C', geoY='CA:C:N+1', title='Angles'))
             printList.append(geop.GeoPlot(atomData, 'C-1:N:CA', geoY='CA:C:N+1', title='Angles'))
-            self.printCsvToHtml(printList, self.pdbs, title, cols, printPath, fileName)
+            self.printToHtml(printList, self.pdbs, title, cols, printPath, fileName)
         elif reportName == 'RachelsChoice' or reportName == 'RachelsChoiceNonXRay' :
             atomData = self.getReportCsv(reportName)
             # We want the dummy trace correlation plot so we can see if there are areas of interest
@@ -154,7 +193,7 @@ class GeoReport:
             printList.append(geop.GeoPlot(None, 'C-1:N:CA', geoY='CA:C:N+1', title='', hue='aa', palette='nipy_spectral', newData=True,categorical=True))
             printList.append(geop.GeoPlot(None, 'C-1:N:CA', geoY='CA:C:N+1', title='', hue='pdbCode', palette='Set1', newData=True,categorical=True))
 
-            self.printCsvToHtml(printList, self.pdbs, title, cols, printPath, fileName)
+            self.printToHtml(printList, self.pdbs, title, cols, printPath, fileName)
 
         elif reportName == 'MainChainHistograms': # Sp2Planarity, DensityAtomCompare, OmegaCis
             atomData = self.getReportCsv(reportName)
@@ -179,7 +218,7 @@ class GeoReport:
             printList.append(geop.GeoPlot(atomData, 'N:CA:C:N+1', title='PSI', hue='rid'))
             printList.append(geop.GeoPlot(atomData, 'CA:C:N+1:CA+1', title='AbsVal OMEGA', hue='rid', operation='ABS'))
 
-            self.printCsvToHtml(printList, self.pdbs, title, cols, printPath, fileName)
+            self.printToHtml(printList, self.pdbs, title, cols, printPath, fileName)
 
         elif reportName == 'Sp2Planarity': # Sp2Planarity, DensityAtomCompare, OmegaCis
             atomData = self.getReportCsv(reportName)
@@ -196,7 +235,7 @@ class GeoReport:
             printList.append(geop.GeoPlot(atomData, 'N+1:O:C:CA', geoY='N+1:C:CA',hue='bfactor'))
             printList.append(geop.GeoPlot(atomData, 'N+1:C:CA', geoY='O:C:N+1',hue='FoFc', palette='Spectral',centre=True))
 
-            self.printCsvToHtml(printList, self.pdbs, title, cols, printPath, fileName)
+            self.printToHtml(printList, self.pdbs, title, cols, printPath, fileName)
 
         elif reportName == 'DataPerPdb':
             for apdb in self.pdbs:
@@ -204,17 +243,16 @@ class GeoReport:
                 atomData = apdb.dataFrame
                 title = 'General Data Report'
                 cols = 3
-                printList = []
-                printList.append(geop.GeoPlot(atomData, 'atomNo', geoY='aa', hue='aa', categorical=True,palette='nipy_spectral'))
-                printList.append(geop.GeoPlot(atomData, 'atomNo', geoY='dssp',hue= 'aa',categorical=True,palette='nipy_spectral'))
-                printList.append(geop.GeoPlot(atomData, '2FoFc', geoY='bfactor',hue= 'element',palette='jet',categorical=True))
-                printList.append(geop.GeoPlot(atomData, 'atomNo', geoY='bfactor',hue= 'element',palette='jet',categorical=True))
-                printList.append(geop.GeoPlot(atomData, 'atomNo', geoY='2FoFc',hue='element',palette='jet',categorical=True))
-                printList.append(geop.GeoPlot(atomData, 'atomNo', geoY='FoFc',hue='element',palette='jet',categorical=True))
-                printList.append(geop.GeoPlot(atomData, 'x', geoY='y',hue='atomNo', palette='plasma_r'))
-                printList.append(geop.GeoPlot(atomData, 'y', geoY='z',hue='atomNo', palette='plasma_r'))
-                printList.append(geop.GeoPlot(atomData, 'z', geoY='x',hue='atomNo', palette='plasma_r'))
-                self.printCsvToHtml(printList, [apdb], title, cols, printPath, fileName + '_' + apdb.pdbCode)
+                self.addScatter(data=atomData, geoX='atomNo', geoY='aa', hue='aa', categorical=True,palette='nipy_spectral')
+                self.addScatter(data=atomData, geoX='atomNo', geoY='dssp',hue= 'aa',categorical=True,palette='nipy_spectral')
+                self.addScatter(data=atomData, geoX='2FoFc', geoY='bfactor',hue= 'element',palette='jet',categorical=True)
+                self.addScatter(data=atomData, geoX='atomNo', geoY='bfactor',hue= 'element',palette='jet',categorical=True)
+                self.addScatter(data=atomData, geoX='atomNo', geoY='2FoFc',hue='element',palette='jet',categorical=True)
+                self.addScatter(data=atomData, geoX='atomNo', geoY='FoFc',hue='element',palette='jet',categorical=True)
+                self.addScatter(data=atomData, geoX='x', geoY='y',hue='atomNo', palette='plasma_r')
+                self.addScatter(data=atomData, geoX='y', geoY='z',hue='atomNo', palette='plasma_r')
+                self.addScatter(data=atomData, geoX='z', geoY='x',hue='atomNo', palette='plasma_r')
+                self.printToHtml(title, cols, fileName + '_' + apdb.pdbCode)
 
         elif reportName == 'Slow_DensityPointsPerPdb' or reportName == 'Slow_DensityPeaksPerPdb': # this can only be done per pdb
             for apdb in self.pdbs:
@@ -287,14 +325,15 @@ class GeoReport:
                     printList.append(geop.GeoPlot(atomData, 'aa',title='Amino Acids'))
                     printList.append(geop.GeoPlot(atomData, 'element',title='Atoms'))
                     printList.append(geop.GeoPlot(atomData, '2FoFc',title='Peaks in 2FoFc'))
-                    self.printCsvToHtml(printList, [apdb], title, cols, printPath, fileName + '_' + apdb.pdbCode)
+                    self.printToHtml(printList, [apdb], title, cols, printPath, fileName + '_' + apdb.pdbCode)
                 else:
                     print('\tPSU:',apdb.pdbCode,'has no density matrix')
 
 
 
 
-    def printCsvToHtml(self, queryList,pdbList,title,cols,printPath,fileName):
+    #def printCsvToHtml(self, queryList,pdbList,title,cols,printPath,fileName):
+    def printToHtml(self, title, cols, fileName):
         width=str(100/cols)
         html = '<!DOCTYPE html><html lang="en"><head><title>PSU-' + fileName + '-GEO</title>\n'
         #html += '<style> body {background-color:SeaShell;} table {table-layout:fixed;display:table;margin:0 auto;}td {border:1px solid RosyBrown;background-color:SeaShell;}</style>'
@@ -307,9 +346,9 @@ class GeoReport:
         html += '<h2>PSU: Geometric Correlations</h2>\n'
         html += '<hr/>'
 
-        if len(pdbList) > 0:
+        if len(self.pdbs) > 0:
             html += '<table><tr><td>PdbCode</td><td>Resolution</td><td>Pdb Link</td><td>PDBe Link</td></tr>\n'
-            for apdb in pdbList:
+            for apdb in self.pdbs:
                 html += '<tr>\n'
                 html += '<td>' + apdb.pdbCode + '</td>\n'
                 html += '<td>' + str(apdb.atoms[0].values['resolution']) + '</td>\n'
@@ -321,13 +360,13 @@ class GeoReport:
 
         html += '<hr/>\n'
 
-        reportPath = printPath + fileName + ".html"
+        reportPath = self.outDataPath + fileName + ".html"
 
         count = 0
         #html += '<table style="width:90%">\n'
         html += '<table>\n'
         row = 1
-        for geoPl in queryList:
+        for geoPl in self.plots:
             if not type(geoPl) is geop.GeoOverlay:
                 #html += self.twoPlots(geoPl.plotA,geoPl.plotB,width)
 
@@ -379,8 +418,8 @@ class GeoReport:
         f.close()
 
     def onePlot(self,geoPl,width):
-        try:
-        #if True:
+        #try:
+        if True:
             if geoPl.newData:
                 if geoPl.plot == 'histogram':
 
@@ -410,8 +449,8 @@ class GeoReport:
                 htmlstring += ret
 
                 html = '<td width=' + width + '%>' + htmlstring + '</td>\n'
-        except:
-            html = '<td width=' + width + '%>' + 'Error:' + geoPl.geoX + ' ' + geoPl.geoY + '</td>\n'
+        #except:
+        #    html = '<td width=' + width + '%>' + 'Error:' + geoPl.geoX + ' ' + geoPl.geoY + '</td>\n'
 
         return (html)
 

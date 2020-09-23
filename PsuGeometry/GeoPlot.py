@@ -14,7 +14,7 @@ from PsuGeometry import GeoPdb as geop
 
 
 class GeoPlot:
-    def __init__(self,data,geoX,geoY='',title='',hue='2FoFc',splitKey='',palette='viridis_r',
+    def __init__(self,data,geoX,geoY='',title='',hue='bfactor',splitKey='',palette='viridis_r',
                  centre=False,vmin=0,vmax=0,operation='',newData=False,plot='scatter',categorical=False):
         self.plot = plot
         self.data = data
@@ -32,6 +32,8 @@ class GeoPlot:
         self.categorical = categorical
         if self.geoY == '':
             self.plot = 'histogram'
+            #if self.hue=='bfactor':
+            #    self.hue = 'pdbCode'
 
     #def getPlot(self,fig, ax):
     #    if self.plot == 'histogram':
@@ -79,10 +81,24 @@ class GeoPlot:
         # sns.distplot(data[xName], norm_hist=True, bins=50, kde=False)
         histCol = 'tomato'
         alpha=1
+        bins = max(int(len(data[self.geoX])/6),10)
         if self.title == 'ghost':
             histCol = 'gainsboro'
             alpha=0.5
-        plt.hist(data[self.geoX], EdgeColor='k', bins=50,color=histCol,alpha=alpha)
+            plt.hist(data[self.geoX], EdgeColor='k', bins=bins,color=histCol,alpha=alpha,density=True,label='ghost')
+            #sns.distplot(data[self.geoX], label='x', norm_hist=True, bins=50, kde=False,color='gainsboro')
+        else:
+            if self.hue != '':
+                splitList = data[self.hue].unique()
+                for split in splitList:
+                    dfx = data[data[self.hue] == split]
+                    bins = max(int(len(dfx[self.geoX]) / 6),10)
+                    #plt.hist(dfx[self.geoX], EdgeColor='k', bins=bins, alpha=alpha, density=True)
+                    sns.distplot(dfx[self.geoX], label=split, norm_hist=True, bins=bins, kde=False,hist_kws=dict(alpha=0.5,EdgeColor='silver'))
+                plt.legend()
+            else:
+                sns.distplot(data[self.geoX], label='', norm_hist=True, bins=bins, kde=False,hist_kws=dict(alpha=0.8,EdgeColor='silver'))
+
 
         plt.title(title)
         #if returnData:
@@ -239,12 +255,17 @@ class GeoPlot:
             self.vmax = max(self.data[self.hue].max(), -1 * self.data[self.hue].min())
             self.vmin = self.vmax * -1
 
+        alpha=0.75
+        if self.title=='ghost':
+            alpha = 1
+            #self.palette = 'seismic'
+
         if self.vmin == self.vmax:
-            im = plt.pcolormesh(xgrid, ygrid, zgrid, shading='gouraud', cmap=self.palette)
-            cs = plt.contour(xgrid, ygrid, zgrid, contours, colors='0.7', linewidths=0.4)
+            im = plt.pcolormesh(xgrid, ygrid, zgrid, shading='gouraud', cmap=self.palette,alpha=alpha)
+            cs = plt.contour(xgrid, ygrid, zgrid, contours, colors='0.7', linewidths=0.4,alpha=alpha)
         else:
-            im = plt.pcolormesh(xgrid, ygrid, zgrid, shading='gouraud', cmap=self.palette, vmin=self.vmin, vmax=self.vmax)
-            cs = plt.contour(xgrid, ygrid, zgrid, contours, colors='tab:purple', linewidths=0.05)
+            im = plt.pcolormesh(xgrid, ygrid, zgrid, shading='gouraud', cmap=self.palette, vmin=self.vmin, vmax=self.vmax,alpha=alpha)
+            cs = plt.contour(xgrid, ygrid, zgrid, contours, colors='tab:purple', linewidths=0.05,alpha=alpha)
 
         cbar = fig.colorbar(im, ax=ax)
         cbar.remove()
@@ -318,22 +339,20 @@ class GeoPlot:
 
 
 class GeoOverlay:
-    def __init__(self,plotA, plotB, title,pdbDataPath='',edDataPath=''):
+    def __init__(self,plotA, plotB, title,pdbDataPath='',edDataPath='',outDataPath=''):
         self.title = title
         if title!='ghost':
             self.plotA = plotA
             self.plotB = plotB
         else:#In this case we have only the main plot, so we create the dummy plot
             self.plotB = plotA
-            geoPdbs = geop.GeoPdbs(pdbDataPath, edDataPath)
-            geoGhost = geoPdbs.getPdb('ghost')
-            ghostReport = geor.GeoReport([geoGhost])
+            ghostReport = geor.GeoReport(['ghost'],pdbDataPath,edDataPath,outDataPath)
             geoList = []
             geoList.append(self.plotB.geoX)
             if self.plotB.geoY != '':
                 geoList.append(self.plotB.geoY)
             ghostdata = ghostReport.getGeoemtryCsv(geoList, ['pdbCode'])
-            self.plotA = GeoPlot(ghostdata, self.plotB.geoX, geoY=self.plotB.geoY, title='ghost', hue='pdbCode', palette='Greys')
+            self.plotA = GeoPlot(ghostdata, self.plotB.geoX, geoY=self.plotB.geoY, title='ghost', hue='pdbCode', palette='Greys',plot=self.plotB.plot)
 
 
 

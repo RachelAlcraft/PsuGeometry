@@ -1,6 +1,7 @@
 
-from PsuGeometry import GeoReport as geor
-from PsuGeometry import GeoPdb as geop
+#from PsuGeometry import GeoReport as geor
+#from PsuGeometry import GeoPdb as geop
+from PsuGeometry import GeoReport as psu
 
 
 pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
@@ -14,7 +15,7 @@ pdbList = ['1ejg','1us0','1tt8','1i1w','1ucs','1yk4','1hje','1r6j','1pjx']
 #pdbList = ['6jvv','6rr2','6E6O','6S2M','6shk','6fgz','6ctd','6fwf','6q53']
 # split list in 2 for memory purposes
 
-pdbList = ['2xjh']
+pdbList = ['2cnq']
 #pdbList = ['1ejg','1us0','1tt8','1i1w','1ucs','1yk4','1hje']
 
 
@@ -26,10 +27,10 @@ if not runIndividualReports:
     geoList = []
     for pdb in pdbList:
         pdb = pdb.lower()
-        geoPdb = geop.GeoPdb(pdb, pdbDataPath,edDataPath)
-        geoList.append(geoPdb)
+        #geoPdb = geop.GeoPdb(pdb, pdbDataPath,edDataPath)
+        #geoList.append(geoPdb)
 
-    georep = geor.GeoReport(geoList)
+    #georep = geor.GeoReport(geoList)
 
     geoName = 'all'
 
@@ -39,13 +40,16 @@ if not runIndividualReports:
 
 else:
     for pdb in pdbList:
+        georep = psu.GeoReport([pdb], pdbDataPath, edDataPath, printPath)
+
         pdb = pdb.lower()
-        geoPdb = geop.GeoPdb(pdb, pdbDataPath, edDataPath)
-        georep = geor.GeoReport([geoPdb])
-        georep.printReport('Sp2Planarity',printPath,geoPdb.pdbCode + '_sp2')
+        #geoPdb = geop.GeoPdb(pdb, pdbDataPath, edDataPath)
+        #georep = geor.GeoReport([geoPdb])
+        #georep.printReport('Sp2Planarity',printPath,pdb + '_sp2')
+
         #georep.printReport('BackboneOutliers', printPath,geoPdb.pdbCode + '_bbone')
         #georep.printReport('RachelsChoice', printPath,geoPdb.pdbCode + '_rae')
-        #georep.printReport('DataPerPdb', printPath,geoPdb.pdbCode + '_data')
+        georep.printReport('DataPerPdb', printPath,pdb + '_data')
         geoPdb = None
         geoRep = None
 

@@ -37,6 +37,7 @@ class GeoPdbs:
             GeoPdbs.instance.edDirectory = edDirectory
 
     def getPdb(self, pdbCode):
+        pdbCode = pdbCode.lower()
         if self.instance.__existsPdb__(pdbCode):
             return self.instance.__getPdb__(pdbCode)
         else:
