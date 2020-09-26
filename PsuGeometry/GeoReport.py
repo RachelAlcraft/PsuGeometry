@@ -18,36 +18,36 @@ class GeoReport:
             self.pdbs.append(pdbmanager.getPdb(pdbCode))
         self.plots = []
 
-    def addHistogram(self,geoX='',data=None,title='',ghost=False,operation='',splitKey='',hue=''):
+    def addHistogram(self,geoX='',data=None,title='',ghost=False,operation='',splitKey='',hue='',restrictions={}):
         isNew = False
         if data is None:
             isNew=True
         if hue=='':
             hue='pdbCode'
-        gp = geop.GeoPlot(data,geoX,geoY='',title=title,newData=isNew,operation=operation,splitKey=splitKey,plot='histogram',hue=hue)
+        gp = geop.GeoPlot(data,geoX,geoY='',title=title,newData=isNew,operation=operation,splitKey=splitKey,plot='histogram',hue=hue,restrictions=restrictions)
         if not ghost:
             self.plots.append(gp)
         else:
             self.plots.append(geop.GeoOverlay(gp,'',title='ghost', pdbDataPath=self.pdbDataPath, edDataPath=self.edDataPath))
 
-    def addScatter(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',centre=False,vmin=0,vmax=0,categorical=False):
+    def addScatter(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',centre=False,vmin=0,vmax=0,categorical=False,restrictions={}):
         isNew = False
         if data is None:
             isNew = True
         if hue == 'dssp':
             categorical=True
-        gp = geop.GeoPlot(data, geoX, geoY=geoY, title=title, newData=isNew, operation=operation,splitKey=splitKey,hue=hue,palette=palette,centre=centre,vmin=vmin,vmax=vmax,categorical=categorical,plot='scatter')
+        gp = geop.GeoPlot(data, geoX, geoY=geoY, title=title, newData=isNew, operation=operation,splitKey=splitKey,hue=hue,palette=palette,centre=centre,vmin=vmin,vmax=vmax,categorical=categorical,plot='scatter',restrictions=restrictions)
         if not ghost:
             self.plots.append(gp)
         else:
             self.plots.append(
                 geop.GeoOverlay(gp, '', title='ghost', pdbDataPath=self.pdbDataPath, edDataPath=self.edDataPath))
 
-    def addProbability(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',centre=False,vmin=0,vmax=0,categorical=False):
+    def addProbability(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',centre=False,vmin=0,vmax=0,categorical=False,restrictions={}):
         isNew = False
         if data is None:
             isNew = True
-        gp = geop.GeoPlot(data, geoX, geoY=geoY, title=title, newData=isNew, operation=operation,splitKey=splitKey,hue=hue,palette=palette,centre=centre,vmin=vmin,vmax=vmax,categorical=categorical,plot='probability')
+        gp = geop.GeoPlot(data, geoX, geoY=geoY, title=title, newData=isNew, operation=operation,splitKey=splitKey,hue=hue,palette=palette,centre=centre,vmin=vmin,vmax=vmax,categorical=categorical,plot='probability',restrictions=restrictions)
         if not ghost:
             self.plots.append(gp)
         else:
@@ -249,8 +249,8 @@ class GeoReport:
                 atomData = apdb.dataFrame
                 title = 'General Data Report'
                 cols = 3
-                self.addScatter(data=atomData, geoX='atomNo', geoY='aa', hue='aa', categorical=True,palette='nipy_rainbow')
-                self.addScatter(data=atomData, geoX='atomNo', geoY='dssp',hue= 'aa',categorical=True,palette='nipy_rainbow')
+                self.addScatter(data=atomData, geoX='atomNo', geoY='aa', hue='aa', categorical=True,palette='gist_rainbow')
+                self.addScatter(data=atomData, geoX='atomNo', geoY='dssp',hue= 'aa',categorical=True,palette='gist_rainbow')
                 self.addScatter(data=atomData, geoX='2FoFc', geoY='bfactor',hue= 'element',palette='jet_r',categorical=True)
                 self.addScatter(data=atomData, geoX='atomNo', geoY='bfactor',hue= 'element',palette='jet_r',categorical=True)
                 self.addScatter(data=atomData, geoX='atomNo', geoY='2FoFc',hue='element',palette='jet_r',categorical=True)
@@ -431,15 +431,18 @@ class GeoReport:
         #try:
         if True:
             if geoPl.newData:
+                geoPl.getNewData(self.pdbs)
+                '''
                 if geoPl.plot == 'histogram':
 
                     calcList = [geoPl.geoX]
                     hueList = [geoPl.hue]
+                    
                     dfs = []
                     for apdb in self.pdbs:
                         data = apdb.getGeoemtryCsv(calcList, hueList)
                         dfs.append(data)
-                    geoPl.data = pd.concat(dfs, ignore_index=True)
+                    geoPl.data = pd.concat(dfs, ignore_index=True)                    
                 else:
                     calcList = [geoPl.geoX, geoPl.geoY]
                     hueList = [geoPl.hue]
@@ -448,6 +451,7 @@ class GeoReport:
                         datatmp = apdb.getGeoemtryCsv(calcList, hueList)
                         dfs.append(datatmp)
                     geoPl.data = pd.concat(dfs, ignore_index=True)
+            '''
 
             if geoPl.hasMatrix:
                 fig, ax = plt.subplots()

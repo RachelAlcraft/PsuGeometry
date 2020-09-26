@@ -15,7 +15,7 @@ from PsuGeometry import GeoPdb as geop
 
 class GeoPlot:
     def __init__(self,data,geoX,geoY='',title='',hue='bfactor',splitKey='',palette='viridis_r',
-                 centre=False,vmin=0,vmax=0,operation='',newData=False,plot='scatter',categorical=False):
+                 centre=False,vmin=0,vmax=0,operation='',newData=False,plot='scatter',categorical=False,restrictions={}):
         self.plot = plot
         self.data = data
         self.geoX = geoX
@@ -32,9 +32,9 @@ class GeoPlot:
         self.categorical = categorical
         self.numpy = []
         self.hasMatrix = False
-        self.restrictions = {}
         self.axX = 0,0
         self.axY = 0, 0
+        self.restrictions=restrictions
         if self.geoY == '':
             self.plot = 'histogram'
             #if self.hue=='bfactor':
@@ -259,7 +259,6 @@ class GeoPlot:
         plt.axis([minX, maxX, minY, maxY])
         if self.hasMatrix:
             xgrid, ygrid, zgrid = self.numpy
-            print(zgrid)
         else:
             xgrid, ygrid, zgrid = self.kde2D_scipy(kde,[minX,maxX,minY,maxY], bins)
 
@@ -357,8 +356,12 @@ class GeoPlot:
         hueList = hues
         if hues == None:
             hueList = [self.hue]
+        for rest in self.restrictions:
+            if rest not in hueList:
+                hueList.append(rest)
+
+
         dfs = []
-        print('calcList', calcList)
         for apdb in pdbs:
             data = apdb.getGeoemtryCsv(calcList, hueList)
             dfs.append(data)
@@ -366,13 +369,15 @@ class GeoPlot:
         # now the data can be restricted as per the restrictions, which is a dictionary of restrictions, eg aa:'THR,PRO'
         if len(self.restrictions)>0:
             dfs = []
-            for hue in self.restrictions:
-                allowed = self.restrictions[hue]
-                data = self.data[self.data[hue] == allowed]
-                dfs.append(data)
+            for rest in self.restrictions:
+                allowed = self.restrictions[rest]
+                allows = allowed.split(',')
+                for all in allows:
+                    data = self.data[self.data[rest] == all]
+                    dfs.append(data)
                 if self.title != '':
                     self.title += '/n'
-                self.title += hue + ':' + allowed
+                self.title += rest + ':' + allowed
             self.data = pd.concat(dfs, ignore_index=True)
 
     def getMatrix(self):
@@ -405,7 +410,6 @@ class GeoDifference:
     def __init__(self,pdbs,dataA,dataB,geoX,geoY='',title='',restrictionsA={},restrictionsB={},newData=False,palette='seismic'):
 
         #huelist is all of the restrictions
-        print('rest2', restrictionsA)
         hues = []
         for hue in restrictionsA:
             if hue not in hues:
@@ -434,8 +438,6 @@ class GeoDifference:
 
         arAA = self.plotA.getMatrix()
         arBB = self.plotB.getMatrix()
-
-        print('same',arAA[2] == arBB[2])
 
         arA = arAA[2]
         arB = arBB[2]

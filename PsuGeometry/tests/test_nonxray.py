@@ -3,7 +3,7 @@ from PsuGeometry import GeoReport as psu
 
 pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
-printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results/nonxray/'
+printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/nonxray/'
 
 pdbList = ['5xsg','6j60','6uos','6kj2','6bzm','6m9j','6cf4','6axz'] # high res cryoem
 geoName = 'all'
