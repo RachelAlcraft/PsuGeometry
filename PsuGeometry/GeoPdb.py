@@ -1,15 +1,11 @@
 
 import Bio.PDB as bio
-from Bio.PDB.DSSP import DSSP
 import pandas as pd
 import numpy as np
 
 from PsuGeometry import GeoAtom as atm
 from PsuGeometry import GeoDensity as den
 from PsuGeometry import GeoCalcs as calcs
-
-# global store of pdb structures for reuse in memory
-pdbs = {}
 
 
 '''
@@ -18,10 +14,12 @@ https://python-3-patterns-idioms-test.readthedocs.io/en/latest/Singleton.html
 '''
 class GeoPdbs:
     class __GeoPdbs:
-        def __init__(self,pdbDirectory,edDirectory):
+        def __init__(self,pdbDirectory,edDirectory,ed=True,dssp=True):
             self.pdbs = {}
             self.pdbDirectory = pdbDirectory
             self.edDirectory = edDirectory
+            self.ed = ed
+            self.dssp=dssp
         def __getPdb__(self,pdbCode):
             return self.pdbs[pdbCode]
         def __existsPdb__(self,pdbCode):
@@ -29,19 +27,21 @@ class GeoPdbs:
         def __addPdb__(self,pdbCode,pdb):
             self.pdbs[pdbCode] = pdb
     instance=None
-    def __init__(self,pdbDirectory,edDirectory):
+    def __init__(self,pdbDirectory,edDirectory,ed=True,dssp=True):
         if not GeoPdbs.instance:
-            GeoPdbs.instance = GeoPdbs.__GeoPdbs(pdbDirectory,edDirectory)
+            GeoPdbs.instance = GeoPdbs.__GeoPdbs(pdbDirectory,edDirectory,ed,dssp)
         else:
             GeoPdbs.instance.pdbDirectory = pdbDirectory
             GeoPdbs.instance.edDirectory = edDirectory
+            GeoPdbs.instance.ed = ed
+            GeoPdbs.instance.dssp = dssp
 
     def getPdb(self, pdbCode):
         pdbCode = pdbCode.lower()
         if self.instance.__existsPdb__(pdbCode):
             return self.instance.__getPdb__(pdbCode)
         else:
-            gp = GeoPdb(pdbCode,self.instance.pdbDirectory,self.instance.edDirectory)
+            gp = GeoPdb(pdbCode,self.instance.pdbDirectory,self.instance.edDirectory,self.instance.ed,self.instance.dssp)
             self.instance.__addPdb__(pdbCode,gp)
             return gp
 
@@ -49,43 +49,45 @@ class GeoPdbs:
 
 
 class GeoPdb:
-    def __init__(self,pdbCode,pdbDataPath,edDataPath):
+    def __init__(self,pdbCode,pdbDataPath,edDataPath,ed,dssp):
         pdbCode = pdbCode.lower()
         print('PSU: init',pdbCode)
-        if pdbCode in pdbs:
-            self = pdbs[pdbCode]
-            print(self.pdbCode)
-        else:
-            self.pdbCode = pdbCode
-            self.pdbDataPath= pdbDataPath
-            self.hasDensity = False
-            self.hasDSSP = False
-            self.hasPDB = False
-            self.atoms = []
+
+        self.pdbCode = pdbCode
+        self.pdbDataPath= pdbDataPath
+        self.hasDensity = False
+        self.hasDSSP = False
+        self.hasPDB = False
+        self.atoms = []
+        if ed:
             self.geoDen = den.GeoDensity(pdbCode,'fifty',pdbDataPath,edDataPath)
             self.hasDensity = self.geoDen.valid
-            self.dataFrame = None
-            self.ghost = False
-            if self.pdbCode == 'ghost':
-                self.ghost = True
-                self.pdbCode =  '2q1j'
+        else:
+            self.hasDensity = False
+        self.hasDssp = dssp
+        self.dataFrame = None
+        self.ghost = False
+        if self.pdbCode == 'ghost':
+            self.ghost = True
+            self.pdbCode =  '2q1j'
 
-            if self.__gatherAtoms():
+        if self.__gatherAtoms():
+            if self.hasDssp:
                 self.__applyDssp()
-                #print("Gathered atoms")
-                self.dataFrame = pd.DataFrame(columns=('pdbCode', 'resolution',
-                                                  'chain', 'rid', 'dssp', 'aa',
-                                                  'atom', 'atomNo', 'electrons','element', 'x', 'y', 'z','bfactor','occupant', 'occupancy',
-                                                  '2FoFc', 'FoFc', 'Fo', 'Fc'))
-                for atom in self.atoms:
-                    nextrow = len(self.dataFrame)
-                    self.dataFrame.loc[nextrow] = (atom.values['pdbCode'], atom.values['resolution'],
-                                               atom.values['chain'], atom.values['rid'], atom.values['dssp'], atom.values['aa'],
-                                               atom.values['atom'], atom.values['atomNo'], atom.values['electrons'], atom.values['element'],atom.values['x'], atom.values['y'], atom.values['z'], atom.values['bfactor'], atom.values['occupant'],atom.values['occupancy'],
-                                               atom.values['2FoFc'], atom.values['FoFc'], atom.values['Fo'], atom.values['Fc'])  # switching ijk to crs
-            if self.ghost == True:
-                self.pdbCode = 'ghost'
-            pdbs[self.pdbCode] = self
+
+            print('PSU: create data structure',self.pdbCode)
+            self.dataFrame = pd.DataFrame(columns=('pdbCode', 'resolution',
+                                              'chain', 'rid', 'dssp', 'aa',
+                                              'atom', 'atomNo', 'electrons','element', 'x', 'y', 'z','bfactor','occupant', 'occupancy',
+                                              '2FoFc', 'FoFc', 'Fo', 'Fc'))
+            for atom in self.atoms:
+                nextrow = len(self.dataFrame)
+                self.dataFrame.loc[nextrow] = (atom.values['pdbCode'], atom.values['resolution'],
+                                           atom.values['chain'], atom.values['rid'], atom.values['dssp'], atom.values['aa'],
+                                           atom.values['atom'], atom.values['atomNo'], atom.values['electrons'], atom.values['element'],atom.values['x'], atom.values['y'], atom.values['z'], atom.values['bfactor'], atom.values['occupant'],atom.values['occupancy'],
+                                           atom.values['2FoFc'], atom.values['FoFc'], atom.values['Fo'], atom.values['Fc'])  # switching ijk to crs
+        if self.ghost == True:
+            self.pdbCode = 'ghost'
 
     #########################################################################################################################
     ## PRIVATE FUNCTIONS FOR THE CLASS
@@ -95,6 +97,7 @@ class GeoPdb:
         if True:
             self.hasPDB = True
             pdbCode = self.pdbCode.lower()
+            print('PSU: load from BioPython', self.pdbCode)
             parser = bio.PDBParser()
             biodl = bio.PDBList()
             structure = None
@@ -142,6 +145,7 @@ class GeoPdb:
         return (self.hasPDB)
 
     def __applyDssp(self):
+        from Bio.PDB.DSSP import DSSP
         print('PSU: apply dssp')
         p = bio.PDBParser()
         pdbFile = self.pdbDataPath + 'pdb' + self.pdbCode + '.ent'

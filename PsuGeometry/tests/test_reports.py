@@ -6,7 +6,7 @@ from PsuGeometry import GeoReport as psu
 
 pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
-printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results/'
+printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/'
 
 # split list in 2 for memory purposes
 pdbList = ['1ejg','1us0','1tt8','1i1w','1ucs','1yk4','1hje','1r6j','1pjx']
@@ -42,14 +42,12 @@ else:
     for pdb in pdbList:
         georep = psu.GeoReport([pdb], pdbDataPath, edDataPath, printPath)
 
-        pdb = pdb.lower()
-        #geoPdb = geop.GeoPdb(pdb, pdbDataPath, edDataPath)
         #georep = geor.GeoReport([geoPdb])
-        #georep.printReport('Sp2Planarity',printPath,pdb + '_sp2')
-
-        #georep.printReport('BackboneOutliers', printPath,geoPdb.pdbCode + '_bbone')
-        #georep.printReport('RachelsChoice', printPath,geoPdb.pdbCode + '_rae')
-        georep.printReport('DataPerPdb', printPath,pdb + '_data')
+        georep.printReport('Sp2Planarity',pdb + '_sp2')
+        georep.printReport('BackboneOutliers', pdb + '_bbone')
+        georep.printReport('MainChainHistograms',pdb + '_main')
+        georep.printReport('RachelsChoice', pdb + '_rae')
+        georep.printReport('DataPerPdb', pdb + '_data')
         geoPdb = None
         geoRep = None
 
