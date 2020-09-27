@@ -7,15 +7,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import io
 import base64
-import PIL
 
 from PsuGeometry import GeoReport as geor
-from PsuGeometry import GeoPdb as geop
-
+from PsuGeometry import GeoPdb as geopdb
 
 class GeoPlot:
     def __init__(self,data,geoX,geoY='',title='',hue='bfactor',splitKey='',palette='viridis_r',
-                 centre=False,vmin=0,vmax=0,operation='',newData=False,plot='scatter',categorical=False,restrictions={}):
+                 centre=False,vmin=0,vmax=0,operation='',newData=False,plot='scatter',categorical=False,
+                 restrictions={},exclusions={},report=None):
+        self.parent=report
         self.plot = plot
         self.data = data
         self.geoX = geoX
@@ -35,6 +35,7 @@ class GeoPlot:
         self.axX = 0,0
         self.axY = 0, 0
         self.restrictions=restrictions
+        self.exclusions = exclusions
         if self.geoY == '':
             self.plot = 'histogram'
             #if self.hue=='bfactor':
@@ -188,11 +189,13 @@ class GeoPlot:
             if self.palette == 'gist_gray_r':
                 lw = 0  # this gives a crystollagraphic image look
 
-            if self.hue == 'aa':
+            if self.hue in 'aa,dssp':
                 try:
-                    self.data = self.data.sort_values(by='2FoFc', ascending=True)
+                    self.data = self.data.sort_values(by='bfactor', ascending=False)
                 except:
                     self.data = self.data.sort_values(by=self.hue, ascending=True)
+            elif self.hue in 'resolution,bfactor':
+                self.data = self.data.sort_values(by=self.hue, ascending=False)
             else:
                 self.data = self.data.sort_values(by=self.hue, ascending=True)
 
@@ -348,7 +351,7 @@ class GeoPlot:
         else:
             return huelist
 
-    def getNewData(self,pdbs,hues=None):
+    def getNewData(self,hues=None):
         if self.plot == 'histogram':
             calcList = [self.geoX]
         else:
@@ -360,14 +363,20 @@ class GeoPlot:
             if rest not in hueList:
                 hueList.append(rest)
 
-
         dfs = []
-        for apdb in pdbs:
-            data = apdb.getGeoemtryCsv(calcList, hueList)
-            dfs.append(data)
-        self.data = pd.concat(dfs, ignore_index=True)
+        if self.parent != None:
+            pdbmanager = geopdb.GeoPdbs(self.parent.pdbDataPath, self.parent.edDataPath, self.parent.ed, self.parent.dssp)
+            for pdb in self.parent.pdbCodes:
+                apdb = pdbmanager.getPdb(pdb)
+                data = apdb.getGeoemtryCsv(calcList, hueList)
+                dfs.append(data)
+            self.data = pd.concat(dfs, ignore_index=True)
+        else:
+            print('PSU: cannot create data, pass in report parent to plots')
+
+    def applyRestrictions(self):
         # now the data can be restricted as per the restrictions, which is a dictionary of restrictions, eg aa:'THR,PRO'
-        if len(self.restrictions)>0:
+        if len(self.restrictions)>0 and not self.data.empty:
             dfs = []
             for rest in self.restrictions:
                 allowed = self.restrictions[rest]
@@ -376,9 +385,22 @@ class GeoPlot:
                     data = self.data[self.data[rest] == all]
                     dfs.append(data)
                 if self.title != '':
-                    self.title += '/n'
-                self.title += rest + ':' + allowed
+                    self.title += '\n'
+                self.title += rest + '=' + allowed
             self.data = pd.concat(dfs, ignore_index=True)
+
+    def applyExclusions(self):
+        # now the data can be restricted as per the restrictions, which is a dictionary of restrictions, eg aa:'THR,PRO'
+        if len(self.exclusions)>0 and not self.data.empty:
+            dfs = []
+            for exc in self.exclusions:
+                notallowed = self.exclusions[exc]
+                nallows = notallowed.split(',')
+                for nall in nallows:
+                    self.data = self.data[self.data[exc] != nall]
+                if self.title != '':
+                    self.title += '\n'
+                self.title += exc + '!=' + notallowed
 
     def getMatrix(self):
 
@@ -407,7 +429,7 @@ class GeoOverlay:
             self.plotA = GeoPlot(ghostdata, self.plotB.geoX, geoY=self.plotB.geoY, title='ghost', hue='pdbCode', palette='Greys',plot=self.plotB.plot,operation=self.plotB.operation)
 
 class GeoDifference:
-    def __init__(self,pdbs,dataA,dataB,geoX,geoY='',title='',restrictionsA={},restrictionsB={},newData=False,palette='seismic'):
+    def __init__(self,dataA,dataB,geoX,geoY='',title='',restrictionsA={},restrictionsB={},exclusionsA={},exclusionsB={}, newData=False,palette='seismic',report=None):
 
         #huelist is all of the restrictions
         hues = []
@@ -416,14 +438,30 @@ class GeoDifference:
                 hues.append(hue)
 
 
-        self.plotA = GeoPlot(dataA,geoX,geoY=geoY,newData=newData,palette=palette,plot='probability')
-        self.plotB = GeoPlot(dataB, geoX, geoY=geoY, newData=newData, palette=palette + '_r',plot='probability')
+        self.plotA = GeoPlot(dataA,geoX,geoY=geoY,newData=newData,palette=palette,plot='probability',report=report)
+        self.plotB = GeoPlot(dataB, geoX, geoY=geoY, newData=newData, palette=palette + '_r',plot='probability',report=report)
 
         self.plotA.restrictions = restrictionsA
         self.plotB.restrictions = restrictionsB
 
-        self.plotA.getNewData(pdbs,hues)
-        self.plotB.getNewData(pdbs,hues)
+        self.plotA.exclusions = exclusionsA
+        self.plotB.exclusions = exclusionsB
+
+        if self.plotA.newData:
+            self.plotA.getNewData(hues)
+
+        if self.plotB.newData:
+            self.plotB.getNewData(hues)
+
+        titleA = self.plotA.title
+        self.plotA.applyRestrictions() # these will be pplied twice, so don;t let the title get changed twice
+        self.plotA.applyExclusions()
+        self.plotA.title = titleA
+
+        titleB = self.plotA.title
+        self.plotB.applyRestrictions()
+        self.plotB.applyExclusions()
+        self.plotB.title = titleB
 
         self.plotA.newData = False
         self.plotB.newData = False
@@ -462,7 +500,7 @@ class GeoDifference:
         self.plotB.vmax = maxVal
 
 
-        self.plotDiff = GeoPlot(dataA, geoX, geoY=geoY, newData=False, palette=palette,vmin=minVal,vmax=maxVal,plot='probability')
+        self.plotDiff = GeoPlot(dataA, geoX, geoY=geoY, newData=False, palette=palette,vmin=minVal,vmax=maxVal,plot='probability',report=report)
         self.plotDiff.hasMatrix = True
         self.plotDiff.numpy = arB[0],arB[1],arDiff
         self.plotDiff.vmax = maxVal

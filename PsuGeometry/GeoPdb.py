@@ -36,6 +36,10 @@ class GeoPdbs:
             GeoPdbs.instance.ed = ed
             GeoPdbs.instance.dssp = dssp
 
+    def existsPdb(self, pdbCode):
+        pdbCode = pdbCode.lower()
+        return self.instance.__existsPdb__(pdbCode)
+
     def getPdb(self, pdbCode):
         pdbCode = pdbCode.lower()
         if self.instance.__existsPdb__(pdbCode):
@@ -51,8 +55,6 @@ class GeoPdbs:
 class GeoPdb:
     def __init__(self,pdbCode,pdbDataPath,edDataPath,ed,dssp):
         pdbCode = pdbCode.lower()
-        print('PSU: init',pdbCode)
-
         self.pdbCode = pdbCode
         self.pdbDataPath= pdbDataPath
         self.hasDensity = False
@@ -76,16 +78,34 @@ class GeoPdb:
                 self.__applyDssp()
 
             print('PSU: create data structure',self.pdbCode)
-            self.dataFrame = pd.DataFrame(columns=('pdbCode', 'resolution',
-                                              'chain', 'rid', 'dssp', 'aa',
-                                              'atom', 'atomNo', 'electrons','element', 'x', 'y', 'z','bfactor','occupant', 'occupancy',
-                                              '2FoFc', 'FoFc', 'Fo', 'Fc'))
+            dicdfs = []
             for atom in self.atoms:
-                nextrow = len(self.dataFrame)
-                self.dataFrame.loc[nextrow] = (atom.values['pdbCode'], atom.values['resolution'],
-                                           atom.values['chain'], atom.values['rid'], atom.values['dssp'], atom.values['aa'],
-                                           atom.values['atom'], atom.values['atomNo'], atom.values['electrons'], atom.values['element'],atom.values['x'], atom.values['y'], atom.values['z'], atom.values['bfactor'], atom.values['occupant'],atom.values['occupancy'],
-                                           atom.values['2FoFc'], atom.values['FoFc'], atom.values['Fo'], atom.values['Fc'])  # switching ijk to crs
+                #df = pd.DataFrame(columns=('pdbCode', 'resolution',
+                #                                       'chain', 'rid', 'dssp', 'aa',
+                #                                       'atom', 'atomNo', 'electrons', 'element', 'x', 'y', 'z',
+                #                                       'bfactor', 'occupant', 'occupancy',
+                #                                       '2FoFc', 'FoFc', 'Fo', 'Fc'))
+
+                #nextrow = len(df)
+                #df.loc[nextrow] = (atom.values['pdbCode'], atom.values['resolution'],
+                #                           atom.values['chain'], atom.values['rid'], atom.values['dssp'], atom.values['aa'],
+                #                           atom.values['atom'], atom.values['atomNo'], atom.values['electrons'], atom.values['element'],atom.values['x'], atom.values['y'], atom.values['z'], atom.values['bfactor'], atom.values['occupant'],atom.values['occupancy'],
+                #                           atom.values['2FoFc'], atom.values['FoFc'], atom.values['Fo'], atom.values['Fc'])  # switching ijk to crs
+                #dfs.append(df)
+                dic={   'pdbCode':atom.values['pdbCode'],'resolution':atom.values['resolution'],
+                        'chain':atom.values['chain'], 'rid':atom.values['rid'],
+                        'dssp':atom.values['dssp'], 'aa':atom.values['aa'],
+                        'atom':atom.values['atom'], 'atomNo':atom.values['atomNo'],
+                        'electrons':atom.values['electrons'], 'element':atom.values['element'],
+                        'x':atom.values['x'], 'y':atom.values['y'], 'z':atom.values['z'],
+                        'bfactor':atom.values['bfactor'], 'occupant':atom.values['occupant'],
+                        'occupancy':atom.values['occupancy'],
+                        '2FoFc':atom.values['2FoFc'], 'FoFc':atom.values['FoFc'],
+                        'Fo':atom.values['Fo'], 'Fc':atom.values['Fc']}
+
+
+            #self.dataFrame = pd.concat(dfs, ignore_index=True)
+            self.dataFrame = pd.DataFrame.from_dict(dicdfs)
         if self.ghost == True:
             self.pdbCode = 'ghost'
 
@@ -145,7 +165,6 @@ class GeoPdb:
         return (self.hasPDB)
 
     def __applyDssp(self):
-        from Bio.PDB.DSSP import DSSP
         print('PSU: apply dssp')
         p = bio.PDBParser()
         pdbFile = self.pdbDataPath + 'pdb' + self.pdbCode + '.ent'
@@ -185,7 +204,7 @@ class GeoPdb:
         for hue in hues:
             geoData[hue] = np.nan
         for geo in geoList:
-            geoData[geo] = np.nan
+            geoData[self.convertAliases(geo)] = np.nan
 
         for ch in range(0, chrows):
             thisChain = chainList[ch]
@@ -197,6 +216,7 @@ class GeoPdb:
                 listCalcs = []
 
                 for geo in geoList:
+                    geo = self.convertAliases(geo)
                     geos = geo.split(':')
                     geoPairs = self.__geosToPairs(geos)
 
@@ -374,3 +394,13 @@ class GeoPdb:
             pairs.append([atomX, offX])
 
         return (pairs)
+
+    def convertAliases(self,geo):
+        if geo == 'PHI':
+            return 'C-1:N:CA:C'
+        elif geo == 'PSI':
+            return 'N:CA:C:N+1'
+        elif geo == 'TAU':
+            return 'N:CA:C'
+        else:
+            return geo

@@ -21,6 +21,6 @@ pdbList = ['2cnq']
 for pdb in pdbList:
     georep = geor.GeoReport([pdb],pdbDataPath, edDataPath,printPath)
     #if geoPdb.atoms[0].values['resolution'] < 2:
-    #georep.printReport('Slow_DensityPeaksPerPdb', pdb + '_den')
+    georep.printReport('Slow_DensityPeaksPerPdb', pdb + '_den')
     #else:
-    georep.printReport('Slow_DensityPointsPerPdb', pdb + '_den')
+    #georep.printReport('Slow_DensityPointsPerPdb', pdb + '_den')

@@ -20,11 +20,8 @@ hueList = ['dssp','aa','bfactor','2FoFc','rid'] # note the hues are the sum od t
 data = georep.getGeoemtryCsv(geoList, hueList)
 
 #this is 3 reports in 1
-georep.addDifference(restrictionsA={'aa':'ALA','aa':'GLY'},restrictionsB={'aa':'PRO','aa':'THR'},geoX='N:CA:C',geoY='N:CA:C:N+1')
-georep.addDifference(restrictionsA={'aa':'ALA','aa':'GLY'},restrictionsB={'aa':'PRO'},geoX='N:CA:C',geoY='N:CA:C:N+1')
-georep.addDifference(restrictionsA={'aa':'ALA','aa':'GLY'},restrictionsB={'aa':'THR'},geoX='N:CA:C',geoY='N:CA:C:N+1')
-georep.addDifference(restrictionsA={'aa':'ALA','aa':'GLY'},geoX='N:CA:C',geoY='N:CA:C:N+1')
-#georep.addDifference(restrictionsA={'aa':'ALA','aa':'GLY'},geoX='N:CA:C',geoY='N:CA:C:N+1',palette='Spectral')
+georep.addDifference(restrictionsA={'aa':'ALA','aa':'GLY'},exclusionsB={'aa':'ALA','aa':'GLY'},geoX='N:CA:C',geoY='N:CA:C:N+1')
+
 georep.addProbability(data=data, geoX='N:CA:C',geoY='N:CA:C:N+1',title='All residues', palette='Spectral')
 georep.addProbability(data=data, geoX='N:CA:C',geoY='N:CA:C:N+1',title='All residues', palette='inferno')
 georep.addProbability(data=data, geoX='N:CA:C',geoY='N:CA:C:N+1',title='All residues')

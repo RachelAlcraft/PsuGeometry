@@ -13,60 +13,73 @@ class GeoReport:
         self.outDataPath = outDataPath
         self.ed = ed
         self.dssp=dssp
-        pdbmanager = geopdb.GeoPdbs(pdbDataPath,edDataPath,self.ed,self.dssp)
-        for pdbCode in listPdbs:
-            self.pdbs.append(pdbmanager.getPdb(pdbCode))
+        if self.dssp:
+            from Bio.PDB.DSSP import DSSP
+        self.pdbCodes = listPdbs
         self.plots = []
 
-    def addHistogram(self,geoX='',data=None,title='',ghost=False,operation='',splitKey='',hue='',restrictions={}):
+    def addHistogram(self,geoX='',data=None,title='',ghost=False,operation='',splitKey='',hue='',restrictions={},exclusions={}):
         isNew = False
         if data is None:
             isNew=True
         if hue=='':
             hue='pdbCode'
-        gp = geop.GeoPlot(data,geoX,geoY='',title=title,newData=isNew,operation=operation,splitKey=splitKey,plot='histogram',hue=hue,restrictions=restrictions)
+        gp = geop.GeoPlot(data,geoX,geoY='',title=title,newData=isNew,operation=operation,splitKey=splitKey,
+                          plot='histogram',hue=hue,restrictions=restrictions,exclusions=exclusions,report=self)
         if not ghost:
             self.plots.append(gp)
         else:
             self.plots.append(geop.GeoOverlay(gp,'',title='ghost', pdbDataPath=self.pdbDataPath, edDataPath=self.edDataPath))
 
-    def addScatter(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',centre=False,vmin=0,vmax=0,categorical=False,restrictions={}):
+    def addScatter(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',centre=False,vmin=0,vmax=0,categorical=False,restrictions={},exclusions={}):
         isNew = False
         if data is None:
             isNew = True
         if hue == 'dssp':
             categorical=True
-        gp = geop.GeoPlot(data, geoX, geoY=geoY, title=title, newData=isNew, operation=operation,splitKey=splitKey,hue=hue,palette=palette,centre=centre,vmin=vmin,vmax=vmax,categorical=categorical,plot='scatter',restrictions=restrictions)
+        gp = geop.GeoPlot(data, geoX, geoY=geoY, title=title, newData=isNew, operation=operation,splitKey=splitKey,
+                          hue=hue,palette=palette,centre=centre,vmin=vmin,vmax=vmax,categorical=categorical,
+                          plot='scatter',restrictions=restrictions,exclusions=exclusions,report=self)
         if not ghost:
             self.plots.append(gp)
         else:
             self.plots.append(
                 geop.GeoOverlay(gp, '', title='ghost', pdbDataPath=self.pdbDataPath, edDataPath=self.edDataPath))
 
-    def addProbability(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',centre=False,vmin=0,vmax=0,categorical=False,restrictions={}):
+    def addProbability(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',centre=False,vmin=0,vmax=0,categorical=False,restrictions={},exclusions={}):
         isNew = False
         if data is None:
             isNew = True
-        gp = geop.GeoPlot(data, geoX, geoY=geoY, title=title, newData=isNew, operation=operation,splitKey=splitKey,hue=hue,palette=palette,centre=centre,vmin=vmin,vmax=vmax,categorical=categorical,plot='probability',restrictions=restrictions)
+        gp = geop.GeoPlot(data, geoX, geoY=geoY, title=title, newData=isNew, operation=operation,splitKey=splitKey,
+                          hue=hue,palette=palette,centre=centre,vmin=vmin,vmax=vmax,categorical=categorical,
+                          plot='probability',restrictions=restrictions,exclusions=exclusions,report=self)
         if not ghost:
             self.plots.append(gp)
         else:
             self.plots.append(
                 geop.GeoOverlay(gp, '', title='ghost', pdbDataPath=self.pdbDataPath, edDataPath=self.edDataPath))
 
-    def addDifference(self,dataA=None,dataB=None,geoX='',geoY='',restrictionsA={},restrictionsB = {},title='',palette='seismic'):
+    def addDifference(self,dataA=None,dataB=None,geoX='',geoY='',restrictionsA={},restrictionsB = {},exclusionsA={},exclusionsB={},title='',palette='seismic'):
         isNew = False
         if dataA is None:
             isNew = True
-        print('rest1',restrictionsA)
-        diffPlot = geop.GeoDifference(self.pdbs,dataA=dataA,dataB=dataB,geoX=geoX,geoY=geoY,title=title,palette=palette,restrictionsA=restrictionsA,restrictionsB=restrictionsB,newData=isNew)
+        diffPlot = geop.GeoDifference(dataA=dataA,dataB=dataB,geoX=geoX,geoY=geoY,title=title,
+                                      palette=palette,restrictionsA=restrictionsA,restrictionsB=restrictionsB,
+                                      exclusionsA=exclusionsA,exclusionsB=exclusionsB,newData=isNew,report=self)
+
         self.plots.append(diffPlot.plotA)
         self.plots.append(diffPlot.plotDiff)
         self.plots.append(diffPlot.plotB)
 
     def getGeoemtryCsv(self,calcList, hueList):
         dfs = []
-        for apdb in self.pdbs:
+        pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
+        count = 0
+        for pdb in self.pdbCodes:
+            count = count + 1
+            if not pdbmanager.existsPdb(pdb):
+                print('PSU: get',pdb,count,'/',len(self.pdbCodes))
+            apdb = pdbmanager.getPdb(pdb)
             data = apdb.getGeoemtryCsv(calcList, hueList)
             dfs.append(data)
         df = pd.concat(dfs, ignore_index=True)
@@ -88,11 +101,7 @@ class GeoReport:
             calcList = ['CA-1:CA','CA:CA+1','CA:C:N+1:CA+1','CA-1:C-1:N:CA','N:CA:C']
         elif reportName == 'RachelsChoice' or reportName == 'RachelsChoiceNonXRay':
             calcList = ['N:O','CB:O','N:CA:C:N+1','C-1:N:CA:C']
-        dfs = []
-        for apdb in self.pdbs:
-            data = apdb.getGeoemtryCsv(calcList, hueList)
-            dfs.append(data)
-        df = pd.concat(dfs,ignore_index=True)
+        df = self.getGeoemtryCsv(calcList,hueList)
         return (df)
 
 
@@ -261,7 +270,9 @@ class GeoReport:
                 self.printToHtml(title, cols, fileName + '_' + apdb.pdbCode)
 
         elif reportName == 'Slow_DensityPointsPerPdb' or reportName == 'Slow_DensityPeaksPerPdb': # this can only be done per pdb
-            for apdb in self.pdbs:
+            for pdb in self.pdbCodes:
+                pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
+                apdb = pdbmanager.getPdb(pdb)
                 if apdb.hasDensity:
                     print('\tPSU:', reportName, 'for', apdb.pdbCode)
                     allPoints = True
@@ -353,14 +364,19 @@ class GeoReport:
         html += '<h2>PSU: Geometric Correlations</h2>\n'
         html += '<hr/>'
 
-        if len(self.pdbs) > 0:
+        pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
+        if len(self.pdbCodes) > 0:
             html += '<table><tr><td>PdbCode</td><td>Resolution</td><td>Pdb Link</td><td>PDBe Link</td></tr>\n'
-            for apdb in self.pdbs:
+            for pdb in self.pdbCodes:
                 html += '<tr>\n'
-                html += '<td>' + apdb.pdbCode + '</td>\n'
-                html += '<td>' + str(apdb.atoms[0].values['resolution']) + '</td>\n'
-                html += "<td><a href='https://www.rcsb.org/structure/" + apdb.pdbCode + "' title='PDB Link' target='_blank'>Link to PDB</a></td>\n"
-                html += "<td><a href='https://www.ebi.ac.uk/pdbe/entry/pdb/" + apdb.pdbCode + "' title='PDB Link' target='_blank'>Link to PDBe</a></td>\n"
+                html += '<td>' + pdb + '</td>\n'
+                res = ''
+                if pdbmanager.existsPdb(pdb):
+                    apdb = pdbmanager.getPdb(pdb)
+                    res = str(apdb.atoms[0].values['resolution'])
+                html += '<td>' + res  + '</td>\n'
+                html += "<td><a href='https://www.rcsb.org/structure/" + pdb + "' title='PDB Link' target='_blank'>Link to PDB</a></td>\n"
+                html += "<td><a href='https://www.ebi.ac.uk/pdbe/entry/pdb/" + pdb + "' title='PDB Link' target='_blank'>Link to PDBe</a></td>\n"
                 html += '</tr>\n'
             html += '</table>\n'
 
@@ -411,6 +427,7 @@ class GeoReport:
                         geoqSplit.data = data
                         geoqSplit.title = title + ' ' + split
 
+                    print('PSU: plot',count,'/',len(self.plots))
                     if type(geoqSplit) is geop.GeoOverlay:
                         html += self.twoPlotsOverlay(geoPl.plotA,geoPl.plotB,width)
                     elif type(geoqSplit) is geop.GeoDifference:
@@ -431,27 +448,10 @@ class GeoReport:
         #try:
         if True:
             if geoPl.newData:
-                geoPl.getNewData(self.pdbs)
-                '''
-                if geoPl.plot == 'histogram':
+                geoPl.getNewData()
 
-                    calcList = [geoPl.geoX]
-                    hueList = [geoPl.hue]
-                    
-                    dfs = []
-                    for apdb in self.pdbs:
-                        data = apdb.getGeoemtryCsv(calcList, hueList)
-                        dfs.append(data)
-                    geoPl.data = pd.concat(dfs, ignore_index=True)                    
-                else:
-                    calcList = [geoPl.geoX, geoPl.geoY]
-                    hueList = [geoPl.hue]
-                    dfs = []
-                    for apdb in self.pdbs:
-                        datatmp = apdb.getGeoemtryCsv(calcList, hueList)
-                        dfs.append(datatmp)
-                    geoPl.data = pd.concat(dfs, ignore_index=True)
-            '''
+            geoPl.applyRestrictions()
+            geoPl.applyExclusions()
 
             if geoPl.hasMatrix:
                 fig, ax = plt.subplots()
@@ -483,9 +483,14 @@ class GeoReport:
         if True:
             fig, ax = plt.subplots()
             if geoPlA.newData:
-                geoPlA.getNewData(self.pdbs)
+                geoPlA.getNewData()
             if geoPlB.newData:
-                geoPlB.getNewData(self.pdbs)
+                geoPlB.getNewData()
+
+            geoPlA.applyRestrictions()
+            geoPlA.applyExclusions()
+            geoPlB.applyRestrictions()
+            geoPlB.applyExclusions()
 
             if geoPlA.plot == 'probabilty':
                 retA = geoPlB.plotToAxes(fig, ax) # for probability plot ghost second as it is alpha 0.5 over the top
