@@ -7,14 +7,11 @@ from PsuGeometry import GeoPdb as geopdb
 class GeoReport:
 
     def __init__(self,listPdbs,pdbDataPath,edDataPath,outDataPath,ed=True,dssp=True):
-        self.pdbs = []
         self.pdbDataPath = pdbDataPath
         self.edDataPath = edDataPath
         self.outDataPath = outDataPath
         self.ed = ed
         self.dssp=dssp
-        if self.dssp:
-            from Bio.PDB.DSSP import DSSP
         self.pdbCodes = listPdbs
         self.plots = []
 
@@ -29,7 +26,7 @@ class GeoReport:
         if not ghost:
             self.plots.append(gp)
         else:
-            self.plots.append(geop.GeoOverlay(gp,'',title='ghost', pdbDataPath=self.pdbDataPath, edDataPath=self.edDataPath))
+            self.plots.append(geop.GeoOverlay(gp,'',title='ghost',report=self))
 
     def addScatter(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',centre=False,vmin=0,vmax=0,categorical=False,restrictions={},exclusions={}):
         isNew = False
@@ -44,7 +41,7 @@ class GeoReport:
             self.plots.append(gp)
         else:
             self.plots.append(
-                geop.GeoOverlay(gp, '', title='ghost', pdbDataPath=self.pdbDataPath, edDataPath=self.edDataPath))
+                geop.GeoOverlay(gp, '', title='ghost', report=self))
 
     def addProbability(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',centre=False,vmin=0,vmax=0,categorical=False,restrictions={},exclusions={}):
         isNew = False
@@ -56,8 +53,7 @@ class GeoReport:
         if not ghost:
             self.plots.append(gp)
         else:
-            self.plots.append(
-                geop.GeoOverlay(gp, '', title='ghost', pdbDataPath=self.pdbDataPath, edDataPath=self.edDataPath))
+            self.plots.append(geop.GeoOverlay(gp, '', title='ghost', report=self))
 
     def addDifference(self,dataA=None,dataB=None,geoX='',geoY='',restrictionsA={},restrictionsB = {},exclusionsA={},exclusionsB={},title='',palette='seismic'):
         isNew = False
@@ -253,9 +249,11 @@ class GeoReport:
             self.printToHtml(title, cols, fileName)
 
         elif reportName == 'DataPerPdb':
-            for apdb in self.pdbs:
-                print('\tPSU:', reportName, 'for', apdb.pdbCode)
-                atomData = apdb.dataFrame
+            pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
+            for pdb in self.pdbCodes:
+                print('\tPSU:', reportName, 'for', pdb)
+                apdb = pdbmanager.getPdb(pdb)
+                atomData = apdb.getDataFrame()
                 title = 'General Data Report'
                 cols = 3
                 self.addScatter(data=atomData, geoX='atomNo', geoY='aa', hue='aa', categorical=True,palette='gist_rainbow')
@@ -281,7 +279,7 @@ class GeoReport:
                         allPoints = False
                         title = 'Density Peaks and Atoms Comparison'
                     peaksData = apdb.geoDen.getPeaks(allPoints)
-                    atomData = apdb.dataFrame
+                    atomData = apdb.getDataFrame()
                     atomData['FoFc2'] = atomData['FoFc'] ** 2
 
                     cols = 3
@@ -353,41 +351,10 @@ class GeoReport:
     def printToHtml(self, title, cols, fileName):
         print('PSU: formatting to html...')
         width=str(100/cols)
-        html = '<!DOCTYPE html><html lang="en"><head><title>PSU-' + fileName + '-GEO</title>\n'
-        #html += '<style> body {background-color:SeaShell;} table {table-layout:fixed;display:table;margin:0 auto;}td {border:1px solid RosyBrown;background-color:SeaShell;}</style>'
-        #html += '<style> body {background-color:HoneyDew;} table {background-color:HoneyDew;} .innertable td {border:1px solid MistyRose;background-color:MintCream;}</style>'
-        html += '<style> body {text-align:center;background-color:LightSteelBlue ;} img {width:95% }'
-        html += 'table {font-size:0.8vw;width:95%;table-layout:fixed;display:table;margin:0 auto;background-color:LightSteelBlue ;}'
-        html += ' td {border:1px solid MistyRose;background-color:AliceBlue;}</style>'
-        html += '</head>\n'
-        html += '<body><h1>' + title + '</h1>\n'
-        html += '<h2>PSU: Geometric Correlations</h2>\n'
-        html += '<hr/>'
-
-        pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
-        if len(self.pdbCodes) > 0:
-            html += '<table><tr><td>PdbCode</td><td>Resolution</td><td>Pdb Link</td><td>PDBe Link</td></tr>\n'
-            for pdb in self.pdbCodes:
-                html += '<tr>\n'
-                html += '<td>' + pdb + '</td>\n'
-                res = ''
-                if pdbmanager.existsPdb(pdb):
-                    apdb = pdbmanager.getPdb(pdb)
-                    res = str(apdb.atoms[0].values['resolution'])
-                html += '<td>' + res  + '</td>\n'
-                html += "<td><a href='https://www.rcsb.org/structure/" + pdb + "' title='PDB Link' target='_blank'>Link to PDB</a></td>\n"
-                html += "<td><a href='https://www.ebi.ac.uk/pdbe/entry/pdb/" + pdb + "' title='PDB Link' target='_blank'>Link to PDBe</a></td>\n"
-                html += '</tr>\n'
-            html += '</table>\n'
-
-
-        html += '<hr/>\n'
-
         reportPath = self.outDataPath + fileName + ".html"
-
         count = 0
         #html += '<table style="width:90%">\n'
-        html += '<table>\n'
+        html = '<table>\n'
         row = 1
         for geoPl in self.plots:
             if type(geoPl) is geop.GeoPlot:
@@ -435,14 +402,45 @@ class GeoReport:
                     else:
                         html += self.onePlot(geoqSplit, width)
 
-        html += '</tr></table><hr/><p>Produced by PsuGeometry, written by Rachel Alcraft </p></body>\n'
-
+        html += '</tr></table><hr/><p>Produced by PsuGeometry, written by Rachel Alcraft<br/>Please cite the application note...</p></body>\n'
+        hhtml = self.getHeaderString(fileName, title)
         # and print
         f = open(reportPath, "w+")
-        f.write(html)
+        f.write(hhtml + html)
         print('PSU: saved file to',reportPath)
         self.flush()
         f.close()
+
+    def getHeaderString(self,fileName,title):
+        html = '<!DOCTYPE html><html lang="en"><head><title>PSU-' + fileName + '-GEO</title>\n'
+        # html += '<style> body {background-color:SeaShell;} table {table-layout:fixed;display:table;margin:0 auto;}td {border:1px solid RosyBrown;background-color:SeaShell;}</style>'
+        # html += '<style> body {background-color:HoneyDew;} table {background-color:HoneyDew;} .innertable td {border:1px solid MistyRose;background-color:MintCream;}</style>'
+        html += '<style> body {text-align:center;background-color:LightSteelBlue ;} img {width:95% }'
+        html += 'table {font-size:0.8vw;width:95%;table-layout:fixed;display:table;margin:0 auto;background-color:LightSteelBlue ;}'
+        html += ' td {border:1px solid MistyRose;background-color:AliceBlue;}</style>'
+        html += '</head>\n'
+        html += '<body><h1>' + title + '</h1>\n'
+        html += '<h2>PSU: Geometric Correlations</h2>\n'
+        html += '<hr/>'
+
+        pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
+        if len(self.pdbCodes) > 0:
+            html += '<table><tr><td>PdbCode</td><td>Resolution</td><td>Pdb Link</td><td>PDBe Link</td></tr>\n'
+            for pdb in self.pdbCodes:
+                html += '<tr>\n'
+                html += '<td>' + pdb + '</td>\n'
+                res = ''
+                if pdbmanager.existsPdb(pdb):
+                    apdb = pdbmanager.getPdb(pdb)
+                    res = str(apdb.atoms[0].values['resolution'])
+                html += '<td>' + res + '</td>\n'
+                html += "<td><a href='https://www.rcsb.org/structure/" + pdb + "' title='PDB Link' target='_blank'>Link to PDB</a></td>\n"
+                html += "<td><a href='https://www.ebi.ac.uk/pdbe/entry/pdb/" + pdb + "' title='PDB Link' target='_blank'>Link to PDBe</a></td>\n"
+                html += '</tr>\n'
+            html += '</table>\n'
+
+        html += '<hr/>\n'
+        return html
 
     def onePlot(self,geoPl,width):
         #try:

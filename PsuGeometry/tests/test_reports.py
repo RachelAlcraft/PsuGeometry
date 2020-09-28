@@ -42,13 +42,12 @@ else:
     for pdb in pdbList:
         georep = psu.GeoReport([pdb], pdbDataPath, edDataPath, printPath)
 
-        #georep = geor.GeoReport([geoPdb])
         georep.printReport('Sp2Planarity',pdb + '_sp2')
         georep.printReport('BackboneOutliers', pdb + '_bbone')
         georep.printReport('MainChainHistograms',pdb + '_main')
         georep.printReport('RachelsChoice', pdb + '_rae')
         georep.printReport('DataPerPdb', pdb + '_data')
-        geoPdb = None
+
         geoRep = None
 
 

@@ -413,20 +413,20 @@ class GeoPlot:
 
 
 class GeoOverlay:
-    def __init__(self,plotA, plotB, title,pdbDataPath='',edDataPath='',outDataPath=''):
+    def __init__(self,plotA, plotB, title,report):
         self.title = title
         if title!='ghost':
             self.plotA = plotA
             self.plotB = plotB
         else:#In this case we have only the main plot, so we create the dummy plot
             self.plotB = plotA
-            ghostReport = geor.GeoReport(['ghost'],pdbDataPath,edDataPath,outDataPath)
+            ghostReport = geor.GeoReport(['ghost'],report.pdbDataPath,report.edDataPath,report.outDataPath,report.ed,report.dssp)
             geoList = []
             geoList.append(self.plotB.geoX)
             if self.plotB.geoY != '':
                 geoList.append(self.plotB.geoY)
             ghostdata = ghostReport.getGeoemtryCsv(geoList, ['pdbCode'])
-            self.plotA = GeoPlot(ghostdata, self.plotB.geoX, geoY=self.plotB.geoY, title='ghost', hue='pdbCode', palette='Greys',plot=self.plotB.plot,operation=self.plotB.operation)
+            self.plotA = GeoPlot(ghostdata, self.plotB.geoX, geoY=self.plotB.geoY, title='ghost', hue='pdbCode', palette='Greys',plot=self.plotB.plot,operation=self.plotB.operation,report=report)
 
 class GeoDifference:
     def __init__(self,dataA,dataB,geoX,geoY='',title='',restrictionsA={},restrictionsB={},exclusionsA={},exclusionsB={}, newData=False,palette='seismic',report=None):
