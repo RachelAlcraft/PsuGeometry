@@ -14,7 +14,7 @@ from PsuGeometry import GeoPdb as geopdb
 class GeoPlot:
     def __init__(self,data,geoX,geoY='',title='',hue='bfactor',splitKey='',palette='viridis_r',
                  centre=False,vmin=0,vmax=0,operation='',newData=False,plot='scatter',categorical=False,
-                 restrictions={},exclusions={},report=None):
+                 restrictions={},exclusions={},report=None,count=False):
         self.parent=report
         self.plot = plot
         self.data = data
@@ -38,6 +38,7 @@ class GeoPlot:
         self.exclusions = exclusions
         if self.geoY == '':
             self.plot = 'histogram'
+        self.count=count # only for histograms, probability or count
             #if self.hue=='bfactor':
             #    self.hue = 'pdbCode'
 
@@ -85,13 +86,14 @@ class GeoPlot:
         title += '\nLast:' + self.hue + ' ' + str(lastHue) + '=' + str(lastVal)
 
         # sns.distplot(data[xName], norm_hist=True, bins=50, kde=False)
-        histCol = 'crimson'
+        histCol = self.palette
         alpha=1
         bins = min(max(int(len(data[self.geoX])/6),10),50)
+        density = not self.count
         if self.title == 'ghost':
             histCol = 'gainsboro'
             alpha=0.5
-            plt.hist(data[self.geoX], EdgeColor='k', bins=bins,color=histCol,alpha=alpha,density=True,label='ghost')
+            plt.hist(data[self.geoX], EdgeColor='k', bins=bins,color=histCol,alpha=alpha,density=density,label='ghost')
             #sns.distplot(data[self.geoX], label='x', norm_hist=True, bins=50, kde=False,color='gainsboro')
         else:
             #if self.hue != '':
@@ -104,7 +106,7 @@ class GeoPlot:
             #    plt.legend()
             #else:
             #sns.distplot(data[self.geoX], label='', norm_hist=True, bins=bins, kde=False,hist_kws=dict(alpha=0.8,EdgeColor='silver'))
-            plt.hist(data[self.geoX], EdgeColor='k', bins=bins, color=histCol, alpha=alpha, density=True)
+            plt.hist(data[self.geoX], EdgeColor='k', bins=bins, color=histCol, density=density,alpha=alpha)
 
 
         plt.title(title)

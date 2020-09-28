@@ -71,7 +71,7 @@ else: # then load the csv files up to produce the reports
     #georep.addHistogram(data=allData, geoX='pdbCode',title='PDBs')
     #georep.addScatter(data=allData, geoX='pdbCode', geoY='aa', title='Amino Acids', hue='aa', palette='Accent')
     georep.addProbability(data=allData, geoX='N:CA:C', geoY='N:CA:C:N+1', title='TAU-PSI',palette='cubehelix_r')
-    georep.addHistogram(data=allData, geoX='C-1:N',title='C-1:N',exclusions={'aa':'PRO'})
+    georep.addHistogram(data=allData, geoX='C-1:N',title='C-1:N',exclusions={'aa':'PRO'},palette='DarkSeaGreen')
     georep.addHistogram(data=allData, geoX='N:CA',title='N:CA',exclusions={'aa':'PRO,GLY'})
     georep.addHistogram(data=allData, geoX='CA:C',title='CA:C',exclusions={'aa':'GLY'})
     georep.addHistogram(data=allData, geoX='C:O',title='C:O')
@@ -79,9 +79,5 @@ else: # then load the csv files up to produce the reports
     georep.addHistogram(data=allData, geoX='N:CA:C',title='Tau',restrictions={'aa':'GLY'})
     georep.addHistogram(data=allData, geoX='N:CA:C',title='Tau',restrictions={'aa':'PRO'})
     #georep.addHistogram(data=allData,geoX='N:CA:C',splitKey='aa',title='TAU')
-    #georep.addHistogram(data=allDataexcPro, geoX='C-1:N',title='C-1:N exc PRO', splitKey='pdbCode')
-    #georep.addHistogram(data=allDataexcGlyPro, geoX='N:CA',title='N:CA exc GLY PRO', splitKey='pdbCode')
-    #georep.addHistogram(data=allDataexcGly, geoX='CA:C',title='CA:C exc GLY', splitKey='pdbCode')
-    #georep.addHistogram(data=allData, geoX='C:O',title='C:O', splitKey='pdbCode')
     # Print the report
     georep.printToHtml('Jaskolski Pdbs', 3, 'jaskolski')

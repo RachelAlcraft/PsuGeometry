@@ -71,7 +71,8 @@ class GeoPdb:
         self.ghost = False
         if self.pdbCode == 'ghost':
             self.ghost = True
-            self.pdbCode =  '2q1j'
+            #self.pdbCode =  '2q1j'
+            self.pdbCode = '4rek'
 
         if self.__gatherAtoms():
             if self.hasDssp:
@@ -99,8 +100,8 @@ class GeoPdb:
         self.dataFrame = pd.DataFrame.from_dict(dicdfs)
 
     def getDataFrame(self):
-        if self.dataFrame == None:
-            self.createDataStructure()
+        #if self.dataFrame == None:
+        self.createDataStructure()
         return self.dataFrame
 
 
@@ -132,6 +133,9 @@ class GeoPdb:
                         chain = residue.get_full_id()[2]
                         if r != 'HOH':  # bio.is_aa(residue):
                             for atom in residue:
+                                if atom.is_disordered():
+                                    if atom.disordered_has_id("A"):
+                                        atom.disordered_select("A")
                                 # print('Atom:', atom)
                                 oneAtom = atm.GeoAtom()
                                 oneAtom.setStructureInfo(pdbCode, resolution)
@@ -147,6 +151,8 @@ class GeoPdb:
                                 bfactor = atom.get_bfactor()
                                 occupancy = atom.get_occupancy()
                                 oneAtom.setAtomInfo(name, atomNo, x, y, z, bfactor, occupant, occupancy)
+                                #if rid < 3:
+                                #    print(oneAtom)
                                 # add density if we can
                                 if self.hasDensity:
                                     tFoFc, FoFc, Fo, Fc = self.geoDen.getDensityXYZ(x, y, z)
@@ -154,6 +160,7 @@ class GeoPdb:
 
                                 # print('Atom:',atomNo)
                                 self.atoms.append(oneAtom)
+
 
         # except:
         #    self.hasPDB = False
@@ -179,8 +186,9 @@ class GeoPdb:
     def getStructureCsv(self):
         return (self.data)
 
-    def getGeoemtryCsv(self,geoListIn, hues):
+    def getGeoemtryCsv(self,geoListEntered, hues):
         # geo in format C-1, C+1, C
+        dics = []
         usingAliases = False
         # remove anything that is in anyway
         if 'rid' in hues:
@@ -192,134 +200,147 @@ class GeoPdb:
         if 'aa' not in hues:
             hues.append('aa')
         geoList = []
-        for geoa in geoListIn:
+        geoListIn = []
+        for geoa in geoListEntered:
             for aa in self.getAAList():
                 geo = self.aliasToGeo(geoa,aa)
                 if geo != geoa:
                     usingAliases = True
                 #print(geoa,geo,aa,usingAliases)
                 if ':' not in geo:
-                    hues.append(geo)
-                    #geoList.append(geo)
+                    if geo not in hues:
+                        hues.append(geo)
                 else:
                     if geo not in geoList:
                         geoList.append(geo)
+                    if geoa not in geoListIn:
+                        geoListIn.append(geoa)
 
         if len(geoList)<2:
             geoList.append('N:CA')
             geoList.append('CA:C')
+        if len(geoListIn)<2:
+            geoListIn.append('N:CA')
+            geoListIn.append('CA:C')
         #print(geoList,geoListIn,hues)
-        allAtomsA = self.__getAtomsOccupant('A',self.atoms)
+        #allAtomsA = self.__getAtomsOccupant('A',self.atoms)
 
-        chainList = self.__getChainsUnique(allAtomsA)
-        ridList = self.__getRidUnique(allAtomsA)
+        #chainList = self.__getChainsUnique(allAtomsA)
+        #ridList = self.__getRidUnique(allAtomsA)
+        occList = ['A']#self.__getOccList()
+        ridList = self.__getRidList()
+        chainList = self.__getChainList()
+
         rows = len(ridList)
         chrows = len(chainList)
+        occs = len(occList)
+
+        #an atom will be uniquely defined by rid, chain, occupant
 
         # set up the geoData to which we concatenate first
-        geoData = pd.DataFrame(columns=('pdbCode', 'chain', 'rid'))
-        for hue in hues:
-            geoData[hue] = np.nan
+        #geoData = pd.DataFrame(columns=('pdbCode', 'chain', 'rid'))
+        #for hue in hues:
+        #    geoData[hue] = np.nan
 
-        for geo in geoListIn: #the column names will be the alias names or whatever we passed in AND the aliases
-            geoData[geo] = np.nan
-        for geo in geoList: #the column names will be the alias names or whatever we passed in AND the aliases
-            geoData[geo] = np.nan
+        #for geo in geoListIn: #the column names will be the alias names or whatever we passed in AND the aliases
+        #    geoData[geo] = np.nan
+        #for geo in geoList: #the column names will be the alias names or whatever we passed in AND the aliases
+        #    geoData[geo] = np.nan
 
         for ch in range(0, chrows):
             thisChain = chainList[ch]
+            for occ in range(0,occs):
+                thisOcc = occList[occ]
+                for rid in range(0, rows):
+                    thisResid = ridList[rid]
+                    thisResidue = self.__getResidue(thisChain, thisResid,thisOcc)# not really a residue but it does for getting aa
+                    if thisResidue == None:
+                        #print(thisChain,thisResid,thisOcc)
+                        a=2
+                    else:
+                        allValid = True
+                        aa = thisResidue.values['aa']
 
-            #for aa in self.getAAList():
-            #    print(aa)
-            if True:
-                aa = ''
+                        listCalcs = []
 
-                allAtomsChain = self.__getAtomsChain(thisChain, aa,allAtomsA)
-                #print(len(allAtomsChain))
+                        for geoa in geoListIn:
+                            geo = self.aliasToGeo(geoa,aa)
+                            geos = geo.split(':')
+                            geoPairs = self.__geosToPairs(geos)
 
-                for r in range(0, rows):
-                #for atm in allAtomsChain:
-                    thisResid = ridList[r]
-                    #thisResid = atm.values['rid']
-                    allValid = True
-                    listCalcs = []
-
-                    for geoa in geoListIn:
-                        geo = self.aliasToGeo(geoa,aa)
-                        #print(geo,geoa,aa)
-                        geos = geo.split(':')
-                        geoPairs = self.__geosToPairs(geos)
-
-                        datasA = []
-                        for a in range(0, len(geoPairs)):
-                            geoPair = geoPairs[a]
-                            geoAtom = geoPair[0]
-                            ridA = thisResid + geoPairs[a][1]  # add the offset
-                            allAtomsRid = self.__getAtomsRid(ridA, allAtomsChain)
-                            allAtomsAtom = self.__getAtomsAtom(geoAtom, allAtomsRid)
-                            # There shold now be ONLY 1 atom
-                            if len(allAtomsAtom) == 1:
-                                datasA.append(allAtomsAtom[0])
-                                aa = allAtomsAtom[0].values['aa']
-                            else:
-                                allValid = False
-                        listCalcs.append([datasA,geo])
+                            datasA = []
+                            for a in range(0, len(geoPairs)):
+                                geoPair = geoPairs[a]
+                                geoAtom = geoPair[0]
+                                ridA = thisResid + geoPairs[a][1]  # add the offset
+                                atomA = self.__getAtom(thisChain, ridA,thisOcc,geoAtom)
+                                # There should be 1 atom
+                                if atomA != None:
+                                    datasA.append(atomA)
+                                else:
+                                    #print(thisChain, ridA, thisOcc,geoAtom)
+                                    allValid = False
+                            listCalcs.append([datasA,geo])
 
 
-                    if allValid:
-                        #add a new row to the dataframe
-                        df1 = pd.DataFrame([[np.nan] * len(geoData.columns)], columns=geoData.columns)
-                        geoData = df1.append(geoData, ignore_index=True)
-                        thisRow = 0#len(geoData)-1
-                        geoData.loc[thisRow, 'pdbCode'] = self.pdbCode
-                        geoData.loc[thisRow, 'chain'] = thisChain
-                        geoData.loc[thisRow, 'rid'] = int(thisResid)
+                        if allValid:
+                            #add a new row to the dataframe
+                            #df1 = pd.DataFrame([[np.nan] * len(geoData.columns)], columns=geoData.columns)
+                            #geoData = df1.append(geoData, ignore_index=True)
+                            thisRow = 0#len(geoData)-1
+                            #geoData.loc[thisRow, 'pdbCode'] = self.pdbCode
+                            #geoData.loc[thisRow, 'chain'] = thisChain
+                            #geoData.loc[thisRow, 'rid'] = int(thisResid)
+                            dic = {}
+                            dic['pdbCode'] = self.pdbCode
+                            dic['chain'] = thisChain
+                            dic['rid'] = int(thisResid)
 
 
-                        # add the main data to the data frame
-                        reshues = {}
-                        for hue in hues:
-                            reshues[hue] = ''
-                        for oneGeo in listCalcs:
-                            datasA = oneGeo[0]
-                            geo = oneGeo[1]
-                            geoatoms = geo.split(':')
-                            geoPairs = self.__geosToPairs([geoatoms])
-                            gpCount = 0
-                            for gp in geoPairs:
-                                offset = geoPairs[0][1]
-                                if offset == 0:
-                                    for hue in hues:
-                                        oneHue = datasA[gpCount].values[hue]
-                                        if reshues[hue] == '':
+                            # add the main data to the data frame
+                            reshues = {}
+                            for hue in hues:
+                                reshues[hue] = ''
+                            for oneGeo in listCalcs:
+                                datasA = oneGeo[0]
+                                geo = oneGeo[1]
+                                geoatoms = geo.split(':')
+                                geoPairs = self.__geosToPairs([geoatoms])
+                                gpCount = 0
+                                for gp in geoPairs:
+                                    offset = geoPairs[0][1]
+                                    if offset == 0:
+                                        for hue in hues:
+                                            oneHue = datasA[gpCount].values[hue]
+                                            if reshues[hue] == '':
+                                                try:
+                                                    float(oneHue)
+                                                    reshues[hue] = 0
+                                                except:
+                                                   reshues[hue] = oneHue
+
+                                if len(datasA) == 4:  # dihedral
+                                        valA = calcs.torsion(datasA[0].values['x'], datasA[0].values['y'], datasA[0].values['z'],
+                                                             datasA[1].values['x'], datasA[1].values['y'], datasA[1].values['z'],
+                                                             datasA[2].values['x'], datasA[2].values['y'], datasA[2].values['z'],
+                                                             datasA[3].values['x'], datasA[3].values['y'], datasA[3].values['z'])
+                                        for hue in hues:
+                                            aHue = datasA[0].values[hue]
+                                            bHue = datasA[0].values[hue]
+                                            cHue = datasA[0].values[hue]
+                                            dHue = datasA[0].values[hue]
                                             try:
-                                                float(oneHue)
-                                                reshues[hue] = 0
+                                                float(aHue)
+                                                thisHue = (aHue + bHue + cHue + dHue)/4
+                                                reshues[hue] += thisHue
+                                                if reshues[hue] != thisHue:
+                                                    reshues[hue] = reshues[hue]/2 # we want the average of all the atoms in the calculation
                                             except:
-                                               reshues[hue] = oneHue
-
-                            if len(datasA) == 4:  # dihedral
-                                    valA = calcs.torsion(datasA[0].values['x'], datasA[0].values['y'], datasA[0].values['z'],
-                                                         datasA[1].values['x'], datasA[1].values['y'], datasA[1].values['z'],
-                                                         datasA[2].values['x'], datasA[2].values['y'], datasA[2].values['z'],
-                                                         datasA[3].values['x'], datasA[3].values['y'], datasA[3].values['z'])
-                                    for hue in hues:
-                                        aHue = datasA[0].values[hue]
-                                        bHue = datasA[0].values[hue]
-                                        cHue = datasA[0].values[hue]
-                                        dHue = datasA[0].values[hue]
-                                        try:
-                                            float(aHue)
-                                            thisHue = (aHue + bHue + cHue + dHue)/4
-                                            reshues[hue] += thisHue
-                                            if reshues[hue] != thisHue:
-                                                reshues[hue] = reshues[hue]/2 # we want the average of all the atoms in the calculation
-                                        except:
-                                            reshues[hue] =reshues[hue]
+                                                reshues[hue] =reshues[hue]
 
 
 
-                            elif len(datasA) == 3:  # angle
+                                elif len(datasA) == 3:  # angle
                                     valA = calcs.angle(datasA[0].values['x'], datasA[0].values['y'], datasA[0].values['z'],
                                                          datasA[1].values['x'], datasA[1].values['y'], datasA[1].values['z'],
                                                          datasA[2].values['x'], datasA[2].values['y'], datasA[2].values['z'])
@@ -336,7 +357,7 @@ class GeoPdb:
                                         except:
                                             reshues[hue] =reshues[hue]
 
-                            elif len(datasA) == 2:  # distance
+                                elif len(datasA) == 2:  # distance
                                     valA = calcs.distance(datasA[0].values['x'], datasA[0].values['y'], datasA[0].values['z'],
                                                          datasA[1].values['x'], datasA[1].values['y'], datasA[1].values['z'])
                                     for hue in hues:
@@ -350,23 +371,29 @@ class GeoPdb:
                                                 reshues[hue] = reshues[hue]/2 # we want the average of all the atoms in the calculation
                                         except:
                                             reshues[hue] =reshues[hue]
-                            else: # just some data
-                                print('??',datasA)
+                                else: # just some data
+                                    print('??',datasA)
 
-                            geoData.loc[thisRow, geo] = valA
-                            # hue could be an average or an
-                            for hue in hues:
-                                geoData.loc[thisRow, hue] = reshues[hue]
+                                #geoData.loc[thisRow, geo] = valA
+                                dic[geo] = valA
+                                # hue could be an average or an
+                                for hue in hues:
+                                    #geoData.loc[thisRow, hue] = reshues[hue]
+                                    dic[hue] = reshues[hue]
 
-                            #print(usingAliases)
-                            if usingAliases:
-                                aa = geoData['aa'][0]
-                                geoa = self.geoToAlias(geo,aa)
-                                #print(geoa,geo,aa)
-                                if geoa != geo:
-                                    geoData.loc[thisRow, geoa] = valA # we have alias and geo column
-                            #print(geoData)
-        return geoData
+                                #print(usingAliases)
+                                if usingAliases:
+                                    #aa = geoData['aa'][0]
+                                    geoa = self.geoToAlias(geo,aa)
+                                    #print(geoa,geo,aa)
+                                    if geoa != geo:
+                                        #geoData.loc[thisRow, geoa] = valA # we have alias and geo column
+                                        dic[geoa] = valA
+
+                            dics.append(dic)
+        dataFrame = pd.DataFrame.from_dict(dics)
+        #print(dataFrame)
+        return dataFrame
 
 
     def __getAtomsRid(self,rid,atoms):
@@ -376,7 +403,7 @@ class GeoPdb:
                 newAtoms.append(atm)
         return(newAtoms)
 
-    def __getAtomsChain(self, chain,aa,atoms):
+    def __getAtomsChain(self, chain,atoms):
         newAtoms = []
         for atm in atoms:
             if atm.values['chain'] == chain:# and atm.values['aa'] == aa:
@@ -397,6 +424,17 @@ class GeoPdb:
                 newAtoms.append(atm)
         return (newAtoms)
 
+    def __getResidue(self, chain, rid, occ):
+        for atm in self.atoms:
+            if atm.values['chain'] == chain and atm.values['rid'] == rid and atm.values['occupant'] == occ:
+                return atm
+        return None
+
+    def __getAtom(self, chain, rid, occ,atom):
+        for atm in self.atoms:
+            if atm.values['chain'] == chain and atm.values['rid'] == rid and atm.values['occupant'] == occ and atm.values['atom'] == atom:
+                return atm
+        return None
 
     def __getChainsUnique(self, atoms):
         chains = []
@@ -405,11 +443,33 @@ class GeoPdb:
                 chains.append(atm.values['chain'])
         return (chains)
 
+    def __getChainList(self):
+        chains = []
+        for atm in self.atoms:
+            if atm.values['chain'] not in chains:
+                chains.append(atm.values['chain'])
+        return (chains)
+
+    def __getRidList(self):
+        rids = []
+        for atm in self.atoms:
+            if atm.values['rid'] not in rids:
+                rids.append(atm.values['rid'])
+        return (rids)
+
+    def __getOccList(self):
+        occs = []
+        for atm in self.atoms:
+            if atm.values['occupant'] not in occs:
+                occs.append(atm.values['occupant'])
+        return (occs)
+
     def __getRidUnique(self, atoms):
         vals = []
         for atm in atoms:
             if atm.values['rid'] not in vals:
                 vals.append(atm.values['rid'])
+        print(vals)
         return (vals)
 
     def __geosToPairs(self,geos):
@@ -468,6 +528,7 @@ class GeoPdb:
                 'CHI1_SER': 'N:CA:CB:OG',
                 'CHI1_THR': 'N:CA:CB:OG1',
                 'CHI1_VAL': 'N:CA:CB:CG1',
+                'CHI1_ALA': 'N:CA:CB:HB1',
                 'CHI2': 'CA:CB:CG:CD',
                 'CHI2_ASN': 'CA:CB:CG:OD1',
                 'CHI2_ASP': 'CA:CB:CG:OD1',
@@ -478,12 +539,15 @@ class GeoPdb:
                 'CHI2_PHE': 'CA:CB:CG:CD1',
                 'CHI2_TRP': 'CA:CB:CG:CD1',
                 'CHI2_TYR': 'CA:CB:CG:CD1',
+                'CHI2_VAL': 'CA:CB:CG1:HG11',
+                'CHI2_THR': 'CA:CB:CG2:HG21',
                 'CHI3':'CB:CG:CD:CE',
                 'CHI3_ARG': 'CB:CG:CD:NE',
                 'CHI3_GLN': 'CB:CG:CD:OE1',
                 'CHI3_GLU': 'CB:CG:CD:OE1',
                 'CHI3_MET': 'CB:CG:SD:CE',
                 'CHI3_PRO': 'CB:CG:CD:N',
+                'CHI2_VAL': 'CA:CB:CG2:HG21',
                 'CHI4': 'CG:CD:CE:CZ',
                 'CHI4_ARG': 'CG:CD:NE:CZ',
                 'CHI4_PRO': 'CG:CD:N:CA',

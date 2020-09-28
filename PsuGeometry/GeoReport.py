@@ -15,14 +15,14 @@ class GeoReport:
         self.pdbCodes = listPdbs
         self.plots = []
 
-    def addHistogram(self,geoX='',data=None,title='',ghost=False,operation='',splitKey='',hue='',restrictions={},exclusions={}):
+    def addHistogram(self,geoX='',data=None,title='',ghost=False,operation='',splitKey='',hue='',palette='crimson',count=False,restrictions={},exclusions={}):
         isNew = False
         if data is None:
             isNew=True
         if hue=='':
             hue='pdbCode'
         gp = geop.GeoPlot(data,geoX,geoY='',title=title,newData=isNew,operation=operation,splitKey=splitKey,
-                          plot='histogram',hue=hue,restrictions=restrictions,exclusions=exclusions,report=self)
+                          plot='histogram',hue=hue,palette=palette,count=count,restrictions=restrictions,exclusions=exclusions,report=self)
         if not ghost:
             self.plots.append(gp)
         else:
@@ -514,4 +514,5 @@ class GeoReport:
     def flush(self):
         self.plots = []
         html = ''
+        self.dataFrame = None
 

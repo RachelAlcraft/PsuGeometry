@@ -36,6 +36,10 @@ class GeoAtom:
         self.values['FoFc'] = 0
         self.values['2FoFc'] = 0
 
+
+    def __str__(self):
+        return self.values['pdbCode'] + '_'+self.values['atom']+'_'+str(self.values['atomNo'])+'_'+str(self.values['rid'])+'_'+self.values['aa']+'_'+self.values['occupant']
+
     def setStructureInfo(self,pdbCode,resolution):
         self.values['pdbCode'] = pdbCode
         self.values['resolution'] = resolution
