@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from PsuGeometry import GeoPlot as geop
 from PsuGeometry import GeoPdb as geopdb
+from PsuGeometry import CloseContact as geocc
 
 
 class GeoReport:
@@ -66,6 +67,17 @@ class GeoReport:
         self.plots.append(diffPlot.plotA)
         self.plots.append(diffPlot.plotDiff)
         self.plots.append(diffPlot.plotB)
+
+    def addCloseContact(self,pdbCode,atomA,atomB,distanceLimit=8,ridLimit=2,palette='viridis',hue='distance',categorical=False):
+        pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
+        pdb = pdbmanager.getPdb(pdbCode)
+        cc = geocc.CloseContact(pdb,atomA,atomB,distanceLimit,ridLimit,hue)
+        if hue !='distance':
+            hue = hue+'A'
+        df = cc.createContacts()
+        gp = geop.GeoPlot(data=df, geoX='ridA', geoY='ridB', title=atomA+':'+atomB, newData=False, hue=hue,
+                          palette=palette, plot='contact',categorical=categorical,report=self)
+        self.plots.append(gp)
 
     def getGeoemtryCsv(self,calcList, hueList):
         dfs = []
@@ -443,8 +455,8 @@ class GeoReport:
         return html
 
     def onePlot(self,geoPl,width):
-        #try:
-        if True:
+        try:
+        #if True:
             if geoPl.newData:
                 geoPl.getNewData()
 
@@ -467,8 +479,8 @@ class GeoReport:
                 htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
                 htmlstring += ret
                 html = '<td width=' + width + '%>' + htmlstring + '</td>\n'
-        #except:
-        #    html = '<td width=' + width + '%>' + 'Error:' + geoPl.geoX + ' ' + geoPl.geoY + '</td>\n'
+        except:
+            html = '<td width=' + width + '%>' + 'Error:' + geoPl.geoX + ' ' + geoPl.geoY + '</td>\n'
 
         return (html)
 

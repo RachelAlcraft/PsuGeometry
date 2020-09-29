@@ -197,12 +197,7 @@ class GeoPdb:
             hues.remove('pdbCode')
         if 'chain' in hues:
             hues.remove('chain')
-        if 'aa' not in hues:
-            hues.append('aa')
-        if 'atomNo' not in hues:
-            hues.append('atomNo')
-        if 'bfactor' not in hues:
-            hues.append('bfactor')
+
         geoList = []
         geoListIn = []
         for geoa in geoListEntered:
@@ -226,11 +221,14 @@ class GeoPdb:
         if len(geoListIn)<2:
             geoListIn.append('N:CA')
             geoListIn.append('CA:C')
-        #print(geoList,geoListIn,hues)
-        #allAtomsA = self.__getAtomsOccupant('A',self.atoms)
 
-        #chainList = self.__getChainsUnique(allAtomsA)
-        #ridList = self.__getRidUnique(allAtomsA)
+        if 'aa' not in hues:
+            hues.append('aa')
+        if 'atomNo' not in hues:
+            hues.append('atomNo')
+        if 'bfactor' not in hues:
+            hues.append('bfactor')
+
         occList = ['A']#self.__getOccList()
         ridList = self.__getRidList()
         chainList = self.__getChainList()

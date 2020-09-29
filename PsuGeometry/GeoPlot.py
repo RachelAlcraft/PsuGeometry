@@ -53,7 +53,7 @@ class GeoPlot:
     def plotToAxes(self,fig, ax):
         if self.plot == 'histogram':
             return self.plotHistogram(fig, ax)
-        elif self.plot == 'scatter':
+        elif self.plot == 'scatter' or self.plot=='contact':
             return self.plotScatter(fig, ax)
         elif self.plot == 'probability':
             return self.plotProbability(fig, ax)
@@ -192,6 +192,8 @@ class GeoPlot:
             #    self.data = self.data.sort_values(by='bfactor', ascending=True)
             if self.hue == 'resolution':
                 self.data = self.data.sort_values(by=self.hue, ascending=False)
+            elif self.plot == 'contact':
+                self.data = self.data.sort_values(by='ridA', ascending=False)
             else:
                 self.data = self.data.sort_values(by=self.hue, ascending=True)
 
@@ -200,9 +202,34 @@ class GeoPlot:
             if self.title=='ghost':
                 alpha = 0.4
 
-            im = sns.scatterplot(x=self.geoX, y=self.geoY, hue=self.hue, data=self.data, alpha=alpha,
-                                 palette=self.palette, edgecolor='aliceblue', linewidth=lw)
-            plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)  # Put the legend out of the figure
+            if self.plot == 'contact':
+                alpha = 0.75
+                self.data['distanceinv'] = 1/(self.data['distance'] ** 3)*4000
+                if self.categorical == False:
+                    g = ax.scatter(self.data[self.geoX], self.data[self.geoY], c=self.data[self.hue],
+                                   cmap=self.palette,s=self.data['distanceinv'],edgecolor='grey',alpha=alpha,linewidth=lw)
+                    cb = plt.colorbar(g)
+                    cb.set_label(self.hue)
+                else:
+                    alpha = 0.65
+                    im = sns.scatterplot(x=self.geoX, y=self.geoY, hue=self.hue, data=self.data, alpha=alpha,legend='brief',
+                                     palette=self.palette, edgecolor='grey', linewidth=lw,vmax=3,
+                                     size='distanceinv',sizes=(25,100))
+                    #https://stackoverflow.com/questions/53437462/how-do-i-remove-an-attribute-from-the-legend-of-a-scatter-plot
+                    # EXTRACT CURRENT HANDLES AND LABELS
+                    h, l = ax.get_legend_handles_labels()
+                    # COLOR LEGEND (FIRST 30 ITEMS)
+                    huelen = len(self.data.sort_values(by=self.hue, ascending=True)[self.hue].unique())+1
+                    col_lgd = plt.legend(h[:huelen], l[:huelen], loc='upper left',bbox_to_anchor=(1.05, 1), fancybox=True, shadow=True, ncol=1)
+                    # SIZE LEGEND (LAST 5 ITEMS)
+                    #size_lgd = plt.legend(h[-5:], l[-5:], loc='lower center', borderpad=1.6, prop={'size': 20},bbox_to_anchor=(0.5, -0.45), fancybox=True, shadow=True, ncol=5)
+                    # ADD FORMER (OVERWRITTEN BY LATTER)
+                    plt.gca().add_artist(col_lgd)
+                    ax.set_xlabel('')
+                    ax.set_ylabel('')
+            else:
+                im = sns.scatterplot(x=self.geoX, y=self.geoY, hue=self.hue, data=self.data, alpha=alpha,palette=self.palette, edgecolor='aliceblue', linewidth=lw)
+                plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)  # Put the legend out of the figure
 
         count = len(self.data.index)
         title = self.title
@@ -213,15 +240,6 @@ class GeoPlot:
 
         plt.title(title)
         return ''
-        #if returnData:
-        #    img = io.BytesIO()
-        #    fig.savefig(img, format='png', bbox_inches='tight')
-        #    img.seek(0)
-        #    encoded = base64.b64encode(img.getvalue())
-        #    # html = '<img width=100% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
-        #    html = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
-        #    plt.close('all')
-        #    return html
 
     def getPlotImage(self,fig, ax):
         #fig, ax = plt.subplots()
