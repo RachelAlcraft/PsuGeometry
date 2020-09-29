@@ -199,6 +199,10 @@ class GeoPdb:
             hues.remove('chain')
         if 'aa' not in hues:
             hues.append('aa')
+        if 'atomNo' not in hues:
+            hues.append('atomNo')
+        if 'bfactor' not in hues:
+            hues.append('bfactor')
         geoList = []
         geoListIn = []
         for geoa in geoListEntered:

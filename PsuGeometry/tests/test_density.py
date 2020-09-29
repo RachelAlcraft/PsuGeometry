@@ -16,11 +16,11 @@ pdbList = ['6jvv','6rr2','6E6O','6S2M','6shk','6fgz','6ctd','6fwf','6q53']
 ### split list in 2 for memory purposes
 
 #pdbList = ['6shk']
-pdbList = ['2cnq']
+pdbList = ['6jvv']
 
 for pdb in pdbList:
     georep = geor.GeoReport([pdb],pdbDataPath, edDataPath,printPath)
     #if geoPdb.atoms[0].values['resolution'] < 2:
     georep.printReport('Slow_DensityPeaksPerPdb', pdb + '_den')
     #else:
-    #georep.printReport('Slow_DensityPointsPerPdb', pdb + '_den')
+    #georep.printReport('Slow_DensityPointsPerPdb', pdb + '_denpk')

@@ -111,14 +111,7 @@ class GeoPlot:
 
         plt.title(title)
         plt.xlabel(self.geoX)
-        #if returnData:
-        #    img = io.BytesIO()
-        #    fig.savefig(img, format='png', bbox_inches='tight')
-        #    img.seek(0)
-        #    encoded = base64.b64encode(img.getvalue())
-        #    # html = '<img width=100% src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
-        #    html = '<p><img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
-        #    plt.close('all')
+
         if self.title != 'ghost':
             dfdesc = self.data[self.geoX].describe()
             rows = len(dfdesc.index)
@@ -157,17 +150,17 @@ class GeoPlot:
             gradsorig = self.data.sort_values(by=self.hue, ascending=True)[self.hue].unique()
             grads = self.getHueLists(self.hue,gradsorig)
             evenly_spaced_interval = np.linspace(0, 1, len(grads))
-            if self.palette is str:
-                try:
-                    sns.set_palette(sns.color_palette(self.palette, len(grads)))
-                    colors = [cm.get_cmap(self.palette)(x) for x in evenly_spaced_interval]
-                except:
-                    colors = [cm.get_cmap(self.palette)(x) for x in evenly_spaced_interval]
+
+            try:
+                sns.set_palette(sns.color_palette(self.palette, len(grads)))
+                colors = [cm.get_cmap(self.palette)(x) for x in evenly_spaced_interval]
                 i = 0
                 for g in grads:
                     gradients[g] = colors[i]
                     i = i+1
                 self.palette = gradients
+            except:
+                self.palette = self.palette
 
         if self.centre:
             self.data[self.hue + '2'] = self.data[self.hue] ** 2
@@ -186,20 +179,22 @@ class GeoPlot:
             ax.set_xlabel(self.geoX)
             ax.set_ylabel(self.geoY)
         else:
-
             lw = 0.5
             if self.palette == 'gist_gray_r':
                 lw = 0  # this gives a crystollagraphic image look
 
-            if self.hue in 'aa,dssp':
-                try:
-                    self.data = self.data.sort_values(by='bfactor', ascending=False)
-                except:
-                    self.data = self.data.sort_values(by=self.hue, ascending=True)
-            elif self.hue in 'resolution,bfactor':
+            #if self.hue == 'aa' or self.hue == 'dssp':
+            #    try:
+            #        self.data = self.data.sort_values(by='bfactor', ascending=True)
+            #    except:
+            #        self.data = self.data.sort_values(by=self.hue, ascending=True)
+            #elif self.hue == 'bfactor':
+            #    self.data = self.data.sort_values(by='bfactor', ascending=True)
+            if self.hue == 'resolution':
                 self.data = self.data.sort_values(by=self.hue, ascending=False)
             else:
                 self.data = self.data.sort_values(by=self.hue, ascending=True)
+
 
             alpha=0.8
             if self.title=='ghost':
