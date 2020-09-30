@@ -36,7 +36,7 @@ class GeoPlot:
         self.axY = 0, 0
         self.restrictions=restrictions
         self.exclusions = exclusions
-        if self.geoY == '':
+        if self.geoY == '' and plot != 'surface':
             self.plot = 'histogram'
         self.count=count # only for histograms, probability or count
             #if self.hue=='bfactor':
@@ -59,6 +59,16 @@ class GeoPlot:
             return self.plotScatter(fig, ax)
         elif self.plot == 'probability':
             return self.plotProbability(fig, ax)
+        elif self.plot == 'surface':
+            return self.plotSurface(fig, ax)
+
+    def plotSurface(self, fig, ax):
+        image = plt.imshow(self.surface, cmap=self.palette, interpolation='nearest', origin='low', aspect='equal')
+        image = plt.contour(self.surface, colors='grey', alpha=0.3, linewidths=1, levels=15)
+        ax.grid(False)
+        plt.axis('off')
+        return ''
+
 
     def plotHistogram(self,fig, ax):
         data = self.data.sort_values(by=self.geoX, ascending=True)
@@ -235,6 +245,9 @@ class GeoPlot:
                 cb = plt.colorbar(g)
                 cb.set_label(self.hue)
 
+        ax.set_xlabel(self.geoX)
+        ax.set_ylabel(self.geoY)
+
         count = len(self.data.index)
         title = self.title
         if title == '':
@@ -354,7 +367,7 @@ class GeoPlot:
         return ''
 
     def getHueLists(self,hue,huelist):
-        if hue == 'dssp':
+        if 'dssp' in hue: # could be be dsspA or dsspB too
             return ['-','B','E','G','H','I','S','T','X']
         else:
             return huelist

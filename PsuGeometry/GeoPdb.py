@@ -61,13 +61,14 @@ class GeoPdb:
         self.hasDSSP = False
         self.hasPDB = False
         self.atoms = []
+        self.densCSV = pd.DataFrame()
         if ed:
             self.geoDen = den.GeoDensity(pdbCode,'fifty',pdbDataPath,edDataPath)
             self.hasDensity = self.geoDen.valid
         else:
             self.hasDensity = False
         self.hasDssp = dssp
-        self.dataFrame = None
+        self.dataFrame = pd.DataFrame()
         self.ghost = False
         if self.pdbCode == 'ghost':
             self.ghost = True
@@ -101,8 +102,26 @@ class GeoPdb:
 
     def getDataFrame(self):
         #if self.dataFrame == None:
-        self.createDataStructure()
+        if self.dataFrame.empty:
+            self.createDataStructure()
         return self.dataFrame
+
+    def getDensitySquare(self,squares,hue):
+        xsq = squares[0]
+        ysq = squares[1]
+        zsq = squares[2]
+        x,y = xsq.shape
+        squ = np.zeros((x,y))
+        for i in range(0,x):
+            for j in range(0, y):
+                a,b,c = xsq[i,j],ysq[i,j],zsq[i,j]
+                den = self.geoDen.getInterpolatedDensity(a,b,c,False)
+                squ[i,j] = den
+        return squ
+
+
+
+
 
 
     #########################################################################################################################
@@ -186,8 +205,14 @@ class GeoPdb:
                 if atom.values['rid'] == res_no and atom.values['chain'] == chain:
                     atom.setDsspInfo(ss)
 
-    def getStructureCsv(self):
-        return (self.data)
+
+    def getStructureDensity(self,allPoints,divisor,pdbDataPath,edDataPath):
+        if self.hasDensity:
+            if self.densCSV.empty:
+                self.geoDen = den.GeoDensity(self.pdbCode,'fifty',pdbDataPath,edDataPath)
+                self.densCSV = self.geoDen.getPeaks(allPoints,divisor)
+        return self.densCSV
+
 
     def getGeoemtryCsv(self,geoListEntered, hues):
         # geo in format C-1, C+1, C
@@ -399,7 +424,6 @@ class GeoPdb:
 
                             dics.append(dic)
         dataFrame = pd.DataFrame.from_dict(dics)
-        #print(dataFrame)
         return dataFrame
 
 

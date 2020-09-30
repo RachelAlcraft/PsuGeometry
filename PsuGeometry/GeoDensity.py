@@ -69,7 +69,7 @@ class GeoDensity:
         return [tFoFc,FoFc,Fo,Fc]
 
 
-    def getPeaks(self,allPoints=False):
+    def getPeaks(self,allPoints=False,divisor=10):
         if allPoints:
             print("PSU: Warning, the Density points function can take some minutes")
         else:
@@ -84,7 +84,7 @@ class GeoDensity:
             for j in range(0, b):
                 peakList = []
                 if allPoints:
-                    peakList = self.getRowPoints(matrix, i, j, -1)
+                    peakList = self.getRowPoints(matrix, i, j, -1,divisor)
                 else:
                     peakList = self.getRowPeaks(matrix,i,j,-1)
                 for peak in peakList:
@@ -103,7 +103,7 @@ class GeoDensity:
                         tfofc, fofc, fo, fc = self.getDensityCRS(c,r,s)
                         finalPeakList.append([c,r,s,x,y,z,tfofc,fofc,fo,fc])
 
-        densityData = pd.DataFrame(columns=('pdb_code', 'c', 'r', 's', 'x', 'y', 'z', 'peak2FoFc','peakFoFc','peakFo','peakFc'))
+        densityData = pd.DataFrame(columns=('pdb_code', 'c', 'r', 's', 'x', 'y', 'z', '2FoFc','FoFc','Fo','Fc'))
         print('', end='\n')
         print('\t\tPSU: Density complete, points=', len(finalPeakList), end='\n')
         for peak in finalPeakList:
@@ -167,21 +167,12 @@ class GeoDensity:
                     lastCoordsVal = i, j, k, val
         return (peakList)
 
-    def getRowPoints(self,matrix,x,y,z):
+    def getRowPoints(self,matrix,x,y,z,divisor=10):
         '''
         Gets the peaks for a row
         '''
         a,b,c = matrix.shape
         maxMat = matrix.max()
-        #medMat = np.median(matrix)
-        divisor = 10
-        if a < 120:
-            divisor = 8
-        elif a < 150:
-            divisor = 6
-        elif a < 190:
-            divisor = 4
-        #print(a,b,c)
         xRange = range(x,x+1)
         yRange = range(y,y+1)
         zRange = range(z,z+1)

@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from PsuGeometry import GeoPlot as geop
 from PsuGeometry import GeoPdb as geopdb
 from PsuGeometry import CloseContact as geocc
+from PsuGeometry import GeoSpace as geosp
 
 
 class GeoReport:
@@ -83,6 +84,39 @@ class GeoReport:
         gp = geop.GeoPlot(data=df, geoX='ridxA', geoY='ridxB', title=title, newData=False, hue=hue,
                           palette=palette, plot='contact',categorical=categorical,report=self)
         self.plots.append(gp)
+
+
+    def addDataView(self, pdbCode, geoX, geoY, palette='viridis', hue='2FoFc', categorical=False, title=''):
+        pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
+        apdb = pdbmanager.getPdb(pdbCode)
+        df = apdb.getDataFrame()
+        self.addScatter(data=df, geoX=geoX, geoY=geoY, title=title, hue=hue, palette=palette,categorical=categorical)
+
+    def addDensityView(self, pdbCode, geoX, geoY, peaks=True,divisor=10, palette='viridis', hue='2FoFc', categorical=False, title=''):
+        pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
+        apdb = pdbmanager.getPdb(pdbCode)
+        allPoints = not peaks
+        if apdb.hasDensity:
+            peaksData = apdb.getStructureDensity(allPoints,divisor,self.pdbDataPath,self.edDataPath)
+            self.addScatter(data=peaksData, geoX=geoX, geoY=geoY, title=title, hue=hue, palette=palette,categorical=categorical)
+
+
+    def addDensitySlice(self, pdbCode, length,gap,central, linear, planar, palette='viridis', title='',hue='2FoFc'):
+        pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
+        apdb = pdbmanager.getPdb(pdbCode)
+        squares = length*2+1
+        sq = geosp.GeoSpace().getSquare(squares,gap,central,linear,planar)
+        sfc = apdb.getDensitySquare(sq,hue)
+        #sfc = [[1,2],[0,1]]
+        print(sfc)
+        gp = geop.GeoPlot(data=None,geoX='',title=title, hue=hue, palette=palette, plot='surface', report=self)
+        gp.surface = sfc
+        self.plots.append(gp)
+        return sfc
+
+    def addDensitySlices(self, slices, palette='viridis', title=''):
+        return ''
+
 
     def getGeoemtryCsv(self,calcList, hueList):
         dfs = []
@@ -295,43 +329,43 @@ class GeoReport:
                     if reportName == 'Slow_DensityPeaksPerPdb':
                         allPoints = False
                         maintitle = 'Density Peaks and Atoms Comparison'
-                    peaksData = apdb.geoDen.getPeaks(allPoints)
+                    peaksData = apdb.getStructureDensity(allPoints,10,self.pdbDataPath,self.edDataPath)
                     atomData = apdb.getDataFrame()
                     atomData['FoFc2'] = atomData['FoFc'] ** 2
 
                     cols = 3
                     printList = []
-                    self.addScatter(data=peaksData, geoX='c', geoY='r', title='Density CR Fo',hue='peakFo',palette='gist_gray_r')
-                    self.addScatter(data=peaksData, geoX='r', geoY='s',title='Density RS Fo',hue='peakFo',palette='gist_gray_r')
-                    self.addScatter(data=peaksData, geoX='s', geoY='c',title='Density SC Fo',hue='peakFo',palette='gist_gray_r')
+                    self.addScatter(data=peaksData, geoX='c', geoY='r', title='Density CR Fo',hue='Fo',palette='gist_gray_r')
+                    self.addScatter(data=peaksData, geoX='r', geoY='s',title='Density RS Fo',hue='Fo',palette='gist_gray_r')
+                    self.addScatter(data=peaksData, geoX='s', geoY='c',title='Density SC Fo',hue='Fo',palette='gist_gray_r')
 
-                    self.addScatter(data=peaksData, geoX='c', geoY='r',title='Density CR Fo',hue='peakFo',palette='cubehelix_r')
-                    self.addScatter(data=peaksData, geoX='r', geoY='s',title='Density RS Fo',hue='peakFo',palette='cubehelix_r')
-                    self.addScatter(data=peaksData, geoX='s', geoY='c',title='Density SC Fo',hue='peakFo',palette='cubehelix_r')
+                    self.addScatter(data=peaksData, geoX='c', geoY='r',title='Density CR Fo',hue='Fo',palette='cubehelix_r')
+                    self.addScatter(data=peaksData, geoX='r', geoY='s',title='Density RS Fo',hue='Fo',palette='cubehelix_r')
+                    self.addScatter(data=peaksData, geoX='s', geoY='c',title='Density SC Fo',hue='Fo',palette='cubehelix_r')
 
-                    self.addScatter(data=peaksData, geoX='c', geoY='r',title='Density CR 2FoFC',hue='peak2FoFc',palette='cubehelix_r')
-                    self.addScatter(data=peaksData, geoX='r', geoY='s',title='Density RS 2FoFC',hue='peak2FoFc',palette='cubehelix_r')
-                    self.addScatter(data=peaksData, geoX='s', geoY='c',title='Density SC 2FoFC',hue='peak2FoFc',palette='cubehelix_r')
+                    self.addScatter(data=peaksData, geoX='c', geoY='r',title='Density CR 2FoFC',hue='2FoFc',palette='cubehelix_r')
+                    self.addScatter(data=peaksData, geoX='r', geoY='s',title='Density RS 2FoFC',hue='2FoFc',palette='cubehelix_r')
+                    self.addScatter(data=peaksData, geoX='s', geoY='c',title='Density SC 2FoFC',hue='2FoFc',palette='cubehelix_r')
 
-                    self.addScatter(data=peaksData, geoX='c', geoY='r',title='Density CR FC',hue='peakFc',palette='cubehelix_r')
-                    self.addScatter(data=peaksData, geoX='r', geoY='s',title='Density RS FC',hue='peakFc',palette='cubehelix_r')
-                    self.addScatter(data=peaksData, geoX='s', geoY='c',title='Density SC FC',hue='peakFc',palette='cubehelix_r')
+                    self.addScatter(data=peaksData, geoX='c', geoY='r',title='Density CR FC',hue='Fc',palette='cubehelix_r')
+                    self.addScatter(data=peaksData, geoX='r', geoY='s',title='Density RS FC',hue='Fc',palette='cubehelix_r')
+                    self.addScatter(data=peaksData, geoX='s', geoY='c',title='Density SC FC',hue='Fc',palette='cubehelix_r')
 
-                    self.addScatter(data=peaksData, geoX='c', geoY='r',title='Density CR FoFC',hue='peakFoFc',palette='PiYG',centre=True)
-                    self.addScatter(data=peaksData, geoX='r', geoY='s',title='Density RS FoFC',hue='peakFoFc',palette='PiYG',centre=True)
-                    self.addScatter(data=peaksData, geoX='s', geoY='c',title='Density SC FoFC',hue='peakFoFc',palette='PiYG',centre=True)
+                    self.addScatter(data=peaksData, geoX='c', geoY='r',title='Density CR FoFC',hue='FoFc',palette='PiYG',centre=True)
+                    self.addScatter(data=peaksData, geoX='r', geoY='s',title='Density RS FoFC',hue='FoFc',palette='PiYG',centre=True)
+                    self.addScatter(data=peaksData, geoX='s', geoY='c',title='Density SC FoFC',hue='FoFc',palette='PiYG',centre=True)
 
-                    self.addScatter(data=peaksData, geoX='x', geoY='y',title='Density XY Fo',hue='peakFo',palette='cubehelix_r')
-                    self.addScatter(data=peaksData, geoX='y', geoY='z',title='Density YZ Fo',hue='peakFo',palette='cubehelix_r')
-                    self.addScatter(data=peaksData, geoX='z', geoY='x',title='Density ZX Fo',hue='peakFo',palette='cubehelix_r')
+                    self.addScatter(data=peaksData, geoX='x', geoY='y',title='Density XY Fo',hue='Fo',palette='cubehelix_r')
+                    self.addScatter(data=peaksData, geoX='y', geoY='z',title='Density YZ Fo',hue='Fo',palette='cubehelix_r')
+                    self.addScatter(data=peaksData, geoX='z', geoY='x',title='Density ZX Fo',hue='Fo',palette='cubehelix_r')
 
-                    self.addScatter(data=peaksData, geoX='x', geoY='y',title='Density XY FoFC',hue='peakFoFc',palette='PiYG',centre=True)
-                    self.addScatter(data=peaksData, geoX='y', geoY='z',title='Density YZ FoFC',hue='peakFoFc',palette='PiYG',centre=True)
-                    self.addScatter(data=peaksData, geoX='z', geoY='x', title='Density ZX FoFC',hue='peakFoFc',palette='PiYG',centre=True)
+                    self.addScatter(data=peaksData, geoX='x', geoY='y',title='Density XY FoFC',hue='FoFc',palette='PiYG',centre=True)
+                    self.addScatter(data=peaksData, geoX='y', geoY='z',title='Density YZ FoFC',hue='FoFc',palette='PiYG',centre=True)
+                    self.addScatter(data=peaksData, geoX='z', geoY='x', title='Density ZX FoFC',hue='FoFc',palette='PiYG',centre=True)
 
-                    self.addScatter(data=peaksData, geoX='x', geoY='y',title='Density XY 2FoFC',hue='peak2FoFc',palette='cubehelix_r')
-                    self.addScatter(data=peaksData, geoX='y', geoY='z',title='Density YZ 2FoFC',hue='peak2FoFc',palette='cubehelix_r')
-                    self.addScatter(data=peaksData, geoX='z', geoY='x',title='Density ZX 2FoFC',hue='peak2FoFc',palette='cubehelix_r')
+                    self.addScatter(data=peaksData, geoX='x', geoY='y',title='Density XY 2FoFC',hue='2FoFc',palette='cubehelix_r')
+                    self.addScatter(data=peaksData, geoX='y', geoY='z',title='Density YZ 2FoFC',hue='2FoFc',palette='cubehelix_r')
+                    self.addScatter(data=peaksData, geoX='z', geoY='x',title='Density ZX 2FoFC',hue='2FoFc',palette='cubehelix_r')
 
                     self.addScatter(data=atomData, geoX='x', geoY='y',title='PDB XY 2FoFc',hue='2FoFc',palette='cubehelix_r')
                     self.addScatter(data=atomData, geoX='y', geoY='z',title='PDB YZ 2FoFc',hue='2FoFc',palette='cubehelix_r')
@@ -460,15 +494,23 @@ class GeoReport:
         return html
 
     def onePlot(self,geoPl,width):
-        try:
-        #if True:
+        #try:
+        if True:
             if geoPl.newData:
                 geoPl.getNewData()
 
             geoPl.applyRestrictions()
             geoPl.applyExclusions()
 
-            if geoPl.hasMatrix:
+            print(geoPl.plot)
+            if geoPl.plot=='surface':
+                fig, ax = plt.subplots()
+                ret = geoPl.plotToAxes(fig, ax)
+                encoded = geoPl.getPlotImage(fig, ax)
+                htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
+                htmlstring += ret
+                html = '<td width=' + width + '%>' + htmlstring + '</td>\n'
+            elif geoPl.hasMatrix:
                 fig, ax = plt.subplots()
                 ret = geoPl.plotToAxes(fig, ax)
                 encoded = geoPl.getPlotImage(fig, ax)
@@ -484,8 +526,8 @@ class GeoReport:
                 htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
                 htmlstring += ret
                 html = '<td width=' + width + '%>' + htmlstring + '</td>\n'
-        except:
-            html = '<td width=' + width + '%>' + 'Error:' + geoPl.geoX + ' ' + geoPl.geoY + '</td>\n'
+        #except:
+        #    html = '<td width=' + width + '%>' + 'Error:' + geoPl.geoX + ' ' + geoPl.geoY + '</td>\n'
 
         return (html)
 
