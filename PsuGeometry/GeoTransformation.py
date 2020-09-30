@@ -10,6 +10,7 @@ PI = np.pi
 
 class transformation:
     def __init__(self,A,B,C):
+        self.print_info = False
         self.rotations = []
         self.A = A
         self.B = B
@@ -18,26 +19,30 @@ class transformation:
         self.A = [self.A[0] - A[0],self.A[1] - A[1],self.A[2] - A[2]] #A is translated to the origibn
         self.B = [self.B[0] - A[0],self.B[1] - A[1],self.B[2] - A[2]]
         self.C = [self.C[0] - A[0],self.C[1] - A[1],self.C[2] - A[2]]
-        print('\t\ttransformation object',A,B,C)
-        print('\t\ttranslated to', self.A, self.B, self.C)
+        if self.print_info:
+            print('\t\ttransformation object',A,B,C)
+            print('\t\ttranslated to', self.A, self.B, self.C)
 
         #Set it all up in the init
         theta = self.get2dRotationAngle(self.B[0], self.B[1])
         self.rotations.append(['XY', theta])
         self.B[0],self.B[1] = self.addRotation(self.B[0],self.B[1],theta) #holds x and zeroes y
         self.C[0],self.C[1] = self.addRotation(self.C[0],self.C[1],theta)
-        print('\t\t\t coords after XY', theta, self.A, self.B, self.C)
+        if self.print_info:
+            print('\t\t\t coords after XY', theta, self.A, self.B, self.C)
 
         theta = self.get2dRotationAngle(self.B[0], self.B[2])
         self.B[0],self.B[2] = self.addRotation(self.B[0],self.B[2], theta) #holds x and zeroes z
         self.C[0], self.C[2] = self.addRotation(self.C[0], self.C[2],theta)
         self.rotations.append(['XZ', theta])
-        print('\t\t\t coords after XZ', theta, self.A, self.B, self.C)
+        if self.print_info:
+            print('\t\t\t coords after XZ', theta, self.A, self.B, self.C)
 
         theta = self.get2dRotationAngle(self.C[1], self.C[2])
         self.C[1], self.C[2] = self.addRotation(self.C[1], self.C[2],theta)  # holds y and zeroes z
         self.rotations.append(['YZ', theta])
-        print('\t\t\t coords after YZ', theta, self.A, self.B, self.C)
+        if self.print_info:
+            print('\t\t\t coords after YZ', theta, self.A, self.B, self.C)
         # we will end up with [0,0,0], [x,0,0],[x,y,0]
 
     def applyTransformation(self,point):
@@ -116,7 +121,8 @@ class transformation:
             theta *= 360 # in degrees
             if quartile_from == 4 or quartile_from == 3:
                 theta = 360 - theta
-            print('\t\t\t\t theta 2d calc',vector_o_a,vector_o_b,vector_a_b,mag_a_b_sq,cos_theta,theta)
+            if self.print_info:
+                print('\t\t\t\t theta 2d calc',vector_o_a,vector_o_b,vector_a_b,mag_a_b_sq,cos_theta,theta)
 
         if theta < 0:
             theta = 360 + theta

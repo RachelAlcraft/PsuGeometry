@@ -5,6 +5,7 @@ import numpy as np
 class GeoSpace:
 
     def getSquare(self,length,gap,central,linear,planar):
+        print('PSU: get transformed square',central,linear,planar)
         # Create the transformation that would take us from whereever the atoms live to the origin.
         # We will then apply this transformation to all the coordinates in the cube
         transformation = geot.transformation(central, linear, planar)
@@ -15,9 +16,7 @@ class GeoSpace:
                     x = sq_x[i, j]
                     y = sq_y[i, j]
                     z = sq_z[i, j]
-                    print('from',x,y,z)
                     x, y, z = transformation.applyTransformation([x, y, z])
-                    print('to', x, y, z)
                     sq_x[i, j] = x
                     sq_y[i, j] = y
                     sq_z[i, j] = z
@@ -38,7 +37,4 @@ class GeoSpace:
                     sq_x[i+sides,j+sides] = x
                     sq_y[i+sides,j+sides] = y
                     sq_z[i+sides,j+sides] = z
-        print(sq_x)
-        print(sq_y)
-        print(sq_z)
         return ([sq_x,sq_y,sq_z])

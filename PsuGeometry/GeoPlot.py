@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import io
 import base64
+import math
 
 from PsuGeometry import GeoReport as geor
 from PsuGeometry import GeoPdb as geopdb
@@ -31,6 +32,7 @@ class GeoPlot:
         self.newData = newData
         self.categorical = categorical
         self.numpy = []
+        self.norm = False
         self.hasMatrix = False
         self.axX = 0,0
         self.axY = 0, 0
@@ -63,10 +65,28 @@ class GeoPlot:
             return self.plotSurface(fig, ax)
 
     def plotSurface(self, fig, ax):
+        col='darkgrey'
+        lw = 1
+        afa=0.6
+        lvls=12
+        if self.norm:
+            col='black'
+            afa=0.7
+            x,y = self.surface.shape
+            mind = 1000
+            for i in range(0, x):
+                for j in range(0, y):
+                    mind = min(mind, self.surface[i,j])
+            for i in range(0, x):
+                for j in range(0, y):
+                    val = (self.surface[i,j]-mind)+1
+                    self.surface[i,j] = math.log(val)
+
         image = plt.imshow(self.surface, cmap=self.palette, interpolation='nearest', origin='low', aspect='equal')
-        image = plt.contour(self.surface, colors='grey', alpha=0.3, linewidths=1, levels=15)
+        image = plt.contour(self.surface, colors=col, alpha=afa, linewidths=lw, levels=lvls)
         ax.grid(False)
         plt.axis('off')
+        plt.title(self.title)
         return ''
 
 
