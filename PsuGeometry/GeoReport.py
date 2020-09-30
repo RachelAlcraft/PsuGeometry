@@ -80,7 +80,7 @@ class GeoReport:
         title +=atomA+':'+atomB + '\n'
         title += 'Max Contact=' +  str(distanceLimit) + 'Å\n'
         title += 'Residue Gap=' + str(ridLimit)
-        gp = geop.GeoPlot(data=df, geoX='ridA', geoY='ridB', title=title, newData=False, hue=hue,
+        gp = geop.GeoPlot(data=df, geoX='ridxA', geoY='ridxB', title=title, newData=False, hue=hue,
                           palette=palette, plot='contact',categorical=categorical,report=self)
         self.plots.append(gp)
 

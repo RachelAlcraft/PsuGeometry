@@ -87,7 +87,7 @@ class GeoPdb:
         dicdfs = []
         for atom in self.atoms:
             dic={   'pdbCode':atom.values['pdbCode'],'resolution':atom.values['resolution'],
-                    'chain':atom.values['chain'], 'rid':atom.values['rid'],
+                    'chain':atom.values['chain'], 'rid':atom.values['rid'],'ridx':atom.values['ridx'],
                     'dssp':atom.values['dssp'], 'aa':atom.values['aa'],
                     'atom':atom.values['atom'], 'atomNo':atom.values['atomNo'],
                     'electrons':atom.values['electrons'], 'element':atom.values['element'],
@@ -124,6 +124,7 @@ class GeoPdb:
                 structure = parser.get_structure(pdbCode, self.pdbDataPath + 'pdb' + pdbCode + '.ent')
             resolution = structure.header['resolution']
             atomNo = 0
+            resnum = 1
             for model in structure:
                 for chain in model:
                     for residue in chain:
@@ -131,6 +132,8 @@ class GeoPdb:
                         # print('Residue:', r)
                         rid = residue.get_full_id()[3][1]
                         chain = residue.get_full_id()[2]
+                        ridx = resnum
+                        resnum = resnum+1
                         if r != 'HOH':  # bio.is_aa(residue):
                             for atom in residue:
                                 if atom.is_disordered():
@@ -139,7 +142,7 @@ class GeoPdb:
                                 # print('Atom:', atom)
                                 oneAtom = atm.GeoAtom()
                                 oneAtom.setStructureInfo(pdbCode, resolution)
-                                oneAtom.setResidueInfo(chain, rid, r)
+                                oneAtom.setResidueInfo(chain, rid, ridx,r)
                                 atomNo += 1
                                 name = atom.get_name()
                                 occupant = atom.get_full_id()[4][1]
@@ -224,6 +227,8 @@ class GeoPdb:
 
         if 'aa' not in hues:
             hues.append('aa')
+        if 'ridx' not in hues:
+            hues.append('ridx')
         if 'atomNo' not in hues:
             hues.append('atomNo')
         if 'bfactor' not in hues:

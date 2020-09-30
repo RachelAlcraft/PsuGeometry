@@ -5,7 +5,8 @@ pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
 printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/contacts/'
 
-pdbList = ['5nqo']#,'1ejg','4rek']
+pdbList = ['5nqo','1ejg','4rek']
+pdbList = ['6ctd'] # large multichain structure
 
 for pdb in pdbList:
     pdb = pdb.lower()

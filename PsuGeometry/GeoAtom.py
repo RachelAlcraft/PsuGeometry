@@ -17,6 +17,7 @@ class GeoAtom:
         # Residue information
         self.values['chain'] = ''
         self.values['rid'] = 0
+        self.values['ridx'] = 0
         self.values['dssp'] = ''
         self.values['aa'] = ''
         # Atom information
@@ -44,9 +45,10 @@ class GeoAtom:
         self.values['pdbCode'] = pdbCode
         self.values['resolution'] = resolution
 
-    def setResidueInfo(self,chain,rid,aa):
+    def setResidueInfo(self,chain,rid,ridx,aa):
         self.values['chain'] = chain
         self.values['rid'] = int(rid)
+        self.values['ridx'] = int(ridx)
         self.values['aa'] = aa
 
     def setAtomInfo(self,atom,atomNo,x,y,z,bfactor,occupant,occupancy):

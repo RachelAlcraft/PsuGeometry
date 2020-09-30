@@ -141,7 +141,7 @@ class GeoPlot:
 
     def plotScatter(self,fig, ax):
         #fig, ax = plt.subplots()
-        print('**1')
+
         if self.categorical or self.hue == 'dssp':
             #blanksdata = self.data[self.data[self.hue] == '']
             #print(blanksdata)
@@ -182,7 +182,6 @@ class GeoPlot:
             alpha = 0.4
             self.palette='Greys'
 
-        print('**2')
         if self.centre:
             self.data[self.hue + '2'] = self.data[self.hue] ** 2
             data = self.data.sort_values(by=self.hue + '2', ascending=True)
@@ -202,7 +201,6 @@ class GeoPlot:
             ax.set_ylabel(self.geoY)
 
         elif self.plot == 'contact':
-            print('**3')
             alpha = 0.75
             self.data['distanceinv'] = 1/(self.data['distance'] ** 3)*4000
             if self.categorical == False:

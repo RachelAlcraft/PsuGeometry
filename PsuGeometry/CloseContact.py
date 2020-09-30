@@ -19,6 +19,7 @@ class CloseContact:
             atomA = atmA.values['atom']
             if atomA == self.atomA:
                 ridA=atmA.values['rid']
+                ridxA = atmA.values['ridx']
                 aaA = atmA.values['aa']
                 chainA = atmA.values['chain']
                 occA = atmA.values['occupant']
@@ -30,6 +31,7 @@ class CloseContact:
                 for atmB in self.pdb.atoms:
                     atomB = atmB.values['atom']
                     ridB = atmB.values['rid']
+                    ridxB = atmB.values['ridx']
                     aaB = atmB.values['aa']
                     chainB = atmB.values['chain']
                     occB = atmB.values['occupant']
@@ -48,12 +50,14 @@ class CloseContact:
                             dicOne['contactA'] = atomA
                             dicOne['aaA'] = aaA
                             dicOne['ridA'] = ridA
+                            dicOne['ridxA'] = ridxA
                             dicOne['atomNoA'] = atomNoA
                             dicOne['chainA'] = chainA
                             dicOne['occA'] = occA
                             dicOne['contactB'] = atomB
                             dicOne['aaB'] = aaB
                             dicOne['ridB'] = ridB
+                            dicOne['ridxB'] = ridxB
                             dicOne['atomNoB'] = atomNoB
                             dicOne['chainB'] = chainB
                             dicOne['occB'] = occB
