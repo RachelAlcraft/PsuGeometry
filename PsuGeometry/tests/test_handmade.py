@@ -45,9 +45,9 @@ georep.addScatter(data=data, geoX='CA:C:N+1:CA+1',geoY='C:N+1',title='Omega CA',
 
 # Narrow down the data to a zoomed in area aorund the residue of interest
 serdata = data[data['CA:CA+1'] > 5]
-georep.addScatter(data=serdata, geoX='CA:C:N+1:CA+1',geoY='CA:CA+1',title='Zoomed in', hue='rid',palette='Accent')
-georep.addScatter(data=serdata, geoX='CA:C:N+1:CA+1',geoY='N:CA:C',title='Zoomed in', hue='aa',palette='Accent')
-georep.addScatter(data=serdata, geoX='CA:C:N+1:CA+1',geoY='C:N+1',title='Zoomed in', palette='Accent')
+georep.addScatter(data=serdata, geoX='CA:C:N+1:CA+1',geoY='CA:CA+1',title='Zoomed in', hue='rid',palette='Spectral')
+georep.addScatter(data=serdata, geoX='CA:C:N+1:CA+1',geoY='N:CA:C',title='Zoomed in', hue='aa',palette='Spectral')
+georep.addScatter(data=serdata, geoX='CA:C:N+1:CA+1',geoY='C:N+1',title='Zoomed in', palette='Spectral')
 
 
 # And finally create the reort with a file name of choice

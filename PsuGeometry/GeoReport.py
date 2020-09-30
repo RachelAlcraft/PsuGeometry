@@ -68,14 +68,19 @@ class GeoReport:
         self.plots.append(diffPlot.plotDiff)
         self.plots.append(diffPlot.plotB)
 
-    def addCloseContact(self,pdbCode,atomA,atomB,distanceLimit=8,ridLimit=2,palette='viridis',hue='distance',categorical=False):
+    def addCloseContact(self,pdbCode,atomA,atomB,distanceLimit=8,ridLimit=2,palette='viridis',hue='distance',categorical=False,title=''):
         pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
         pdb = pdbmanager.getPdb(pdbCode)
         cc = geocc.CloseContact(pdb,atomA,atomB,distanceLimit,ridLimit,hue)
         if hue !='distance':
             hue = hue+'A'
         df = cc.createContacts()
-        gp = geop.GeoPlot(data=df, geoX='ridA', geoY='ridB', title=atomA+':'+atomB, newData=False, hue=hue,
+        if title != '':
+            title += '\n'
+        title +=atomA+':'+atomB + '\n'
+        title += 'Max Contact=' +  str(distanceLimit) + 'Å\n'
+        title += 'Residue Gap=' + str(ridLimit)
+        gp = geop.GeoPlot(data=df, geoX='ridA', geoY='ridB', title=title, newData=False, hue=hue,
                           palette=palette, plot='contact',categorical=categorical,report=self)
         self.plots.append(gp)
 
@@ -286,10 +291,10 @@ class GeoReport:
                 if apdb.hasDensity:
                     print('\tPSU:', reportName, 'for', apdb.pdbCode)
                     allPoints = True
-                    title = 'Density Points and Atoms Comparison'
+                    maintitle = 'Density Points and Atoms Comparison'
                     if reportName == 'Slow_DensityPeaksPerPdb':
                         allPoints = False
-                        title = 'Density Peaks and Atoms Comparison'
+                        maintitle = 'Density Peaks and Atoms Comparison'
                     peaksData = apdb.geoDen.getPeaks(allPoints)
                     atomData = apdb.getDataFrame()
                     atomData['FoFc2'] = atomData['FoFc'] ** 2
@@ -331,9 +336,9 @@ class GeoReport:
                     self.addScatter(data=atomData, geoX='x', geoY='y',title='PDB XY 2FoFc',hue='2FoFc',palette='cubehelix_r')
                     self.addScatter(data=atomData, geoX='y', geoY='z',title='PDB YZ 2FoFc',hue='2FoFc',palette='cubehelix_r')
                     self.addScatter(data=atomData, geoX='z', geoY='x',title='PDB ZX 2FoFc',hue='2FoFc',palette='cubehelix_r')
-                    self.addScatter(data=atomData, geoX='x', geoY='y',title='PDB XY Electrons',hue='electrons',palette='cubehelix_r',categorical=True)
-                    self.addScatter(data=atomData, geoX='y', geoY='z',title='PDB YZ Electrons',hue='electrons',palette='cubehelix_r',categorical=True)
-                    self.addScatter(data=atomData, geoX='z', geoY='x',title='PDB ZX Electrons',hue='electrons',palette='cubehelix_r',categorical=True)
+                    self.addScatter(data=atomData, geoX='x', geoY='y',title='PDB XY Electrons',hue='electrons',palette='Spectral_r',categorical=True)
+                    self.addScatter(data=atomData, geoX='y', geoY='z',title='PDB YZ Electrons',hue='electrons',palette='Spectral_r',categorical=True)
+                    self.addScatter(data=atomData, geoX='z', geoY='x',title='PDB ZX Electrons',hue='electrons',palette='Spectral_r',categorical=True)
                     self.addScatter(data=atomData, geoX='x', geoY='y',title='PDB XY FoFc',hue='FoFc',palette='PiYG',centre=True)
                     self.addScatter(data=atomData, geoX='y', geoY='z',title='PDB YZ FoFc',hue='FoFc',palette='PiYG',centre=True)
                     self.addScatter(data=atomData, geoX='z', geoY='x',title='PDB ZX FoFc',hue='FoFc',palette='PiYG',centre=True)
@@ -346,13 +351,13 @@ class GeoReport:
                     self.addScatter(data=atomData, geoX='x', geoY='y',title='PDB XY amino acids',hue='aa',palette='nipy_spectral',categorical=True)
                     self.addScatter(data=atomData, geoX='y', geoY='z',title='PDB YZ amino acids',hue='aa',palette='nipy_spectral',categorical=True)
                     self.addScatter(data=atomData, geoX='z', geoY='x',title='PDB ZX amino acids',hue='aa',palette='nipy_spectral',categorical=True)
-                    self.addScatter(data=atomData, geoX='bfactor', geoY='FoFc2',title='PDB bfactor vs FoFc^2',hue='electrons',palette='viridis_r',categorical=True)
+                    self.addScatter(data=atomData, geoX='bfactor', geoY='2FoFc',title='PDB bfactor vs 2FoFc',hue='electrons',palette='viridis_r',categorical=True)
                     self.addScatter(data=atomData, geoX='Fc', geoY='Fo',title='PDB Fc vs Fc',hue='electrons',palette='viridis_r',categorical=True)
                     self.addScatter(data=atomData, geoX='electrons', geoY='2FoFc',title='PDB electrons vs 2FoFc',hue='element',palette='viridis_r',categorical=True)
                     self.addHistogram(data=atomData, geoX='aa',title='Amino Acids')
                     self.addHistogram(data=atomData, geoX='element',title='Atoms')
                     self.addHistogram(data=atomData, geoX='2FoFc',title='Peaks in 2FoFc')
-                    self.printToHtml(title, cols, fileName + '_' + apdb.pdbCode)
+                    self.printToHtml(maintitle, cols, fileName + '_' + apdb.pdbCode)
                 else:
                     print('\tPSU:',apdb.pdbCode,'has no density matrix')
 
@@ -360,7 +365,7 @@ class GeoReport:
 
 
     #def printCsvToHtml(self, queryList,pdbList,title,cols,printPath,fileName):
-    def printToHtml(self, title, cols, fileName):
+    def printToHtml(self, maintitle, cols, fileName):
         print('PSU: formatting to html...')
         width=str(100/cols)
         reportPath = self.outDataPath + fileName + ".html"
@@ -415,7 +420,7 @@ class GeoReport:
                         html += self.onePlot(geoqSplit, width)
 
         html += '</tr></table><hr/><p>Produced by PsuGeometry, written by Rachel Alcraft<br/>Please cite the application note...</p></body>\n'
-        hhtml = self.getHeaderString(fileName, title)
+        hhtml = self.getHeaderString(fileName, maintitle)
         # and print
         f = open(reportPath, "w+")
         f.write(hhtml + html)
