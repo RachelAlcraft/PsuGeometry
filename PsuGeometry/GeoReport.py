@@ -101,29 +101,38 @@ class GeoReport:
             self.addScatter(data=peaksData, geoX=geoX, geoY=geoY, title=title, hue=hue, palette=palette,categorical=categorical)
 
 
-    def addDensitySlice(self, pdbCode, length,gap,central, linear, planar, palette='viridis', title='',hue='2FoFc',norm=False):
+    def addDensitySlice(self, pdbCode, Fos,Fcs,length,gap,central, linear, planar, palette='viridis', title='',logged=False,centre=False):
 
+        sides = int((length/gap) / 2)
         pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
         apdb = pdbmanager.getPdb(pdbCode)
-        squares = length*2+1
+        squares = sides*2+1
         sq = geosp.GeoSpace().getSquare(squares,gap,central,linear,planar)
-        sfc = apdb.getDensitySquare(sq,hue)
-        gp = geop.GeoPlot(data=None,geoX='',title=title, hue=hue, palette=palette, plot='surface', report=self)
+        sfc = apdb.getDensitySquare(sq,Fos,Fcs)
+        gp = geop.GeoPlot(data=None,geoX='',title=title, palette=palette, plot='surface', report=self,centre=centre)
         gp.surface = sfc
-        gp.norm=norm
+        gp.logged=logged
         self.plots.append(gp)
         return sfc
 
-    def addDensitySlices(self, slices, palette='viridis', title='',norm=False):
+    def addDensitySlices(self, slices, palette='viridis', title='',logged=False,centre=False):
         mat = []
         for s in slices:
             if mat == []:
                 mat = s
             else:
                 mat = mat + s
-        gp = geop.GeoPlot(data=None, geoX='', title=title, palette=palette, plot='surface', report=self)
+        gp = geop.GeoPlot(data=None, geoX='', title=title, palette=palette, plot='surface', report=self,centre=centre)
         gp.surface = mat
-        gp.norm=norm
+        gp.logged=logged
+        self.plots.append(gp)
+        return mat
+
+    def addSurfaceOverlay(self, surfaces, palette='viridis', title='',logged=False):
+        mat = []
+        gp = geop.GeoPlot(data=None, geoX='', title=title, palette=palette, plot='surfaces', report=self)
+        gp.surface = surfaces
+        gp.logged=logged
         self.plots.append(gp)
         return mat
 
@@ -512,7 +521,7 @@ class GeoReport:
             geoPl.applyRestrictions()
             geoPl.applyExclusions()
 
-            if geoPl.plot=='surface':
+            if geoPl.plot=='surface' or geoPl.plot=='surfaces':
                 fig, ax = plt.subplots()
                 ret = geoPl.plotToAxes(fig, ax)
                 encoded = geoPl.getPlotImage(fig, ax)

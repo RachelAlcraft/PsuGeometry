@@ -106,7 +106,7 @@ class GeoPdb:
             self.createDataStructure()
         return self.dataFrame
 
-    def getDensitySquare(self,squares,hue):
+    def getDensitySquare(self,squares,Fos,Fcs):
         xsq = squares[0]
         ysq = squares[1]
         zsq = squares[2]
@@ -115,7 +115,7 @@ class GeoPdb:
         for i in range(0,x):
             for j in range(0, y):
                 a,b,c = xsq[i,j],ysq[i,j],zsq[i,j]
-                den = self.geoDen.getInterpolatedDensity(a,b,c,False)
+                den = self.geoDen.getInterpolatedDensity(a,b,c,Fos,Fcs)
                 squ[i,j] = den
         return squ
 

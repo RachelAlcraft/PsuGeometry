@@ -32,13 +32,13 @@ class GeoPlot:
         self.newData = newData
         self.categorical = categorical
         self.numpy = []
-        self.norm = False
+        self.logged = False
         self.hasMatrix = False
         self.axX = 0,0
         self.axY = 0, 0
         self.restrictions=restrictions
         self.exclusions = exclusions
-        if self.geoY == '' and plot != 'surface':
+        if self.geoY == '' and plot not in 'surfaces':
             self.plot = 'histogram'
         self.count=count # only for histograms, probability or count
             #if self.hue=='bfactor':
@@ -63,31 +63,60 @@ class GeoPlot:
             return self.plotProbability(fig, ax)
         elif self.plot == 'surface':
             return self.plotSurface(fig, ax)
+        elif self.plot == 'surfaces':
+            return self.plotSurfaces(fig, ax)
 
     def plotSurface(self, fig, ax):
+        afa = 0.6
+        if self.logged:
+            afa = 0.7
+        self.plotOneSurface(fig,ax,self.surface,afa,self.centre)
+        return ''
+
+    def plotOneSurface(self, fig, ax,surface,afa,zero):
         col='darkgrey'
         lw = 1
-        afa=0.6
-        lvls=12
-        if self.norm:
+        lvls=15
+        if self.logged:
             col='black'
-            afa=0.7
-            x,y = self.surface.shape
+            x,y = surface.shape
             mind = 1000
             for i in range(0, x):
                 for j in range(0, y):
-                    mind = min(mind, self.surface[i,j])
+                    mind = min(mind, surface[i,j])
             for i in range(0, x):
                 for j in range(0, y):
-                    val = (self.surface[i,j]-mind)+1
-                    self.surface[i,j] = math.log(val)
+                    val = (surface[i,j]-mind)+1
+                    surface[i,j] = math.log(val)
 
-        image = plt.imshow(self.surface, cmap=self.palette, interpolation='nearest', origin='low', aspect='equal')
-        image = plt.contour(self.surface, colors=col, alpha=afa, linewidths=lw, levels=lvls)
-        ax.grid(False)
+        if zero:
+            x, y = surface.shape
+            mind = 1000
+            maxd = -1000
+            for i in range(0, x):
+                for j in range(0, y):
+                    mind = min(mind, surface[i, j])
+                    maxd = max(maxd, surface[i, j])
+            maxs = max(maxd,abs(mind))
+            mins=-1*maxs
+            image = plt.imshow(surface, cmap=self.palette, interpolation='nearest', origin='low', aspect='equal',vmin=mins,vmax=maxs)
+        else:
+            image = plt.imshow(surface, cmap=self.palette, interpolation='nearest', origin='low', aspect='equal')
+
+        image = plt.contour(surface, colors=col, alpha=afa, linewidths=lw, levels=lvls)
+        #ax.grid(False)
+        #cbar = fig.colorbar(image, ax=ax)
         plt.axis('off')
         plt.title(self.title)
         return ''
+
+    def plotSurfaces(self, fig, ax):
+        afa = 1
+        for surface,centre in self.surface:
+            self.plotOneSurface(fig,ax,surface,afa,centre)
+            afa = 0.4
+        return ''
+
 
 
     def plotHistogram(self,fig, ax):

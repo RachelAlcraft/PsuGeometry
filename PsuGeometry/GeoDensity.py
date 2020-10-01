@@ -46,12 +46,12 @@ class GeoDensity:
 
     def getDensityXYZ(self,x,y,z): # this is not the intyerpolated density
         tFoFcx = self.analyser.densityObj.getPointDensityFromXyz([x,y,z])
-        tFoFc = self.getInterpolatedDensity(x,y,z,False)
+        tFoFc = self.getInterpolatedDensityMatrix(x,y,z,False)
         #print(tFoFcx,tFoFc)
         tFoFc += self.translation
         tFoFc *= self.factor
         FoFcx = self.analyser.diffDensityObj.getPointDensityFromXyz([x, y, z])
-        FoFc = self.getInterpolatedDensity(x, y, z, True)
+        FoFc = self.getInterpolatedDensityMatrix(x, y, z, True)
         #print(FoFcx, FoFc)
         FoFc *= self.factor
         Fo = tFoFc - FoFc
@@ -212,7 +212,14 @@ class GeoDensity:
 
         return (isPeak)
 
-    def getInterpolatedDensity(self,x,y,z,isDiff):
+    def getInterpolatedDensity(self, x, y, z, Fo, Fc):
+        valMain = self.getInterpolatedDensityMatrix(x, y, z, False)
+        valDiff = self.getInterpolatedDensityMatrix(x, y, z, True)
+        valFo = valMain - valDiff
+        valFc = valMain - (2*valDiff)
+        return (Fo * valFo) + (Fc * valFc)
+
+    def getInterpolatedDensityMatrix(self,x,y,z,isDiff):
         noninterp = self.analyser.densityObj.getPointDensityFromXyz([x, y, z])
         nonc,nonr,nons = self.analyser.densityObj.header.xyz2crsCoord([x,y,z])
         nininterpc = self.analyser.densityObj.getPointDensityFromCrs([nonc,nonr,nons])
