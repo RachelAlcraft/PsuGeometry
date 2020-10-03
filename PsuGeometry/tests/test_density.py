@@ -36,10 +36,4 @@ for pdb in pdbList  :
     georep.printToHtml('Manually Chosen Density Views', 3, pdb + '_den2')
 
 
-for pdb in pdbList:
-    georep = geor.GeoReport([pdb],pdbDataPath, edDataPath,printPath)
-    if peaks:
-        georep.printReport('Slow_DensityPeaksPerPdb', pdb + '_denpk')
-    else:
-        georep.printReport('Slow_DensityPointsPerPdb', pdb + '_denpt')
 

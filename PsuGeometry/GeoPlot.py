@@ -67,17 +67,17 @@ class GeoPlot:
             return self.plotSurfaces(fig, ax)
 
     def plotSurface(self, fig, ax):
-        afa = 0.6
+        afa = 1
+        lw = 0.7
         if self.logged:
-            afa = 0.7
-        self.plotOneSurface(fig,ax,self.surface,afa,self.centre)
+            afa = 1
+        self.plotOneSurface(fig,ax,self.surface,afa,self.centre,self.palette,self.logged,lw)
         return ''
 
-    def plotOneSurface(self, fig, ax,surface,afa,zero):
-        col='darkgrey'
-        lw = 1
-        lvls=15
-        if self.logged:
+    def plotOneSurface(self, fig, ax,surface,afa,zero,palette,logged,lw):
+        col='black'
+        lvls=12
+        if logged:
             col='black'
             x,y = surface.shape
             mind = 1000
@@ -99,9 +99,9 @@ class GeoPlot:
                     maxd = max(maxd, surface[i, j])
             maxs = max(maxd,abs(mind))
             mins=-1*maxs
-            image = plt.imshow(surface, cmap=self.palette, interpolation='nearest', origin='low', aspect='equal',vmin=mins,vmax=maxs)
+            image = plt.imshow(surface, cmap=palette, interpolation='nearest', origin='low', aspect='equal',vmin=mins,vmax=maxs,alpha=afa)
         else:
-            image = plt.imshow(surface, cmap=self.palette, interpolation='nearest', origin='low', aspect='equal')
+            image = plt.imshow(surface, cmap=palette, interpolation='nearest', origin='low', aspect='equal',alpha=afa)
 
         image = plt.contour(surface, colors=col, alpha=afa, linewidths=lw, levels=lvls)
         #ax.grid(False)
@@ -111,10 +111,12 @@ class GeoPlot:
         return ''
 
     def plotSurfaces(self, fig, ax):
-        afa = 1
-        for surface,centre in self.surface:
-            self.plotOneSurface(fig,ax,surface,afa,centre)
-            afa = 0.4
+        afa = 0.9
+        lw = 0.2
+        for surface,palette,centre,logged in self.surface:
+            self.plotOneSurface(fig,ax,surface,afa,centre,palette,logged,lw)
+            afa = 0.6
+            lw = 0.2
         return ''
 
 

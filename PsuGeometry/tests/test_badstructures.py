@@ -1,5 +1,6 @@
 
 from PsuGeometry import GeoReport as psu
+from PsuGeometry import GeoPdb as geopdb
 
 pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
@@ -22,6 +23,10 @@ for pdbCode in pdbList:
 
     #Create the geoplots
     printList = []
+    georep.addHistogram(geoX='N:CA', title='N-CA', ghost=True, hue='rid')
+    georep.addHistogram(geoX='CA:C', title='C-CA', ghost=True, hue='rid')
+    georep.addHistogram(geoX='CA:CA+1', title='CA-CA+1', ghost=True, hue='rid')
+
     georep.addHistogram(data=dataMain,geoX='N:CA',title='N-CA',ghost=True,splitKey='pdbCode')
     georep.addHistogram(data=dataMain,geoX='CA:C',title='CA-C',ghost=True)
     georep.addHistogram(data=dataMain,geoX='C:O',title='C-O',ghost=True)
@@ -44,3 +49,12 @@ for pdbCode in pdbList:
 
     geoName = pdbCode.lower() + "_bad"
     georep.printToHtml('Structures With Unexpected Geometry',3,geoName)
+
+    csv = georep.getGeoemtryCsv(['N:CA'],['bfactor'])
+    pdbmanager = geopdb.GeoPdbs(pdbDataPath, edDataPath)
+    data = pdbmanager.getPdb(pdbCode).getDataFrame()
+    geoFileName = printPath + pdbCode.lower() + 'geo.csv'
+    dataFileName = printPath + pdbCode.lower() + '_data.csv'
+    csv.to_csv(geoFileName, index=False)
+    data.to_csv(dataFileName, index=False)
+

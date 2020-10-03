@@ -76,6 +76,8 @@ class GeoDensity:
             print("PSU: Warning, the Density peaks function can take some minutes")
         matrix = self.analyser.densityObj.density
         maxMat = matrix.max()
+        if maxMat < 100:
+            divisor = 5
         a, b, c = self.analyser.densityObj.density.shape
         print('\t\tPSU: Peaks=',a,'/',end=',')
         finalPeakList = []

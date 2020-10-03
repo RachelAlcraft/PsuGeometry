@@ -102,7 +102,6 @@ class GeoReport:
 
 
     def addDensitySlice(self, pdbCode, Fos,Fcs,length,gap,central, linear, planar, palette='viridis', title='',logged=False,centre=False):
-
         sides = int((length/gap) / 2)
         pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
         apdb = pdbmanager.getPdb(pdbCode)
@@ -128,9 +127,9 @@ class GeoReport:
         self.plots.append(gp)
         return mat
 
-    def addSurfaceOverlay(self, surfaces, palette='viridis', title='',logged=False):
+    def addSurfaceOverlay(self, surfaces, title='',logged=False):
         mat = []
-        gp = geop.GeoPlot(data=None, geoX='', title=title, palette=palette, plot='surfaces', report=self)
+        gp = geop.GeoPlot(data=None, geoX='', title=title, plot='surfaces', report=self)
         gp.surface = surfaces
         gp.logged=logged
         self.plots.append(gp)
