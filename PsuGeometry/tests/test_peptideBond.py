@@ -3,7 +3,7 @@ from PsuGeometry import GeoPdb as geop
 
 ###### User Choices ######################################################
 pdbCodes= ['1ejg','2cnq','1us0','6q53','6jvv','4rek']
-#pdbCodes= ['4rek']
+pdbCodes= ['1ejg']
 pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
 printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/slices/'
@@ -14,6 +14,8 @@ runs = [
         #,[1,-1,'RdGy',True]
         ]
 
+interpmethod = 'spline' #linear or nearest or spline or sphere
+differs=2 # derivative
 logged = True
 length = 6
 gaps = 0.1
@@ -91,7 +93,7 @@ for pdbCode in pdbCodes:
 
                     central,linear,planar = [cx,cy,cz],[lx,ly,lz],[px,py,pz]
                     title = 'Size=' + str(length) + 'Å Gaps=' + str(gaps) + 'Å\n' + ch + str(rid) + '\n' + 'c='+ caa + ':' + str(central) + '\n' + 'l=' + laa + ':'+ str(linear) + '\n' + 'p=' + paa + ':'+ str(planar)
-                    sfc = georep.addDensitySlice(pdbCode,Fos,Fcs,length,gaps,central,linear,planar,palette=palette,title=title,logged=logged)
+                    sfc = georep.addDensitySlice(pdbCode,Fos,Fcs,length,gaps,central,linear,planar,palette=palette,title=title,logged=logged,interp=interpmethod,differ=differs)
 
                     if laa == 'PRO':
                         proslices.append(sfc)
@@ -105,10 +107,10 @@ for pdbCode in pdbCodes:
         sfcd = georep.addDensitySlices(proslices, palette=palette, title='Proline Next - Log Averaged', logged=True,centre=zero)
         surfaces.append([sfca,zero])
         surfacespro.append([sfcc,zero])
-        matstring = str(Fos) + 'Fo' + str(Fcs) + 'Fc'
+        matstring = str(Fos) + 'Fo' + str(Fcs) + 'Fc_' + interpmethod + '_'
         georep.printToHtml(pdbCode.upper() + ' ' + matstring + ' Peptide Bond Density Slices', 3, pdbCode + matstring + '_dens')
 
-    georep = geor.GeoReport([pdbCode], pdbDataPath, edDataPath, printPath)
+
 
 
 

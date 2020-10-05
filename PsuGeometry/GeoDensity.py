@@ -9,6 +9,7 @@ import pdb_eda
 import numpy as np
 import pandas as pd
 import math
+from PsuGeometry import GeoPolynomial as poly
 
 
 class GeoDensity:
@@ -46,12 +47,12 @@ class GeoDensity:
 
     def getDensityXYZ(self,x,y,z): # this is not the intyerpolated density
         tFoFcx = self.analyser.densityObj.getPointDensityFromXyz([x,y,z])
-        tFoFc = self.getInterpolatedDensityMatrix(x,y,z,False)
+        tFoFc = self.getInterpolatedDensity(x,y,z,2,-1,'linear',0)
         #print(tFoFcx,tFoFc)
         tFoFc += self.translation
         tFoFc *= self.factor
         FoFcx = self.analyser.diffDensityObj.getPointDensityFromXyz([x, y, z])
-        FoFc = self.getInterpolatedDensityMatrix(x, y, z, True)
+        FoFc = self.getInterpolatedDensity(x,y,z,1,-1,'linear',0)
         #print(FoFcx, FoFc)
         FoFc *= self.factor
         Fo = tFoFc - FoFc
@@ -214,14 +215,40 @@ class GeoDensity:
 
         return (isPeak)
 
-    def getInterpolatedDensity(self, x, y, z, Fo, Fc):
-        valMain = self.getInterpolatedDensityMatrix(x, y, z, False)
-        valDiff = self.getInterpolatedDensityMatrix(x, y, z, True)
+    def getInterpolatedDensity(self, x, y, z, Fo, Fc,interp,differ):
+        if interp == 'linear':
+            valMain = self.getInterpolatedLinearDensity(x, y, z, False)
+            valDiff = self.getInterpolatedLinearDensity(x, y, z, True)
+        elif interp == 'spline':
+            valMain = self.getInterpolatedSplinedDensity(x, y, z, False,differ)
+            valDiff = self.getInterpolatedSplinedDensity(x, y, z, True,differ)
+        elif interp == 'sphere':
+            valMain = self.getSphereDensity(x, y, z, False)
+            valDiff = self.getSphereDensity(x, y, z, True)
+        else: # the default is nearest neighbour
+            valMain = self.getNeighbourDensity(x, y, z, False)
+            valDiff = self.getNeighbourDensity(x, y, z, True)
+
         valFo = valMain - valDiff
         valFc = valMain - (2*valDiff)
         return (Fo * valFo) + (Fc * valFc)
 
-    def getInterpolatedDensityMatrix(self,x,y,z,isDiff):
+
+    def getNeighbourDensity(self,x,y,z,isDiff):
+        matrix = self.analyser.densityObj
+        if isDiff:
+            matrix = self.analyser.diffDensityObj
+        noninterp = matrix.getPointDensityFromXyz([x, y, z])
+        return noninterp
+
+    def getSphereDensity(self,x,y,z,isDiff):
+        matrix = self.analyser.densityObj
+        if isDiff:
+            matrix = self.analyser.diffDensityObj
+        noninterp = matrix.getTotalDensityFromXyz([x,y,z],0.3)
+        return noninterp
+
+    def getInterpolatedLinearDensity(self,x,y,z,isDiff):
         noninterp = self.analyser.densityObj.getPointDensityFromXyz([x, y, z])
         nonc,nonr,nons = self.analyser.densityObj.header.xyz2crsCoord([x,y,z])
         nininterpc = self.analyser.densityObj.getPointDensityFromCrs([nonc,nonr,nons])
@@ -256,6 +283,34 @@ class GeoDensity:
 
         return interps[3]
 
+    def getInterpolatedSplinedDensity(self,x,y,z,isDiff,differ):
+        noninterp = self.analyser.densityObj.getPointDensityFromXyz([x, y, z])
+        nonc,nonr,nons = self.analyser.densityObj.header.xyz2crsCoord([x,y,z])
+        nininterpc = self.analyser.densityObj.getPointDensityFromCrs([nonc,nonr,nons])
+
+        matrix = self.analyser.densityObj
+        if isDiff:
+            matrix = self.analyser.diffDensityObj
+
+        co,ro,so = self.Copy_xyz2crsCoord([x,y,z])
+        cmax,rmax,smax = matrix.density.shape
+        cl,cu = math.floor(co), math.ceil(co)
+        rl,ru = math.floor(ro), math.ceil(ro)
+        sl,su = math.floor(so), math.ceil(so)
+        # allpoints can be generated from cl, rl, sl
+        points = []
+        for c in range(cl-1,cl-1+4):
+            for r in range(rl - 1, rl - 1 + 4):
+                for s in range(sl - 1, sl - 1 + 4):
+                    #don't go out of range
+                    ci,ri,si = max(0,c),max(0, r),max(0, s)
+                    ci,ri,si = min(ci,cmax),min(ri, cmax),min(si, cmax)
+                    V = matrix.getPointDensityFromCrs([ci, ri, si])
+                    points.append([ci,ri,si,V])
+
+        interps = self.getSplinedDensityAndPoints(points,[co,ro,so],differ)
+        return interps[3]
+
     def Copy_xyz2crsCoord(self, xyzCoord):
         """
         Copied from the pdb_eda library and adapted to interpolate
@@ -272,8 +327,9 @@ class GeoDensity:
             crsGridPos = [((fraction[i] * self.analyser.densityObj.header.xyzInterval[i])) - self.analyser.densityObj.header.crsStart[self.analyser.densityObj.header.map2xyz[i]] for i in range(3)]
         return [crsGridPos[self.analyser.densityObj.header.map2crs[i]] for i in range(3)]
 
-    def getInterpolatedDensityAndPoints(self,points,centre):
+    def getInterpolatedDensityAndPoints(self,points,centre): #recursive function
         '''
+        RECURSIVE
         points is a list of pairs, where each pair is x,y,z followed by the value to interpolate
         List must be 2^x long
         '''
@@ -307,3 +363,43 @@ class GeoDensity:
             x = (a ** 2 + c ** 2 - b ** 2) / (2 * c)
             fraction = x / c
         return (fraction)
+
+    def getSplinedDensityAndPoints(self,points,centre,differ): #recursive function
+        '''
+        RECURSIVE
+        points is a list of pairs, where each pair is x,y,z followed by the value to interpolate
+        List must be 2^x long
+        '''
+        #print('Recursion depth',len(points))
+        if len(points) == 4: # end of the recursion, return
+            vs = []
+            for point in points:
+                v = point[3]
+                vs.append(v)
+
+            half = int(len(points)/2)
+            p1 = points[half-1]
+            p2 = points[half]
+            fr = self.getFraction(centre,p1,p2)
+            x = p1[0] + fr * (p2[0] - p1[0])
+            y = p1[1] + fr * (p2[1] - p1[1])
+            z = p1[2] + fr * (p2[2] - p1[2])
+            ply = poly.GeoPolynomial(vs,1)
+            # the poly is a sequence so the value we want is a fraction along from the halfway markers
+            valPoint = half + fr
+            finalv = ply.getValue(valPoint,differ)
+            return ([x,y,z,finalv])
+        else:#split recursion down further
+            q1 = int(len(points) / 4)
+            half = int(len(points)/2)
+            q3 = half+q1
+            pointsA = points[:q1]
+            pointsB = points[q1:half]
+            pointsC = points[half:q3]
+            pointsD = points[q3:]
+            newA = self.getSplinedDensityAndPoints(pointsA,centre,differ)
+            newB = self.getSplinedDensityAndPoints(pointsB,centre,differ)
+            newC = self.getSplinedDensityAndPoints(pointsC, centre,differ)
+            newD = self.getSplinedDensityAndPoints(pointsD, centre,differ)
+            return self.getSplinedDensityAndPoints([newA,newB,newC,newD],centre,differ)
+

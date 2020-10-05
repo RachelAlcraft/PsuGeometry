@@ -101,16 +101,17 @@ class GeoReport:
             self.addScatter(data=peaksData, geoX=geoX, geoY=geoY, title=title, hue=hue, palette=palette,categorical=categorical)
 
 
-    def addDensitySlice(self, pdbCode, Fos,Fcs,length,gap,central, linear, planar, palette='viridis', title='',logged=False,centre=False):
+    def addDensitySlice(self, pdbCode, Fos,Fcs,length,gap,central, linear, planar, palette='viridis', title='',logged=False,centre=False,interp='linear',differ=0):
         sides = int((length/gap) / 2)
         pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
         apdb = pdbmanager.getPdb(pdbCode)
         squares = sides*2+1
         sq = geosp.GeoSpace().getSquare(squares,gap,central,linear,planar)
-        sfc = apdb.getDensitySquare(sq,Fos,Fcs)
+        sfc = apdb.getDensitySquare(sq,Fos,Fcs,interp,differ)
         gp = geop.GeoPlot(data=None,geoX='',title=title, palette=palette, plot='surface', report=self,centre=centre)
         gp.surface = sfc
         gp.logged=logged
+        gp.differ=0
         self.plots.append(gp)
         return sfc
 

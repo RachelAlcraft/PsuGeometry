@@ -36,6 +36,7 @@ class GeoPlot:
         self.hasMatrix = False
         self.axX = 0,0
         self.axY = 0, 0
+        self.differ=0
         self.restrictions=restrictions
         self.exclusions = exclusions
         if self.geoY == '' and plot not in 'surfaces':
