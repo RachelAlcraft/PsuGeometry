@@ -86,11 +86,11 @@ class GeoReport:
         self.plots.append(gp)
 
 
-    def addDataView(self, pdbCode, geoX, geoY, palette='viridis', hue='2FoFc', categorical=False, title=''):
+    def addDataView(self, pdbCode, geoX, geoY, palette='viridis', hue='2FoFc', categorical=False, title='',centre=False):
         pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
         apdb = pdbmanager.getPdb(pdbCode)
         df = apdb.getDataFrame()
-        self.addScatter(data=df, geoX=geoX, geoY=geoY, title=title, hue=hue, palette=palette,categorical=categorical)
+        self.addScatter(data=df, geoX=geoX, geoY=geoY, title=title, hue=hue, palette=palette,categorical=categorical,centre=centre)
 
     def addDensityView(self, pdbCode, geoX, geoY, peaks=True,divisor=10, palette='viridis', hue='2FoFc', categorical=False, title=''):
         pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
@@ -101,13 +101,14 @@ class GeoReport:
             self.addScatter(data=peaksData, geoX=geoX, geoY=geoY, title=title, hue=hue, palette=palette,categorical=categorical)
 
 
-    def addDensitySlice(self, pdbCode, Fos,Fcs,length,gap,central, linear, planar, palette='viridis', title='',logged=False,centre=False,interp='linear',differ=0):
+    def addDensitySlice(self, pdbCode, Fos,Fcs,length,gap,central, linear, planar, palette='viridis', title='',logged=False,centre=False,
+                        interp='linear',differ=0,degree=3):
         sides = int((length/gap) / 2)
         pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
         apdb = pdbmanager.getPdb(pdbCode)
         squares = sides*2+1
         sq = geosp.GeoSpace().getSquare(squares,gap,central,linear,planar)
-        sfc = apdb.getDensitySquare(sq,Fos,Fcs,interp,differ)
+        sfc = apdb.getDensitySquare(sq,Fos,Fcs,interp,differ,degree)
         gp = geop.GeoPlot(data=None,geoX='',title=title, palette=palette, plot='surface', report=self,centre=centre)
         gp.surface = sfc
         gp.logged=logged

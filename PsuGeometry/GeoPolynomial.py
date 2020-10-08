@@ -8,9 +8,18 @@ class GeoPolynomial:
         self.derivatives = derivatives
         self.diffCoeffs = self.buildDiffCoeffs(vals)
         self.polyCoeffs = self.buildPolyCoeffs(self.diffCoeffs)
+        self.desc = self.stringDescription()
+
         ##TEST IT##
-        #self.diffCoeffs = self.buildDiffCoeffs([2,6,12,20])
+        #self.diffCoeffs = self.buildDiffCoeffs([1,4,7])
         #self.polyCoeffs = self.buildPolyCoeffs(self.diffCoeffs)
+        #self.desc = self.stringDescription()
+        #print(self.desc)
+        #val1 = self.getValue(2,0)
+        #val2 = self.getValue(2,1)
+        #val3 = self.getValue(2,2)
+        #print(val1,val2,val3)
+
         #print('poly',self.polyCoeffs)
         #print(self.getValue(1,0))
         #print(self.getValue(2,0))
@@ -77,4 +86,13 @@ class GeoPolynomial:
             newy = (xval**degree) * coeff
             yval = yval + newy
         return yval
+
+    def stringDescription(self):
+        desc = ''
+        for i in range(0,len(self.polyCoeffs)):
+            if desc != '':
+                desc = desc + ' '
+            desc = desc + str(self.polyCoeffs[i]) + 'x^' + str(i)
+        return desc
+
 

@@ -112,11 +112,11 @@ class GeoPlot:
         return ''
 
     def plotSurfaces(self, fig, ax):
-        afa = 0.9
+        afa = 0.95
         lw = 0.2
         for surface,palette,centre,logged in self.surface:
             self.plotOneSurface(fig,ax,surface,afa,centre,palette,logged,lw)
-            afa = 0.6
+            afa = 0.55
             lw = 0.2
         return ''
 
@@ -251,16 +251,18 @@ class GeoPlot:
             minh = maxh * -1
             g = ax.scatter(data[self.geoX], data[self.geoY], c=data[self.hue], cmap=self.palette,
                            vmin=minh,vmax=maxh, edgecolor=ecol, alpha=alpha,linewidth=lw,s=20)
-            fig.colorbar(g)
+            cb = fig.colorbar(g)
             ax.set_xlabel(self.geoX)
             ax.set_ylabel(self.geoY)
+            cb.set_label(self.hue)
         elif self.vmin < self.vmax:
             data = self.data.sort_values(by=self.hue, ascending=True)
             g = ax.scatter(data[self.geoX], data[self.geoY], c=data[self.hue], cmap=self.palette, vmin=self.vmin,
                            vmax=self.vmax, edgecolor=ecol, alpha=alpha,linewidth=lw,s=20)
-            fig.colorbar(g)
+            cb = fig.colorbar(g)
             ax.set_xlabel(self.geoX)
             ax.set_ylabel(self.geoY)
+            cb.set_label(self.hue)
 
         elif self.plot == 'contact':
             alpha = 0.75
