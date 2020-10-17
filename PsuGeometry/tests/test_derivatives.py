@@ -5,7 +5,7 @@ import time
 
 ###### User Choices ######################################################
 pdbCodes= ['1ejg','2cnq','1us0','6q53','6jvv','4rek']
-pdbCodes= ['6q53','6jvv']
+#pdbCodes= ['3o4p','1pjx']
 pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
 printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/slices/'
@@ -19,16 +19,37 @@ runs = [
 #[2,-1,'seismic',True,False,4]
 ]
 
-length = 6
+length = 8.5
 gaps = 0.1
 interpmethod = 'spline' #linear or nearest or spline or sphere
 degree = 3
+
+#peptide bond
 central_atom = 'C'
 linear_atom = 'N'
 linear_offset = 1
 planar_atom = 'O'
 planar_offset = 0
 restricted_aa = ''
+
+#tyr ring
+central_atom = 'CE1'
+linear_atom = 'CD2'
+linear_offset = 0
+planar_atom = 'OH'
+planar_offset = 0
+restricted_aa = 'TYR'
+
+#asp bonding
+central_atom = 'CA'
+linear_atom = 'N'
+linear_offset = 0
+planar_atom = 'C'
+planar_offset = 0
+restricted_aa = 'ASP'
+
+
+##
 excluded_aa = ''
 
 
@@ -49,8 +70,10 @@ for pdbCode in pdbCodes:
     georep.addDataView(pdbCode, geoX='x', geoY='y', palette='cubehelix_r', hue='2FoFc')
     georep.addDataView(pdbCode, geoX='y', geoY='z', palette='Spectral', hue='bfactor')
     georep.addDataView(pdbCode, geoX='z', geoY='x', palette='rainbow', hue='atomNo')
-    #georep.addDataView(pdbCode, geoX='x', geoY='z', palette='Spectral', hue='FoFc',centre=True)
-    #georep.addDataView(pdbCode, geoX='y', geoY='x', palette='rainbow', hue='aa',categorical=True)
+    if len(runs) > 3:
+        georep.addDataView(pdbCode, geoX='x', geoY='z', palette='Spectral', hue='FoFc',centre=True)
+    if len(runs) > 4:
+        georep.addDataView(pdbCode, geoX='y', geoY='x', palette='rainbow', hue='aa',categorical=True)
 
     pdbmanager = geop.GeoPdbs(pdbDataPath, edDataPath)
     apdb = pdbmanager.getPdb(pdbCode)
@@ -129,11 +152,13 @@ for pdbCode in pdbCodes:
     den1 = georep.addDensitySlices(dens1, palette=runs[0][2], title='Average Derivative 0', logged=False, centre=runs[0][3])
     den2 = georep.addDensitySlices(dens2, palette=runs[1][2], title='Average Derivative 1', logged=False, centre=runs[1][3])
     den3 = georep.addDensitySlices(dens3, palette=runs[2][2], title='Average Derivative 2', logged=False, centre=runs[2][3])
-    #den4 = georep.addDensitySlices(dens4, palette=runs[3][2], title='Average Derivative 3', logged=False,centre=runs[3][3])
-    #den4 = georep.addDensitySlices(dens5, palette=runs[4][2], title='Average Derivative 4', logged=False,centre=runs[4][3])
+    if len(dens4)>0:
+        den4 = georep.addDensitySlices(dens4, palette=runs[3][2], title='Average Derivative 3', logged=False,centre=runs[3][3])
+    if len(dens5) > 0:
+        den5 = georep.addDensitySlices(dens5, palette=runs[4][2], title='Average Derivative 4', logged=False,centre=runs[4][3])
 
 
-    georep.printToHtml(pdbCode.upper() + ' Peptide Bond Density Derivatives ' + interpmethod, 3,  pdbCode + '_' +interpmethod + '_' + str(degree) + 'degree')
+    georep.printToHtml(pdbCode.upper() + ' Peptide Bond Density Derivatives ' + interpmethod, len(runs),  pdbCode + '_' +interpmethod + '_' + restricted_aa + str(degree) + 'degree')
 
     end = time.time()
     time_diff = end - start

@@ -5,7 +5,7 @@ import time
 
 ###### User Choices ######################################################
 pdbCodes= ['1ejg','2cnq','1us0','6q53','6jvv','4rek']
-pdbCodes= ['1ejg']
+#pdbCodes= ['1ejg']
 pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
 printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/slices/'
@@ -132,7 +132,7 @@ for pdbCode in pdbCodes:
     den2 = georep.addDensitySlices(dens2, palette=runs[1][2], title='Average', logged=runs[1][4], centre=runs[1][3])
     georep.addSurfaceOverlay([[den1,runs[0][2],runs[0][3],runs[0][4]],[den2,runs[1][2],runs[1][3],runs[1][4]]],title='Average Overlay')
 
-    georep.printToHtml(pdbCode.upper() + ' Peptide Bond Laplacian Overlay ' + interpmethod, 3,  pdbCode + interpmethod + '_laplacian')
+    georep.printToHtml(pdbCode.upper() + ' Peptide Bond Laplacian Overlay ' + interpmethod, 3,  pdbCode + '_' + interpmethod + '_laplacian')
 
     end = time.time()
     time_diff = end - start

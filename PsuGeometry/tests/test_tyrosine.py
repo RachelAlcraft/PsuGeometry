@@ -5,31 +5,34 @@ import time
 
 ###### User Choices ######################################################
 pdbCodes= ['1ejg','2cnq','1us0','6q53','6jvv','4rek']
-pdbCodes= ['6jvv','6q53','4rek']
-pdbCodes= ['1ejg','2cnq','5nqo','6jvv','6q53','4rek','1us0']
+pdbCodes= ['1us0']
 pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
 printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/slices/'
 
 # runs are: num of Fo; num of Fc; palette; centre on zero; logg image, differentiation
-#numFo,numFc,palette,zero?log?interp,degree,diff
 runs = [
-[2,-1,'cubehelix_r',False,False,'nearest',0,0],
-[2,-1,'cubehelix_r',False,False,'linear',1,0],
-[2,-1,'cubehelix_r',False,False,'spline',3,0],
-[2,-1,'cubehelix_r',False,False,'spline',5,0]
+[2,-1,'cubehelix_r',False,True,0],
+[2,-1,'seismic',True,False,1],
+[2,-1,'seismic',True,False,2],
+[2,-1,'seismic',True,False,3],
+[2,-1,'seismic',True,False,4]
 ]
 
-length = 6
+length = 8.5
 gaps = 0.1
-central_atom = 'C'
-linear_atom = 'N'
-linear_offset = 1
-planar_atom = 'O'
+interpmethod = 'spline' #linear or nearest or spline or sphere
+degree = 5
+#tyr ring
+central_atom = 'CE1'
+linear_atom = 'CD2'
+linear_offset = 0
+planar_atom = 'OH'
 planar_offset = 0
-restricted_aa = ''
+restricted_aa = 'TYR'
+
+##
 excluded_aa = ''
-restrictednumber = 0 # 0 = all of them
 
 
 #########################################################################
@@ -39,17 +42,20 @@ start = time.time()
 
 for pdbCode in pdbCodes:
 
+    dens1 = []
+    dens2 = []
+    dens3 = []
+    dens4 = []
+    dens5 = []
+
     georep = geor.GeoReport([pdbCode], pdbDataPath, edDataPath, printPath)
-    if len(runs) > 0:
-        georep.addDataView(pdbCode, geoX='x', geoY='y', palette='cubehelix_r', hue='2FoFc')
-    if len(runs) > 1:
-        georep.addDataView(pdbCode, geoX='y', geoY='z', palette='Spectral', hue='bfactor')
-    if len(runs) > 2:
-        georep.addDataView(pdbCode, geoX='z', geoY='x', palette='rainbow', hue='atomNo')
+    georep.addDataView(pdbCode, geoX='x', geoY='y', palette='cubehelix_r', hue='2FoFc')
+    georep.addDataView(pdbCode, geoX='y', geoY='z', palette='Spectral', hue='bfactor')
+    georep.addDataView(pdbCode, geoX='z', geoY='x', palette='rainbow', hue='atomNo')
     if len(runs) > 3:
-        georep.addDataView(pdbCode, geoX='x', geoY='z', palette='seismic', hue='FoFc', centre=True)
+        georep.addDataView(pdbCode, geoX='x', geoY='z', palette='Spectral', hue='FoFc',centre=True)
     if len(runs) > 4:
-        georep.addDataView(pdbCode, geoX='y', geoY='z', palette='rainbow', hue='electrons')
+        georep.addDataView(pdbCode, geoX='y', geoY='x', palette='rainbow', hue='aa',categorical=True)
 
     pdbmanager = geop.GeoPdbs(pdbDataPath, edDataPath)
     apdb = pdbmanager.getPdb(pdbCode)
@@ -65,14 +71,13 @@ for pdbCode in pdbCodes:
     chains = csv['chain'].unique()
     rids = csv['rid'].unique()
     num = len(chains) * len(rids)
-    count = 0
-    averages = {}
+    count = 1
     for ch in chains:
         for rid in rids:
             print(count, '/', num)
             count = count + 1
-            #if True:
-            if restrictednumber == 0 or count <= restrictednumber:
+            if True:
+            # if count < 10:
                 cqry = 'rid=="' + str(rid) + '" and atom=="' + central_atom + '"' + ' and chain=="' + ch + '"'
                 lqry = 'rid=="' + str(
                     rid + linear_offset) + '" and atom=="' + linear_atom + '"' + ' and chain=="' + ch + '"'
@@ -108,28 +113,34 @@ for pdbCode in pdbCodes:
                         palette = run[2]
                         zero = run[3]
                         logged = run[4]
-                        interp=run[5]
-                        degree = run[6]
-                        differ = run[7]
+                        differ = run[5]
 
                         FoFc = str(Fos) + 'Fo'  + str(Fcs) + 'Fc'
-                        title = interp + ' Degree=' + str(degree) + '\nDerivative ' + str(differ) + '\nSize=' + str(length) + 'Å Gaps=' + str(gaps) + 'Å\n' + ch + str(rid) + ' ' + FoFc + '\n' + 'c=' + caa + ':' + str(central) + '\n' + 'l=' + laa + ':' + str(linear) + '\n' + 'p=' + paa + ':' + str(planar)
+                        title = 'Spline Degree=' + str(degree) + '\nDerivative ' + str(differ) + '\nSize=' + str(length) + 'Å Gaps=' + str(gaps) + 'Å\n' + ch + str(rid) + ' ' + FoFc + '\n' + 'c=' + caa + ':' + str(central) + '\n' + 'l=' + laa + ':' + str(linear) + '\n' + 'p=' + paa + ':' + str(planar)
 
-                        sfc = georep.addDensitySlice(pdbCode,Fos,Fcs,length,gaps,central,linear,planar,palette=palette,title=title,logged=logged,centre=zero,interp=interp,differ=differ,degree=degree)
-                        if c in averages:
-                            averages[c].append(sfc)
-                        else:
-                            averages[c] = [sfc]
+                        sfc = georep.addDensitySlice(pdbCode,Fos,Fcs,length,gaps,central,linear,planar,palette=palette,title=title,logged=logged,centre=zero,interp=interpmethod,differ=differ,degree=degree)
+                        if c==0:
+                            dens1.append(sfc)
+                        elif c==1:
+                            dens2.append(sfc)
+                        elif c==2:
+                            dens3.append(sfc)
+                        elif c==3:
+                            dens4.append(sfc)
+                        elif c==4:
+                            dens5.append(sfc)
                         c = c+1
 
-    for c in averages:
-        avg = averages[c]
-        palette = runs[c][2]
-        zero = runs[c][3]
-        interp = runs[c][5]
-        den1 = georep.addDensitySlices(avg, palette=palette, title='Average ' + interp, logged=True, centre=zero)
+    den1 = georep.addDensitySlices(dens1, palette=runs[0][2], title='Average Derivative 0', logged=False, centre=runs[0][3])
+    den2 = georep.addDensitySlices(dens2, palette=runs[1][2], title='Average Derivative 1', logged=False, centre=runs[1][3])
+    den3 = georep.addDensitySlices(dens3, palette=runs[2][2], title='Average Derivative 2', logged=False, centre=runs[2][3])
+    if len(dens4)>0:
+        den4 = georep.addDensitySlices(dens4, palette=runs[3][2], title='Average Derivative 3', logged=False,centre=runs[3][3])
+    if len(dens5) > 0:
+        den5 = georep.addDensitySlices(dens5, palette=runs[4][2], title='Average Derivative 4', logged=False,centre=runs[4][3])
 
-    georep.printToHtml(pdbCode.upper() + ' Density Interp Methods', len(runs),  pdbCode + '_interps')
+
+    georep.printToHtml(pdbCode.upper() + ' Peptide Bond Density Derivatives ' + interpmethod, len(runs),  pdbCode + '_' +interpmethod + '_' + str(degree) + 'degree')
 
     end = time.time()
     time_diff = end - start

@@ -303,9 +303,9 @@ class GeoDensity:
         numPoints = 2 + 2*offset
         halfPoints = int(numPoints/2)
 
-        for r in range(rl - offset, rl - offset + numPoints):
-            for c in range(cl-offset,cl-offset+numPoints):
-                for s in range(sl-offset,sl-offset+numPoints):
+        for c in range(cl - offset, cl - offset + numPoints):
+            for r in range(rl - offset, rl - offset + numPoints):
+                for s in range(sl - offset, sl - offset + numPoints):
                     #don't go out of range
                     #ci,ri,si = max(0,c),max(0, r),max(0, s)
                     #ci,ri,si = min(ci,cmax),min(ri, cmax),min(si, cmax)

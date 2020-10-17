@@ -17,7 +17,8 @@ class GeoReport:
         self.pdbCodes = listPdbs
         self.plots = []
 
-    def addHistogram(self,geoX='',data=None,title='',ghost=False,operation='',splitKey='',hue='',palette='crimson',count=False,restrictions={},exclusions={}):
+    def addHistogram(self,geoX='',data=None,title='',ghost=False,operation='',splitKey='',hue='',
+                     palette='crimson',count=False,restrictions={},exclusions={}):
         isNew = False
         if data is None:
             isNew=True

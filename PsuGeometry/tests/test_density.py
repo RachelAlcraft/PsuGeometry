@@ -16,24 +16,29 @@ pdbList = ['6jvv','6rr2','6E6O','6S2M','6shk','6fgz','6ctd','6fwf','6q53']
 ### split list in 2 for memory purposes
 
 pdbList=['6fwf','6q53','6ctd','6fgz','6shk','6rr2','6jvv']
+pdbList = ['6lu7']
 peaks = True
+
 
 for pdb in pdbList  :
     georep = geor.GeoReport([pdb],pdbDataPath, edDataPath,printPath)
-    georep.addDensityView(pdb, geoX='c', geoY='r', peaks=peaks, divisor=10, palette='cubehelix_r')
-    georep.addDensityView(pdb, geoX='r', geoY='s', peaks=peaks, divisor=10, palette='cubehelix_r')
-    georep.addDensityView(pdb, geoX='s', geoY='c', peaks=peaks, divisor=10, palette='cubehelix_r')
-    georep.addDensityView(pdb,geoX='x',geoY='y',peaks=peaks,divisor=10,palette='cubehelix_r')
-    georep.addDensityView(pdb, geoX='y', geoY='z', peaks=peaks, divisor=10, palette='cubehelix_r')
-    georep.addDensityView(pdb, geoX='z', geoY='x', peaks=peaks, divisor=10, palette='cubehelix_r')
-    georep.addDataView(pdb,geoX='x', geoY='y', palette='cubehelix_r')
-    georep.addDataView(pdb, geoX='y', geoY='z', palette='cubehelix_r')
-    georep.addDataView(pdb, geoX='z', geoY='x', palette='cubehelix_r')
-    georep.addScatter(geoX='x',geoY='y', palette='cubehelix_r',hue='2FoFc')
-    georep.addScatter(geoX='y', geoY='z', palette='cubehelix_r',hue='2FoFc')
-    georep.addScatter(geoX='z', geoY='x', palette='cubehelix_r',hue='2FoFc')
+    #georep.addDensityView(pdb, geoX='c', geoY='r', peaks=peaks, divisor=10, palette='RedYlGreen')
+    #georep.addDensityView(pdb, geoX='r', geoY='s', peaks=peaks, divisor=10, palette='cubehelix_r')
+    #georep.addDensityView(pdb, geoX='s', geoY='c', peaks=peaks, divisor=10, palette='cubehelix_r')
+    georep.addDensityView(pdb, geoX='x', geoY='y', peaks=peaks, divisor=10, palette='Spectral_r')
+    georep.addDensityView(pdb, geoX='r', geoY='s', peaks=peaks, divisor=10, palette='Spectral_r')
+    georep.addDensityView(pdb, geoX='x', geoY='y', peaks=peaks, divisor=10, palette='Spectral')
+    georep.addDensityView(pdb, geoX='r', geoY='s', peaks=peaks, divisor=10, palette='Spectral')
+    #georep.addDensityView(pdb, geoX='y', geoY='z', peaks=peaks, divisor=10, palette='cubehelix_r')
+    #georep.addDensityView(pdb, geoX='z', geoY='x', peaks=peaks, divisor=10, palette='cubehelix_r')
+    #georep.addDataView(pdb,geoX='x', geoY='y', palette='cubehelix_r')
+    #georep.addDataView(pdb, geoX='y', geoY='z', palette='cubehelix_r')
+    #georep.addDataView(pdb, geoX='z', geoY='x', palette='cubehelix_r')
+    #georep.addScatter(geoX='x',geoY='y', palette='cubehelix_r',hue='2FoFc')
+    #georep.addScatter(geoX='y', geoY='z', palette='cubehelix_r',hue='2FoFc')
+    #georep.addScatter(geoX='z', geoY='x', palette='cubehelix_r',hue='2FoFc')
     # And finally create the reort with a file name of choice
-    georep.printToHtml('Manually Chosen Density Views', 3, pdb + '_den2')
+    georep.printToHtml('Manually Chosen Density Views', 2, pdb + '_den2')
 
 
 

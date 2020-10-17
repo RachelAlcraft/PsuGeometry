@@ -15,11 +15,11 @@ pdbList = ['6jvv','6rr2','6E6O','6S2M','6shk','6fgz','6ctd','6fwf','6q53']
 
 
 #peaksList=['1ejg','1us0','1tt8','1i1w','1ucs','6jvv','5nqo']
-peaksList=['1us0','1tt8']
+peaksList=[]#['1us0','1tt8']
 #peaksList=['1i1w','1ucs','5nqo']
 
 #pointsList=['6fwf','6q53','6ctd','6fgz','6rr2','6shk','6rr2']
-pointsList=['5nqo','6fgz']
+pointsList=['1ejg']
 
 
 for pdb in peaksList:
