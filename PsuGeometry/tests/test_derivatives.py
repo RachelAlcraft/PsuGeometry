@@ -5,7 +5,7 @@ import time
 
 ###### User Choices ######################################################
 pdbCodes= ['1ejg','2cnq','1us0','6q53','6jvv','4rek']
-pdbCodes= ['1ejg']
+pdbCodes= ['1us0']
 pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
 printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/slices/'
@@ -21,11 +21,11 @@ runs = [
 [0,1,'cubehelix_r',False,False,0]
 ]
 
-length = 8.5
+length = 10
 gaps = 0.1
 interpmethod = 'spline' #linear or nearest or spline or sphere
 degree = 3
-runCode='deformation'
+runCode='tyr_ring'
 
 #peptide bond
 central_atom = 'C'
@@ -36,12 +36,12 @@ planar_offset = 0
 restricted_aa = ''
 
 #tyr ring
-#central_atom = 'CE1'
-#linear_atom = 'CD2'
-#linear_offset = 0
-#planar_atom = 'OH'
-#planar_offset = 0
-#restricted_aa = 'TYR'
+central_atom = 'CE1'
+linear_atom = 'CD2'
+linear_offset = 0
+planar_atom = 'OH'
+planar_offset = 0
+restricted_aa = 'TYR'
 
 #asp bonding
 #central_atom = 'CA'

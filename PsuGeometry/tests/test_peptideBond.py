@@ -1,6 +1,8 @@
 from PsuGeometry import GeoReport as geor
 from PsuGeometry import GeoPdb as geop
 
+import time
+
 ###### User Choices ######################################################
 pdbCodes= ['1ejg','2cnq','1us0','6q53','6jvv','4rek']
 pdbCodes= ['1ejg']
@@ -15,10 +17,11 @@ runs = [
         ]
 
 interpmethod = 'spline' #linear or nearest or spline or sphere
-differs=2 # derivative
+degree = 3
+differs=0 # derivative
 logged = True
 length = 6
-gaps = 0.1
+gaps = 0.05
 central_atom = 'C'
 linear_atom = 'N'
 linear_offset = 1
@@ -93,7 +96,12 @@ for pdbCode in pdbCodes:
 
                     central,linear,planar = [cx,cy,cz],[lx,ly,lz],[px,py,pz]
                     title = 'Size=' + str(length) + 'Å Gaps=' + str(gaps) + 'Å\n' + ch + str(rid) + '\n' + 'c='+ caa + ':' + str(central) + '\n' + 'l=' + laa + ':'+ str(linear) + '\n' + 'p=' + paa + ':'+ str(planar)
-                    sfc = georep.addDensitySlice(pdbCode,Fos,Fcs,length,gaps,central,linear,planar,palette=palette,title=title,logged=logged,interp=interpmethod,differ=differs)
+                    start = time.time()
+                    sfc = georep.addDensitySlice(pdbCode,Fos,Fcs,length,gaps,central,linear,planar,palette=palette,title=title,logged=logged,interp=interpmethod,differ=differs,degree=degree)
+                    end = time.time()
+                    time_diff = end - start
+                    timestring = str(int(time_diff / 60)) + "m " + str(int(time_diff % 60)) + "s"
+                    print('Slice time taken', timestring)
 
                     if laa == 'PRO':
                         proslices.append(sfc)
