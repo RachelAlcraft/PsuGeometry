@@ -7,6 +7,7 @@ import time
 pdbCodes= ['1ejg','2cnq','1us0','6q53','6jvv','4rek']
 pdbCodes= ['6jvv','6q53','4rek']
 pdbCodes= ['1ejg','2cnq','5nqo','6jvv','6q53','4rek','1us0']
+pdbCodes= ['1ejg']
 pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
 printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/slices/'
@@ -14,14 +15,14 @@ printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/
 # runs are: num of Fo; num of Fc; palette; centre on zero; logg image, differentiation
 #numFo,numFc,palette,zero?log?interp,degree,diff
 runs = [
-[2,-1,'cubehelix_r',False,False,'nearest',0,0],
-[2,-1,'cubehelix_r',False,False,'linear',1,0],
-[2,-1,'cubehelix_r',False,False,'spline',3,0],
-[2,-1,'cubehelix_r',False,False,'spline',5,0]
+[2,-1,'PuBuGn',False,True,'nearest',0,0],
+[2,-1,'PuBuGn',False,True,'linear',1,0],
+[2,-1,'PuBuGn',False,True,'spline',3,0],
+[2,-1,'PuBuGn',False,True,'splinexyz',3,0]
 ]
 
 length = 6
-gaps = 0.1
+gaps = 0.05
 central_atom = 'C'
 linear_atom = 'N'
 linear_offset = 1

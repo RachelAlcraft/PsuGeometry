@@ -76,10 +76,10 @@ class GeoPlot:
         return ''
 
     def plotOneSurface(self, fig, ax,surface,afa,zero,palette,logged,lw):
-        col='black'
-        lvls=12
+        col='darkgrey'
+        lvls=10
         if logged:
-            col='black'
+            col='DarkSlateGray'
             x,y = surface.shape
             mind = 1000
             for i in range(0, x):
