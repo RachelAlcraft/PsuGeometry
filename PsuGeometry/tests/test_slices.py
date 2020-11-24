@@ -1,5 +1,6 @@
 from PsuGeometry import GeoReport as geor
 from PsuGeometry import GeoPdb as geop
+from PsuGeometry import GeoSlice as gsl
 
 import time
 
@@ -110,6 +111,7 @@ for pdbCode in pdbCodes:
 
                         sfc = georep.addDensitySlice(pdbCode,Fos,Fcs,length,gaps,central,linear,planar,palette=palette,title=title,logged=logged,centre=zero,interp=interpmethod)
                         sfs.append([sfc,palette,zero,logged])
+
 
                         if c == 0:
                             dens1.append(sfc)

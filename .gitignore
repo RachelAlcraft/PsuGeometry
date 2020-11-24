@@ -134,3 +134,5 @@ dmypy.json
 # avoid odt only want pdf
 *.odt
 *.odt#
+/PsuGeometry/tests/ccp4_data/1ejg.ccp4
+/PsuGeometry/tests/ccp4_data/1ejg_diff.ccp4
