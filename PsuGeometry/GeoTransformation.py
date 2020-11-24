@@ -16,9 +16,13 @@ class transformation:
         self.B = B
         self.C = C
         self.translation = A
+
         self.A = [self.A[0] - A[0],self.A[1] - A[1],self.A[2] - A[2]] #A is translated to the origibn
         self.B = [self.B[0] - A[0],self.B[1] - A[1],self.B[2] - A[2]]
         self.C = [self.C[0] - A[0],self.C[1] - A[1],self.C[2] - A[2]]
+
+
+
         if self.print_info:
             print('\t\ttransformation object',A,B,C)
             print('\t\ttranslated to', self.A, self.B, self.C)

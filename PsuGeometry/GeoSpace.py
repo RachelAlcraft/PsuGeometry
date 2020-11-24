@@ -16,10 +16,10 @@ class GeoSpace:
                     x = sq_x[i, j]
                     y = sq_y[i, j]
                     z = sq_z[i, j]
-                    x, y, z = transformation.applyTransformation([x, y, z])
-                    sq_x[i, j] = x
-                    sq_y[i, j] = y
-                    sq_z[i, j] = z
+                    xt, yt, zt = transformation.applyTransformation([x, y, z])
+                    sq_x[i, j] = xt
+                    sq_y[i, j] = yt
+                    sq_z[i, j] = zt
 
         return ([sq_x, sq_y, sq_z])
 
