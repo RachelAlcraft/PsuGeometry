@@ -15,20 +15,21 @@ printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/
 
 pal = "cubehelix_r"
 
-pdbCode = '5d8v'
-central = [18.72,18.61,7.161]
-linear = [19.083,13.851,2.536]
-planar = [19.244,13.672,3.507]
+pdbCode = '1us0'
+central = [16.748,-5.111,11.617]
+linear = [15.845,-5.415,11.313]
+planar = [15.865,-6.151,11.989]
 
 georepa = geor.GeoReport([pdbCode], pdbDataPath, edDataPath, printPath)
 sfcp = georepa.addDensitySlice(pdbCode,2,-1,2,1,central,linear,planar,interp='linear',palette=pal)
 
 1
 georep = geor.GeoReport([pdbCode], pdbDataPath, edDataPath, printPath)
-sfc = georep.addDensitySlice(pdbCode,2,-1,4,0.02,central,linear,planar,interp='linear',palette=pal)
-sfc = georep.addDensitySlice(pdbCode,2,-1,4,0.02,central,linear,planar,interp='nearest',palette=pal)
-sfc = georep.addDensitySlice(pdbCode,2,-1,4,0.02,central,linear,planar,interp='linear',palette=pal,logged=True)
-sfc = georep.addDensitySlice(pdbCode,2,-1,4,0.02,central,linear,planar,interp='nearest',palette=pal,logged=True)
+sfc = georep.addDensitySlice(pdbCode,2,-1,8,0.1,central,linear,planar,interp='linear',palette=pal,logged=False)
+sfc = georep.addDensitySlice(pdbCode,2,-1,8,0.1,central,linear,planar,interp='linear',palette=pal,logged=True)
+#sfc = georep.addDensitySlice(pdbCode,2,-1,4,0.02,central,linear,planar,interp='nearest',palette=pal)
+#sfc = georep.addDensitySlice(pdbCode,2,-1,4,0.02,central,linear,planar,interp='linear',palette=pal,logged=True)
+#sfc = georep.addDensitySlice(pdbCode,2,-1,4,0.02,central,linear,planar,interp='nearest',palette=pal,logged=True)
 #sfc = georep.addDensitySlice(pdbCode,2,-1,2,0.2,central,linear,planar,interp='linear',palette=pal)
 #sfc = georep.addDensitySlice(pdbCode,2,-1,2,1,central,linear,planar,interp='linear',palette=pal)
 #sfc = georep.addDensitySlice(pdbCode,2,-1,4,0.2,central,linear,planar,interp='nearest',palette=pal)

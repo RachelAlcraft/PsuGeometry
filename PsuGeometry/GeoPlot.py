@@ -9,8 +9,7 @@ import io
 import base64
 import math
 
-from PsuGeometry import GeoReport as geor
-from PsuGeometry import GeoPdb as geopdb
+
 
 class GeoPlot:
     def __init__(self,data,geoX,geoY='',title='',hue='bfactor',splitKey='',palette='viridis_r',
@@ -449,6 +448,7 @@ class GeoPlot:
 
         dfs = []
         if self.parent != None:
+            from PsuGeometry import GeoPdb as geopdb
             pdbmanager = geopdb.GeoPdbs(self.parent.pdbDataPath, self.parent.edDataPath, self.parent.ed, self.parent.dssp)
             for pdb in self.parent.pdbCodes:
                 apdb = pdbmanager.getPdb(pdb)
@@ -503,6 +503,7 @@ class GeoOverlay:
             self.plotA = plotA
             self.plotB = plotB
         else:#In this case we have only the main plot, so we create the dummy plot
+            from PsuGeometry import GeoReport as geor
             self.plotB = plotA
             ghostReport = geor.GeoReport(['ghost'],report.pdbDataPath,report.edDataPath,report.outDataPath,report.ed,report.dssp)
             geoList = []
