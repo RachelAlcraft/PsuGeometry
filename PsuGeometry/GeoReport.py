@@ -3,8 +3,6 @@ import matplotlib.pyplot as plt
 from PsuGeometry import GeoPlot as geop
 from PsuGeometry import GeoPdb as geopdb
 from PsuGeometry import CloseContact as geocc
-from PsuGeometry import GeoSpace as geosp
-
 
 class GeoReport:
 
@@ -100,35 +98,6 @@ class GeoReport:
         if apdb.hasDensity:
             peaksData = apdb.getStructureDensity(allPoints,divisor,self.pdbDataPath,self.edDataPath)
             self.addScatter(data=peaksData, geoX=geoX, geoY=geoY, title=title, hue=hue, palette=palette,categorical=categorical)
-
-
-    def addDensitySlice(self, pdbCode, Fos,Fcs,length,gap,central, linear, planar, palette='viridis', title='',logged=False,centre=False,
-                        interp='linear',differ=0,degree=3):
-        sides = int((length/gap) / 2)
-        pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
-        apdb = pdbmanager.getPdb(pdbCode)
-        squares = sides*2+1
-        sq = geosp.GeoSpace().getSquare(squares,gap,central,linear,planar)
-        sfc = apdb.getDensitySquare(sq,Fos,Fcs,interp,differ,degree)
-        gp = geop.GeoPlot(data=None,geoX='',title=title, palette=palette, plot='surface', report=self,centre=centre)
-        gp.surface = sfc
-        gp.logged=logged
-        gp.differ=0
-        self.plots.append(gp)
-        return sfc
-
-    def addDensitySlices(self, slices, palette='viridis', title='',logged=False,centre=False):
-        mat = []
-        for s in slices:
-            if mat == []:
-                mat = s
-            else:
-                mat = mat + s
-        gp = geop.GeoPlot(data=None, geoX='', title=title, palette=palette, plot='surface', report=self,centre=centre)
-        gp.surface = mat
-        gp.logged=logged
-        self.plots.append(gp)
-        return mat
 
     def addSurfaceOverlay(self, surfaces, title='',logged=False):
         mat = []
@@ -474,7 +443,17 @@ class GeoReport:
                     else:
                         html += self.onePlot(geoqSplit, width)
 
-        html += '</tr></table><hr/><p>Produced by PsuGeometry, written by Rachel Alcraft<br/>Please cite the application note...</p></body>\n'
+        html += '</tr></table>'
+                #'<hr/><p>Produced by PsuGeometry, written by Rachel Alcraft<br/>Please cite the application note...</p></body>\n'
+
+        html += '<hr/><p style = "background-color:tomato;" >'
+        html += '<a href = "https://rachelalcraft.github.io/psugeometry.html" title = "PsuGeometry" target = "_self">PsuGeometry</a>'
+        html += ' by <a href = "mailto:rachelalcraft@gmail.com">Rachel Alcraft</a>'
+        html += '. Follow <a href = "https://rachelalcraft.github.io/citing.html"> citation guidance </a> </br></p><hr/>'
+
+
+
+
         hhtml = self.getHeaderString(fileName, maintitle)
         # and print
         f = open(reportPath, "w+")

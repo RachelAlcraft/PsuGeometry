@@ -18,7 +18,7 @@ pdbList = ['1ejg','1us0','1tt8','1i1w','1ucs','1yk4','1hje','1r6j','1pjx']
 pdbList = ['2cnq','1ejg','5nqo','1us0','1pjx','3nir']
 pdbList = ['3nir']
 pdbList = ['1tt8','1i1w','1ucs','1yk4','1hje']
-pdbList = ['5nqo']
+#pdbList = ['5nqo']
 
 
 

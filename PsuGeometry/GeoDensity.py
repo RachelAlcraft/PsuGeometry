@@ -9,8 +9,6 @@ import pdb_eda
 import numpy as np
 import pandas as pd
 import math
-from PsuGeometry import GeoPolynomial as poly
-
 
 class GeoDensity:
 

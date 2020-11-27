@@ -64,6 +64,7 @@ elif mode=='LOAD': # then load the csv files up to produce the reports
     allData = None
     # Create an empty report object
     georep = geor.GeoReport([],pdbDataPath,edDataPath,printPath,ed=loadEd,dssp=loadDssp)
+    georepDiff = geor.GeoReport([], pdbDataPath, edDataPath, printPath, ed=loadEd, dssp=loadDssp)
     count = 0
     dfs = []
     for pdb in pdbList:
@@ -97,13 +98,15 @@ elif mode=='LOAD': # then load the csv files up to produce the reports
         georep.addScatter(data=allData, geoX='N:CA:C', geoY='N:CA:C:N+1', title='', hue='resolution',restrictions={'aa':aa},ghost=ghost)
         georep.addProbability(data=allData, geoX='N:CA:C', geoY='N:CA:C:N+1', title='', palette='cubehelix_r',restrictions={'aa':aa},ghost=ghost)
         georep.addHistogram(data=allData, geoX='N:CA:C', title='',restrictions={'aa':aa},ghost=ghost)
-        georep.addDifference(dataA=allData, dataB=allData, geoX='N:CA:C', geoY='N:CA:C:N+1', restrictionsA={'aa': aa}, exclusionsB={'aa': aa})
+        georepDiff.addDifference(dataA=allData, dataB=allData, geoX='N:CA:C', geoY='N:CA:C:N+1', restrictionsA={'aa': aa}, exclusionsB={'aa': aa})
 
     # Print the report
-    georep.printToHtml('Bimodal Tau', 3, 'tau')
+    georep.printToHtml('Bimodal Tau Data', 3, 'tau')
+    georepDiff.printToHtml('Bimodal Tau and Amino Acid Differences', 3, 'tau')
 
 else:
     georep = geor.GeoReport(pdbList, pdbDataPath, edDataPath, printPath, ed=loadEd, dssp=loadDssp)
+    georepDiff = geor.GeoReport([], pdbDataPath, edDataPath, printPath, ed=loadEd, dssp=loadDssp)
 
     geoList = ['TAU', 'PSI']
     hueList = ['aa', 'rid', 'resolution']  # note the hues are the sum of the atoms
@@ -123,7 +126,8 @@ else:
         georep.addScatter(data=data,geoX='N:CA:C', geoY='N:CA:C:N+1', title='', hue='resolution',restrictions={'aa': aa}, ghost=ghost)
         georep.addProbability(data=data,geoX='N:CA:C', geoY='N:CA:C:N+1', title='', palette='cubehelix_r',restrictions={'aa': aa}, ghost=ghost)
         georep.addHistogram(data=data,geoX='N:CA:C', title='', restrictions={'aa': aa}, ghost=ghost)
-        georep.addDifference(data=data,geoX='N:CA:C', geoY='N:CA:C:N+1', restrictionsA={'aa': aa},exclusionsB={'aa': aa})
+        georepDiff.addDifference(data=data,geoX='N:CA:C', geoY='N:CA:C:N+1', restrictionsA={'aa': aa},exclusionsB={'aa': aa})
 
     # Print the report
-    georep.printToHtml('Bimodal Tau', 3, 'tau')
+    georep.printToHtml('Bimodal Tau Data', 3, 'tau')
+    georepDiff.printToHtml('Bimodal Tau and Amino Acid Differences', 3, 'tau')

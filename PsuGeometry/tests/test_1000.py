@@ -14,7 +14,7 @@ from PsuGeometry import GeoPlot as geopl
 ##############################################################################################
 ### USER CHOICE loading or saing data and whether to override #################################
 ###############################################################################################
-mode = 'SAVE' # LOAD, SAVE or ALL
+mode = 'ALL' # LOAD, SAVE or ALL
 override = False
 ghost = False
 loadDssp = False
@@ -96,21 +96,26 @@ elif mode=='LOAD': # then load the csv files up to produce the reports
     georep.printToHtml('1000 High Res Structures', 3, '1000')
 
 else:
-    georep = geor.GeoReport(pdbList, pdbDataPath, edDataPath, printPath, ed=loadEd, dssp=loadDssp)
+    georep = geor.GeoReport(pdbList, pdbDataPath, edDataPath, printPath, ed=False, dssp=False)
 
-    geoList = ['TAU', 'PSI']
+    geoList = ['TAU', 'PSI','N:O','CB:O']
     hueList = ['aa', 'rid', 'resolution']  # note the hues are the sum of the atoms
     # Create the dataframe
     data = georep.getGeoemtryCsv(geoList, hueList)
 
     print('Creating report')
-    georep.addScatter(data=data,geoX='resolution', geoY='pdbCode', title='Info', hue='resolution')
-    georep.addScatter(data=data,geoX='rid', geoY='pdbCode', title='Info', hue='resolution')
-    georep.addScatter(data=data,geoX='resolution', geoY='aa', title='Info', hue='resolution')
+    georep.addScatter(data=data, geoX='PSI', geoY='N:O', title='PSI-N:O', hue='resolution')
+    georep.addScatter(data=data, geoX='PSI', geoY='CB:O', title='PSI-CB:O', hue='resolution')
+    georep.addScatter(data=data, geoX='N:O', geoY='CB:O', title='N:O-CB:O', hue='resolution')
 
     georep.addScatter(data=data,geoX='N:CA:C', geoY='N:CA:C:N+1', title='TAU-PSI', hue='resolution')
     georep.addProbability(data=data,geoX='N:CA:C', geoY='N:CA:C:N+1', title='TAU-PSI', palette='cubehelix_r')
     georep.addHistogram(data=data,geoX='N:CA:C', title='TAU')
+
+    georep.addScatter(data=data, geoX='resolution', geoY='pdbCode', title='Info', hue='resolution')
+    georep.addScatter(data=data, geoX='rid', geoY='pdbCode', title='Info', hue='resolution')
+    georep.addScatter(data=data, geoX='resolution', geoY='aa', title='Info', hue='aa')
+
 
     # Print the report
     georep.printToHtml('1000 High Res Structures', 3, '1000')

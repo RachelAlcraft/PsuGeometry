@@ -156,9 +156,12 @@ class GeoPlot:
 
         minV = self.data[self.geoX].min()
         maxV = self.data[self.geoX].max()
-        disV = abs(maxV - minV)
-        if disV < 5:
-            bins = 13  # int(disV/0.004)
+        try:
+            disV = abs(maxV - minV)
+            if disV < 5:
+                bins = 13  # int(disV/0.004)
+        except:
+            bins = 10  # int(disV/0.004)
 
         if self.title == 'ghost':
             histCol = 'gainsboro'
@@ -179,6 +182,7 @@ class GeoPlot:
             #sns.distplot(data[self.geoX], label='', norm_hist=True, bins=bins, kde=False,hist_kws=dict(alpha=0.8,EdgeColor='silver'))
 
             plt.hist(data[self.geoX], EdgeColor='k', bins=bins, color=histCol, density=density,alpha=alpha)
+
 
 
         plt.title(title)
