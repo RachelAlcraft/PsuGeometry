@@ -96,10 +96,10 @@ elif mode=='LOAD': # then load the csv files up to produce the reports
     georep.printToHtml('1000 High Res Structures', 3, '1000')
 
 else:
-    georep = geor.GeoReport(pdbList, pdbDataPath, edDataPath, printPath, ed=False, dssp=False)
+    georep = geor.GeoReport(pdbList, pdbDataPath, edDataPath, printPath, ed=False, dssp=True)
 
-    geoList = ['TAU', 'PSI','N:O','CB:O']
-    hueList = ['aa', 'rid', 'resolution']  # note the hues are the sum of the atoms
+    geoList = ['TAU', 'PSI','N:O','CB:O','PHI']
+    hueList = ['aa', 'rid', 'resolution','dssp']  # note the hues are the sum of the atoms
     # Create the dataframe
     data = georep.getGeoemtryCsv(geoList, hueList)
 
@@ -108,13 +108,23 @@ else:
     georep.addScatter(data=data, geoX='PSI', geoY='CB:O', title='PSI-CB:O', hue='resolution')
     georep.addScatter(data=data, geoX='N:O', geoY='CB:O', title='N:O-CB:O', hue='resolution')
 
+    georep.addScatter(data=data, geoX='PSI', geoY='N:O', title='PSI-N:O', hue='dssp',palette='tab20')
+    georep.addScatter(data=data, geoX='PSI', geoY='CB:O', title='PSI-CB:O', hue='dssp',palette='tab20')
+    georep.addScatter(data=data, geoX='N:O', geoY='CB:O', title='N:O-CB:O', hue='dssp',palette='tab20')
+
+    georep.addScatter(data=data, geoX='PHI', geoY='PSI', title='Ramachandran Plot', hue='dssp',palette='tab20')
+    georep.addScatter(data=data, geoX='resolution', geoY='pdbCode', title='Info', hue='resolution')
+    georep.addHistogram(data=data, geoX='N:CA:C', title='TAU')
+
     georep.addScatter(data=data,geoX='N:CA:C', geoY='N:CA:C:N+1', title='TAU-PSI', hue='resolution')
     georep.addProbability(data=data,geoX='N:CA:C', geoY='N:CA:C:N+1', title='TAU-PSI', palette='cubehelix_r')
-    georep.addHistogram(data=data,geoX='N:CA:C', title='TAU')
+    georep.addScatter(data=data, geoX='N:CA:C', geoY='N:CA:C:N+1', title='TAU-PSI', hue='dssp',palette='tab20')
 
-    georep.addScatter(data=data, geoX='resolution', geoY='pdbCode', title='Info', hue='resolution')
-    georep.addScatter(data=data, geoX='rid', geoY='pdbCode', title='Info', hue='resolution')
-    georep.addScatter(data=data, geoX='resolution', geoY='aa', title='Info', hue='aa')
+    georep.addDifference(dataA=data, dataB=data, geoX='N:CA:C', geoY='N:CA:C:N+1', restrictionsA={'aa': 'VAL'},restrictionsB={'aa': 'THR'})
+
+
+
+
 
 
     # Print the report
