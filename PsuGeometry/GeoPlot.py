@@ -14,7 +14,7 @@ import math
 class GeoPlot:
     def __init__(self,data,geoX,geoY='',title='',hue='bfactor',splitKey='',palette='viridis_r',
                  centre=False,vmin=0,vmax=0,operation='',newData=False,plot='scatter',categorical=False,
-                 restrictions={},exclusions={},report=None,count=False):
+                 restrictions={},exclusions={},report=None,count=False,sort='ASC'):
         self.parent=report
         self.plot = plot
         self.data = data
@@ -36,6 +36,7 @@ class GeoPlot:
         self.axX = 0,0
         self.axY = 0, 0
         self.differ=0
+        self.sort = sort
         self.restrictions=restrictions
         self.exclusions = exclusions
         if self.geoY == '' and plot not in 'surfaces':
@@ -238,12 +239,14 @@ class GeoPlot:
             except:
                 self.palette = self.palette
 
-        if self.hue == 'resolution':
-            self.data = self.data.sort_values(by=self.hue, ascending=False)
+        if self.sort == 'DESC':
+            data = self.data.sort_values(by=self.hue, ascending=False)
+        elif self.hue == 'resolution':
+            data = self.data.sort_values(by=self.hue, ascending=False)
         elif self.plot == 'contact':
-            self.data = self.data.sort_values(by='ridA', ascending=False)
+            data = self.data.sort_values(by='ridA', ascending=False)
         else:
-            self.data = self.data.sort_values(by=self.hue, ascending=True)
+            data = self.data.sort_values(by=self.hue, ascending=True)
 
         lw = 0.5
         alpha = 0.65
@@ -268,7 +271,7 @@ class GeoPlot:
             ax.set_ylabel(self.geoY)
             cb.set_label(self.hue)
         elif self.vmin < self.vmax:
-            data = self.data.sort_values(by=self.hue, ascending=True)
+            #data = self.data.sort_values(by=self.hue, ascending=True)
             g = ax.scatter(data[self.geoX], data[self.geoY], c=data[self.hue], cmap=self.palette, vmin=self.vmin,
                            vmax=self.vmax, edgecolor=ecol, alpha=alpha,linewidth=lw,s=20)
             cb = fig.colorbar(g)

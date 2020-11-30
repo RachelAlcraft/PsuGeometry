@@ -412,6 +412,7 @@ class GeoPdb:
                                 for hue in hues:
                                     #geoData.loc[thisRow, hue] = reshues[hue]
                                     dic[hue] = reshues[hue]
+                                dic['aa'] = aa
 
                                 #print(usingAliases)
                                 if usingAliases:
@@ -422,8 +423,10 @@ class GeoPdb:
                                         #geoData.loc[thisRow, geoa] = valA # we have alias and geo column
                                         dic[geoa] = valA
 
+
                             dics.append(dic)
         dataFrame = pd.DataFrame.from_dict(dics)
+        print(dataFrame)
         return dataFrame
 
 
@@ -553,6 +556,7 @@ class GeoPdb:
         return {
                 'PHI':'C-1:N:CA:C',
                 'PSI':'N:CA:C:N+1',
+                'OMEGA': 'CA:C:N+1:CA+1',
                 'TAU':'N:CA:C',
                 'CHI1':'N:CA:CB:CG',
                 'CHI1_ILE':'N:CA:CB:CG1',

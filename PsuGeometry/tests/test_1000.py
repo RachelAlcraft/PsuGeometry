@@ -7,9 +7,8 @@ printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/
 
 # hand crafted report for 2bw4 non planar omega
 from PsuGeometry import GeoReport as geor
-from PsuGeometry import GeoPdb as geop
 import pandas as pd
-from PsuGeometry import GeoPlot as geopl
+
 
 ##############################################################################################
 ### USER CHOICE loading or saing data and whether to override #################################

@@ -29,7 +29,8 @@ class GeoReport:
         else:
             self.plots.append(geop.GeoOverlay(gp,'',title='ghost',report=self))
 
-    def addScatter(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',centre=False,vmin=0,vmax=0,categorical=False,restrictions={},exclusions={}):
+    def addScatter(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',
+                   centre=False,vmin=0,vmax=0,categorical=False,sort='ASC',restrictions={},exclusions={}):
         isNew = False
         if data is None:
             isNew = True
@@ -37,7 +38,7 @@ class GeoReport:
             categorical=True
         gp = geop.GeoPlot(data, geoX, geoY=geoY, title=title, newData=isNew, operation=operation,splitKey=splitKey,
                           hue=hue,palette=palette,centre=centre,vmin=vmin,vmax=vmax,categorical=categorical,
-                          plot='scatter',restrictions=restrictions,exclusions=exclusions,report=self)
+                          plot='scatter',restrictions=restrictions,exclusions=exclusions,report=self,sort=sort)
         if not ghost:
             self.plots.append(gp)
         else:
@@ -501,6 +502,7 @@ class GeoReport:
 
             geoPl.applyRestrictions()
             geoPl.applyExclusions()
+            print(geoPl.data)
 
             if geoPl.plot=='surface' or geoPl.plot=='surfaces':
                 fig, ax = plt.subplots()
