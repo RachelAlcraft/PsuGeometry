@@ -1,5 +1,9 @@
-
+# -- ©Rachel Alcraft 2020, PsuGeometry --
 from PsuGeometry import GeoReport as psu
+'''
+
+
+'''
 
 pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'

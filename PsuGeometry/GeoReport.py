@@ -502,7 +502,7 @@ class GeoReport:
 
             geoPl.applyRestrictions()
             geoPl.applyExclusions()
-            print(geoPl.data)
+
 
             if geoPl.plot=='surface' or geoPl.plot=='surfaces':
                 fig, ax = plt.subplots()

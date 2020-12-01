@@ -426,7 +426,7 @@ class GeoPdb:
 
                             dics.append(dic)
         dataFrame = pd.DataFrame.from_dict(dics)
-        print(dataFrame)
+
         return dataFrame
 
 
@@ -465,6 +465,9 @@ class GeoPdb:
         return None
 
     def __getAtom(self, chain, rid, occ,atom):
+        # The atom number cannot be less than 1
+        if rid < 1:
+            return None
         for atm in self.atoms:
             if atm.values['chain'] == chain and atm.values['rid'] == rid and atm.values['occupant'] == occ and atm.values['atom'] == atom:
                 return atm
