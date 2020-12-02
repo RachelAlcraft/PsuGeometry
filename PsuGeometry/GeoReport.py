@@ -6,7 +6,7 @@ from PsuGeometry import CloseContact as geocc
 
 class GeoReport:
 
-    def __init__(self,listPdbs,pdbDataPath,edDataPath,outDataPath,ed=True,dssp=True):
+    def __init__(self,listPdbs,pdbDataPath,edDataPath,outDataPath,includePdbs=True,ed=True,dssp=True):
         self.pdbDataPath = pdbDataPath
         self.edDataPath = edDataPath
         self.outDataPath = outDataPath
@@ -14,6 +14,7 @@ class GeoReport:
         self.dssp=dssp
         self.pdbCodes = listPdbs
         self.plots = []
+        self.includePdbs=includePdbs
 
     def addHistogram(self,geoX='',data=None,title='',ghost=False,operation='',splitKey='',hue='',
                      palette='crimson',count=False,restrictions={},exclusions={}):
@@ -476,7 +477,7 @@ class GeoReport:
         html += '<hr/>'
 
         pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
-        if len(self.pdbCodes) > 0:
+        if len(self.pdbCodes) > 0 and self.includePdbs == True:
             html += '<table><tr><td>PdbCode</td><td>Resolution</td><td>Pdb Link</td><td>PDBe Link</td></tr>\n'
             for pdb in self.pdbCodes:
                 html += '<tr>\n'

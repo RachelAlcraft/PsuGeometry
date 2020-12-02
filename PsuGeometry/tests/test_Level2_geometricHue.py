@@ -1,5 +1,6 @@
 # -- ©Rachel Alcraft 2020, PsuGeometry --
 from PsuGeometry import GeoReport as geor
+from PsuGeometry import GeoPdb as geop
 import pandas as pd
 '''
 This script runs a correlation report on 142 ultrahigh-resolution structures <=0.9A
@@ -13,7 +14,6 @@ edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
 printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/1000Structures/'
 
 pdbList = []
-pdbListPath = printPath + 'pro Structures.csv'
 pdbdata = pd.read_csv('structures09.csv')
 pdbList = pdbdata['pdb_code']
 
@@ -34,7 +34,7 @@ georep.addScatter(data=data, geoX='C-1:N:CA',geoY='TAU',hue='CHI1', title='Tau a
 georep.addScatter(data=data, geoX='C-1:N:CA',geoY='TAU',hue='CA-1:CA', title='Tau angles', palette='Spectral',sort='DESC',restrictions={'aa':'PRO'})
 
 # And finally create the reort with a file name of choice
-title = 'Correlations with geometric hue\n Proline up-pucker by proxy of -v1 CHI1\nProline cis/trans by proxy of short Calpha'
+title = 'Correlations with geometric hue<br/> Proline up-pucker by proxy of CHI1<br/>Proline cis/trans by proxy of short Calpha'
 georep.printToHtml(title,2,'geohue')
 
 

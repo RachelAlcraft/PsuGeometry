@@ -50,8 +50,6 @@ class GeoPdbs:
             return gp
 
 
-
-
 class GeoPdb:
     def __init__(self,pdbCode,pdbDataPath,edDataPath,ed,dssp):
         pdbCode = pdbCode.lower()

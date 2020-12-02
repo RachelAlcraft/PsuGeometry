@@ -240,13 +240,13 @@ class GeoPlot:
                 self.palette = self.palette
 
         if self.sort == 'DESC':
-            data = self.data.sort_values(by=self.hue, ascending=False)
+            self.data = self.data.sort_values(by=self.hue, ascending=False)
         elif self.hue == 'resolution':
-            data = self.data.sort_values(by=self.hue, ascending=False)
+            self.data = self.data.sort_values(by=self.hue, ascending=False)
         elif self.plot == 'contact':
-            data = self.data.sort_values(by='ridA', ascending=False)
-        else:
-            data = self.data.sort_values(by=self.hue, ascending=True)
+            self.data = self.data.sort_values(by='ridA', ascending=False)
+        elif self.sort== 'ASC':
+            self.data = self.data.sort_values(by=self.hue, ascending=True)
 
         lw = 0.5
         alpha = 0.65
@@ -272,7 +272,7 @@ class GeoPlot:
             cb.set_label(self.hue)
         elif self.vmin < self.vmax:
             #data = self.data.sort_values(by=self.hue, ascending=True)
-            g = ax.scatter(data[self.geoX], data[self.geoY], c=data[self.hue], cmap=self.palette, vmin=self.vmin,
+            g = ax.scatter(self.data[self.geoX], self.data[self.geoY], c=self.data[self.hue], cmap=self.palette, vmin=self.vmin,
                            vmax=self.vmax, edgecolor=ecol, alpha=alpha,linewidth=lw,s=20)
             cb = fig.colorbar(g)
             ax.set_xlabel(self.geoX)
