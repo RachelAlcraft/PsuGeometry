@@ -1,10 +1,8 @@
 # -- ©Rachel Alcraft 2020, PsuGeometry --
 from PsuGeometry import GeoReport as geor
 '''
-This script runs a correlation report on 142 ultrahigh-resolution structures <=0.9A
-It runs correlation reports on proline, which it colours on the hue of CHI1 and CA-1:CA
-These geometric measures are proxies for up/down pucker of the proline run (up-pucker=-ve CHI1)
-And cis-trans proline, where pre-omega means proline, which corresponds to short CA-1:CA
+This script runs a correlation report on a few structures to demonstrate the use of 2Fo-Fc as a hue
+The data is precalculated into a datafame
 '''
 
 pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
@@ -30,7 +28,7 @@ georep.addScatter(data=data, geoX='C-1:N:CA',geoY='TAU',hue='2FoFc', title='Tau 
 georep.addScatter(data=data, geoX='C-1:N:CA',geoY='TAU',hue='dssp', title='Tau angles', palette='tab10',sort='NON')
 
 # And finally create the reort with a file name of choice
-title = 'Some correlation reports with "fo-Fc as the hue'
+title = 'Some correlation reports with 2fo-Fc as the hue'
 georep.printToHtml(title,2,'densityhue')
 
 
