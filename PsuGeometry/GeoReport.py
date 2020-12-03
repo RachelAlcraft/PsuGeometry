@@ -87,11 +87,11 @@ class GeoReport:
         self.plots.append(gp)
 
 
-    def addDataView(self, pdbCode, geoX, geoY, palette='viridis', hue='2FoFc', categorical=False, title='',centre=False):
+    def addDataView(self, pdbCode, geoX, geoY, palette='viridis', hue='2FoFc', categorical=False, title='',centre=False,sort='ASC'):
         pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
         apdb = pdbmanager.getPdb(pdbCode)
         df = apdb.getDataFrame()
-        self.addScatter(data=df, geoX=geoX, geoY=geoY, title=title, hue=hue, palette=palette,categorical=categorical,centre=centre)
+        self.addScatter(data=df, geoX=geoX, geoY=geoY, title=title, hue=hue, palette=palette,categorical=categorical,centre=centre,sort=sort)
 
     def addDensityView(self, pdbCode, geoX, geoY, peaks=True,divisor=10, palette='viridis', hue='2FoFc', categorical=False, title=''):
         pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)

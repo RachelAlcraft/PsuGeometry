@@ -33,13 +33,13 @@ override = True # choose if you want to write over the already saved files, if n
 ghost = False # choose if you want to have the silver ghost structure in the report
 loadDssp = True # whether or not to load the secondary structure library - some memory implications
 loadEd = False # whether or not to load the electron density, it will be much more efficient of you do not (but you won't have the electron density!). Will use bfactor instead of ed if you turn this off.
-geoList = ['TAU','PSI','PHI','OMEGA','N:O','CB:O']
+geoList = ['TAU','PSI','PHI','OMEGA','N:O','CB:O','N:CA','CA:C','C:O','C:N+1','CA:C:N+1','N+1:C:O','CA:C:O']
 hueList = ['dssp','aa','bfactor','2FoFc','rid','resolution']
 ###############################################################################################
 
 pdbList = []
 pdbdata = pd.read_csv('structures1000.csv')
-pdbList = pdbdata['pdb_code']
+pdbList = pdbdata['pdb_code'].tolist()
 
 if mode=='SAVE': # Then we are going to write the csv files out, and keep re-starting until we are done
     count = 0
@@ -72,7 +72,7 @@ elif mode=='LOAD': # then load the csv files up to produce the reports
     isEmpty = True
     allData = None
     # Create an empty report object
-    georep = geor.GeoReport([],pdbDataPath,edDataPath,printPath,includePdbs=True,ed=loadEd,dssp=loadDssp)
+    georep = geor.GeoReport([],pdbDataPath,edDataPath,printPath,includePdbs=False,ed=loadEd,dssp=loadDssp)
     count = 0
     dfs = []
     for pdb in pdbList:
@@ -108,6 +108,14 @@ elif mode=='LOAD': # then load the csv files up to produce the reports
     georep.addScatter(data=allData, geoX='N:CA:C', geoY='N:CA:C:N+1',title='TAU-PSI',  hue='resolution')
     georep.addProbability(data=allData, geoX='N:CA:C', geoY='N:CA:C:N+1', title='TAU-PSI',palette='cubehelix_r')
     georep.addHistogram(data=allData, geoX='N:CA:C', title='TAU')
+
+    georep.addHistogram(data=allData, geoX='CA:C', title='CA:C',exclusions={'pdbCode':'4y9w'})
+    georep.addHistogram(data=allData, geoX='C:O', title='C:O',exclusions={'pdbCode':'1d5t'})
+    georep.addHistogram(data=allData, geoX='C:N+1', title='C:N+1',hue='rid',exclusions={'pdbCode':'3aj4','pdbCode':'2cnu'})
+
+    georep.addHistogram(data=allData, geoX='CA:C:N+1', title='CA:C:N+1')
+    georep.addHistogram(data=allData, geoX='N+1:C:O', title='N:C:O')
+    georep.addHistogram(data=allData, geoX='CA:C:O', title='CA:C:O')
 
     # Print the report
     georep.printToHtml('1000 High Res Structures', 3, '1000')

@@ -56,15 +56,9 @@ class GeoPdb:
         self.pdbCode = pdbCode
         self.pdbDataPath= pdbDataPath
         self.hasDensity = False
-        self.hasDSSP = False
         self.hasPDB = False
         self.atoms = []
         self.densCSV = pd.DataFrame()
-        if ed:
-            self.geoDen = den.GeoDensity(pdbCode,'fifty',pdbDataPath,edDataPath)
-            self.hasDensity = self.geoDen.valid
-        else:
-            self.hasDensity = False
         self.hasDssp = dssp
         self.dataFrame = pd.DataFrame()
         self.ghost = False
@@ -72,6 +66,15 @@ class GeoPdb:
             self.ghost = True
             #self.pdbCode =  '2q1j'
             self.pdbCode = '4rek'
+            self.hasDensity = False
+            self.hasDssp = False
+        else:
+            if ed:
+                self.geoDen = den.GeoDensity(pdbCode, 'fifty', pdbDataPath, edDataPath)
+                self.hasDensity = self.geoDen.valid
+            else:
+                self.hasDensity = False
+
 
         if self.__gatherAtoms():
             if self.hasDssp:
@@ -151,7 +154,7 @@ class GeoPdb:
                         chain = residue.get_full_id()[2]
                         ridx = resnum
                         resnum = resnum+1
-                        if r != 'HOH':  # bio.is_aa(residue):
+                        if r in self.getAAList():# != 'HOH':  # bio.is_aa(residue):
                             for atom in residue:
                                 if atom.is_disordered():
                                     if atom.disordered_has_id("A"):
@@ -180,6 +183,7 @@ class GeoPdb:
 
                                 # print('Atom:',atomNo)
                                 self.atoms.append(oneAtom)
+            print('PSU: loaded successfully from BioPython', self.pdbCode)
 
 
         # except:
@@ -187,7 +191,7 @@ class GeoPdb:
         return (self.hasPDB)
 
     def __applyDssp(self):
-        print('PSU: apply dssp')
+        print('PSU: applying dssp')
         from Bio.PDB.DSSP import DSSP
         p = bio.PDBParser()
         pdbFile = self.pdbDataPath + 'pdb' + self.pdbCode + '.ent'
@@ -202,6 +206,7 @@ class GeoPdb:
             for atom in self.atoms:
                 if atom.values['rid'] == res_no and atom.values['chain'] == chain:
                     atom.setDsspInfo(ss)
+        print('PSU: applied dssp successfully')
 
 
     def getStructureDensity(self,allPoints,divisor,pdbDataPath,edDataPath):
@@ -214,6 +219,7 @@ class GeoPdb:
 
     def getGeoemtryCsv(self,geoListEntered, hues):
         # geo in format C-1, C+1, C
+        print('PSU: creating geometry dataframe')
         dics = []
         usingAliases = False
         # remove anything that is in anyway

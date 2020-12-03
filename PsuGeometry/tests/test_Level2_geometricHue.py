@@ -1,6 +1,5 @@
 # -- ©Rachel Alcraft 2020, PsuGeometry --
 from PsuGeometry import GeoReport as geor
-from PsuGeometry import GeoPdb as geop
 import pandas as pd
 '''
 This script runs a correlation report on 142 ultrahigh-resolution structures <=0.9A
