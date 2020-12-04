@@ -11,6 +11,9 @@ pdbList09 = pdbdata09['pdb_code'].tolist()
 pdbdata1000 = pd.read_csv('structures1000.csv')
 pdbList1000 = pdbdata1000['pdb_code'].tolist()
 
+pdbdataJask = pd.read_csv('jask.csv')
+pdbListJask = pdbdataJask['pdb_code'].tolist()
+
 fileText = ''
 '''
 list1000 = ['xxx','sss','sss']
@@ -41,12 +44,22 @@ for pdb in pdbList1000:
     fileText +="'" + pdb.lower() + "'"
 fileText +="]\n"
 
+fileText +="listJask = ["
+isFirst = True
+for pdb in pdbListJask:
+    if not isFirst:
+        fileText += ","
+    isFirst = False
+    fileText +="'" + pdb.lower() + "'"
+fileText +="]\n"
 
 fileText +="class GeoPdbLists:\n"
 fileText += "\tdef getList1000(self):\n"
 fileText += "\t\treturn list1000\n"
 fileText += "\tdef getList100(self):\n"
 fileText += "\t\treturn list100\n"
+fileText += "\tdef getListJask(self):\n"
+fileText += "\t\treturn listJask \n"
 # create the cpp.html so that all the look and feel is consistent
 f= open("../GeoPdbLists.py","w+")
 print(fileText)

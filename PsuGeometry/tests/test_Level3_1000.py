@@ -38,7 +38,6 @@ geoList = ['TAU','PSI','PHI','OMEGA','N:O','CB:O','N:CA','CA:C','C:O','C:N+1','C
 hueList = ['dssp','aa','bfactor','2FoFc','rid','resolution']
 ###############################################################################################
 
-pdbList = []
 pdbList = geol.GeoPdbLists().getList1000()
 
 if mode=='SAVE': # Then we are going to write the csv files out, and keep re-starting until we are done

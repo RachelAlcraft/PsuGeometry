@@ -219,7 +219,7 @@ class GeoPdb:
 
     def getGeoemtryCsv(self,geoListEntered, hues):
         # geo in format C-1, C+1, C
-        print('PSU: creating geometry dataframe')
+        #print('PSU: creating geometry dataframe')
         dics = []
         usingAliases = False
         # remove anything that is in anyway
