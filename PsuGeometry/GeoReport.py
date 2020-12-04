@@ -70,7 +70,7 @@ class GeoReport:
         self.plots.append(diffPlot.plotDiff)
         self.plots.append(diffPlot.plotB)
 
-    def addCloseContact(self,pdbCode,atomA,atomB,distanceLimit=8,ridLimit=2,palette='viridis',hue='distance',categorical=False,title=''):
+    def addCloseContact(self,pdbCode,atomA,atomB,distanceLimit=8.0,ridLimit=2,palette='viridis',hue='distance',categorical=False,title=''):
         pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
         pdb = pdbmanager.getPdb(pdbCode)
         cc = geocc.CloseContact(pdb,atomA,atomB,distanceLimit,ridLimit,hue)

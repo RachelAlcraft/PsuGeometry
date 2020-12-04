@@ -1,5 +1,6 @@
 # -- ©Rachel Alcraft 2020, PsuGeometry --
 from PsuGeometry import GeoReport as geor
+from PsuGeometry import GeoPdbLists as geol
 import pandas as pd
 '''
 This script produces correlation reports for a high resolution dataset of 1000 structures.
@@ -38,8 +39,7 @@ hueList = ['dssp','aa','bfactor','2FoFc','rid','resolution']
 ###############################################################################################
 
 pdbList = []
-pdbdata = pd.read_csv('structures1000.csv')
-pdbList = pdbdata['pdb_code'].tolist()
+pdbList = geol.GeoPdbLists().getList1000()
 
 if mode=='SAVE': # Then we are going to write the csv files out, and keep re-starting until we are done
     count = 0
