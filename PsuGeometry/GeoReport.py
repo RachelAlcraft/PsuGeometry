@@ -72,7 +72,7 @@ class GeoReport:
 
     def addCloseContact(self,pdbCode,atomA,atomB,distanceLimit=8.0,ridLimit=2,palette='viridis',hue='distance',categorical=False,title=''):
         pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
-        pdb = pdbmanager.getPdb(pdbCode)
+        pdb = pdbmanager.getPdb(pdbCode,True)
         cc = geocc.CloseContact(pdb,atomA,atomB,distanceLimit,ridLimit,hue)
         if hue !='distance':
             hue = hue+'A'
@@ -118,7 +118,7 @@ class GeoReport:
             count = count + 1
             if not pdbmanager.existsPdb(pdb):
                 print('PSU: get',pdb,count,'/',len(self.pdbCodes))
-            apdb = pdbmanager.getPdb(pdb)
+            apdb = pdbmanager.getPdb(pdb,False)
             data = apdb.getGeoemtryCsv(calcList, hueList)
             dfs.append(data)
         df = pd.concat(dfs, ignore_index=True)
@@ -295,7 +295,7 @@ class GeoReport:
             pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
             for pdb in self.pdbCodes:
                 print('\tPSU:', reportName, 'for', pdb)
-                apdb = pdbmanager.getPdb(pdb)
+                apdb = pdbmanager.getPdb(pdb,True)
                 atomData = apdb.getDataFrame()
                 title = 'General Data Report'
                 cols = 3
@@ -313,7 +313,7 @@ class GeoReport:
         elif reportName == 'Slow_DensityPointsPerPdb' or reportName == 'Slow_DensityPeaksPerPdb': # this can only be done per pdb
             for pdb in self.pdbCodes:
                 pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
-                apdb = pdbmanager.getPdb(pdb)
+                apdb = pdbmanager.getPdb(pdb,True)
                 if apdb.hasDensity:
                     print('\tPSU:', reportName, 'for', apdb.pdbCode)
                     allPoints = True
@@ -484,7 +484,7 @@ class GeoReport:
                 html += '<td>' + pdb + '</td>\n'
                 res = ''
                 if pdbmanager.existsPdb(pdb):
-                    apdb = pdbmanager.getPdb(pdb)
+                    apdb = pdbmanager.getPdb(pdb,False)
                     res = str(apdb.atoms[0].values['resolution'])
                 html += '<td>' + res + '</td>\n'
                 html += "<td><a href='https://www.rcsb.org/structure/" + pdb + "' title='PDB Link' target='_blank'>Link to PDB</a></td>\n"

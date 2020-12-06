@@ -40,18 +40,18 @@ class GeoPdbs:
         pdbCode = pdbCode.lower()
         return self.instance.__existsPdb__(pdbCode)
 
-    def getPdb(self, pdbCode):
+    def getPdb(self, pdbCode,useAll):
         pdbCode = pdbCode.lower()
         if self.instance.__existsPdb__(pdbCode):
             return self.instance.__getPdb__(pdbCode)
         else:
-            gp = GeoPdb(pdbCode,self.instance.pdbDirectory,self.instance.edDirectory,self.instance.ed,self.instance.dssp)
+            gp = GeoPdb(pdbCode,self.instance.pdbDirectory,self.instance.edDirectory,self.instance.ed,self.instance.dssp,useAll)
             self.instance.__addPdb__(pdbCode,gp)
             return gp
 
 
 class GeoPdb:
-    def __init__(self,pdbCode,pdbDataPath,edDataPath,ed,dssp):
+    def __init__(self,pdbCode,pdbDataPath,edDataPath,ed,dssp,useAll):
         pdbCode = pdbCode.lower()
         self.pdbCode = pdbCode
         self.pdbDataPath= pdbDataPath
@@ -62,6 +62,7 @@ class GeoPdb:
         self.hasDssp = dssp
         self.dataFrame = pd.DataFrame()
         self.ghost = False
+        self.useAll = useAll
         if self.pdbCode == 'ghost':
             self.ghost = True
             #self.pdbCode =  '2q1j'
@@ -154,7 +155,8 @@ class GeoPdb:
                         chain = residue.get_full_id()[2]
                         ridx = resnum
                         resnum = resnum+1
-                        if r in self.getAAList():# != 'HOH':  # bio.is_aa(residue):
+                        #decision as to whether r is to be used. for density maps yes, for geoemtry no
+                        if r in self.getAAList() or (self.useAll and r!='HOH'):# != 'HOH':  # bio.is_aa(residue):
                             for atom in residue:
                                 if atom.is_disordered():
                                     if atom.disordered_has_id("A"):

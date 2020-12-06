@@ -57,4 +57,4 @@ georep.addHistogram(data=data3,geoX='CA:C', title='1000>1.0 CA:C', exclusions={'
 georep.addHistogram(data=data3,geoX='C-1:N', title='1000>1.0 C-1:N', exclusions={'aa': 'PRO'})
 georep.addHistogram(data=data3,geoX='C:O', title='1000>1.0 C:O')
 
-georep.printToHtml('Jaskolski Table 2', 4, 'jask_t2')
+georep.printToHtml('Jaskolski Table 2', 4, 'R1_jask_t2')

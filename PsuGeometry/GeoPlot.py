@@ -216,6 +216,7 @@ class GeoPlot:
 
     def plotScatter(self,fig, ax):
         #fig, ax = plt.subplots()
+        ax.grid(b=True, which='major', color='Gainsboro', linestyle='-')
 
         if self.categorical or self.hue == 'dssp':
             #blanksdata = self.data[self.data[self.hue] == '']
@@ -316,6 +317,7 @@ class GeoPlot:
 
         ax.set_xlabel(self.geoX)
         ax.set_ylabel(self.geoY)
+
 
         count = len(self.data.index)
         title = self.title
