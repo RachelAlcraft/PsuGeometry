@@ -11,7 +11,7 @@ pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
 printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/Paper01/'
 
-pdbList1000 = geol.GeoPdbLists().getList1000()
+pdbList1000 = geol.GeoPdbLists().getListPaper()
 geoList = ['PHI','PSI','TAU','C-1:C','C-1:N:CA','CHI1','CA-1:CA','OMEGA','CA:CA+1','C-1:N:CA:C']
 hueList = ['aa','bfactor','rid','resolution','pdbCode']
 

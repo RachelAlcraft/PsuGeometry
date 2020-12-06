@@ -10,7 +10,7 @@ pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
 printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/Paper01/'
 
-pdbList1000 = geol.GeoPdbLists().getList1000()
+pdbList1000 = geol.GeoPdbLists().getListPaper()
 #pdbList1000 = pdbList1000[:100]
 
 geoList = ['PSI','N:O']

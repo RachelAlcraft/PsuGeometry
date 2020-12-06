@@ -20,6 +20,9 @@ pdbList17 = pdbdata17['pdb_code'].tolist()
 pdbdata25 = pd.read_csv('structures25.csv')
 pdbList25 = pdbdata25['pdb_code'].tolist()
 
+pdbdataPap = pd.read_csv('structuresPaper.csv')
+pdbListPap = pdbdataPap['pdb_code'].tolist()
+
 fileText = ''
 '''
 list1000 = ['xxx','sss','sss']
@@ -77,6 +80,15 @@ for pdb in pdbList25:
     fileText +="'" + pdb.lower() + "'"
 fileText +="]\n"
 
+fileText +="listPap = ["
+isFirst = True
+for pdb in pdbListPap:
+    if not isFirst:
+        fileText += ","
+    isFirst = False
+    fileText +="'" + pdb.lower() + "'"
+fileText +="]\n"
+
 fileText +="class GeoPdbLists:\n"
 fileText += "\tdef getList1000(self):\n"
 fileText += "\t\treturn list1000\n"
@@ -88,6 +100,8 @@ fileText += "\tdef getList17(self):\n"
 fileText += "\t\treturn list17 \n"
 fileText += "\tdef getList25(self):\n"
 fileText += "\t\treturn list25 \n"
+fileText += "\tdef getListPaper(self):\n"
+fileText += "\t\treturn listPap \n"
 # create the cpp.html so that all the look and feel is consistent
 f= open("../GeoPdbLists.py","w+")
 print(fileText)
