@@ -153,10 +153,11 @@ class GeoPdb:
                         # print('Residue:', r)
                         rid = residue.get_full_id()[3][1]
                         chain = residue.get_full_id()[2]
+                        hetatm = residue.get_full_id()[3][0]
                         ridx = resnum
                         resnum = resnum+1
                         #decision as to whether r is to be used. for density maps yes, for geoemtry no
-                        if r in self.getAAList() or (self.useAll and r!='HOH'):# != 'HOH':  # bio.is_aa(residue):
+                        if (r in self.getAAList() and 'H' not in hetatm) or (self.useAll and r!='HOH'):# != 'HOH':  # bio.is_aa(residue):
                             for atom in residue:
                                 if atom.is_disordered():
                                     if atom.disordered_has_id("A"):
@@ -589,9 +590,10 @@ class GeoPdb:
                 'CHI3_ARG': 'CB:CG:CD:NE',
                 'CHI3_GLN': 'CB:CG:CD:OE1',
                 'CHI3_GLU': 'CB:CG:CD:OE1',
+                'CHI3_HIS': 'CA:CB:CG:CD2',
                 'CHI3_MET': 'CB:CG:SD:CE',
                 'CHI3_PRO': 'CB:CG:CD:N',
-                'CHI2_VAL': 'CA:CB:CG2:HG21',
+                'CHI3_VAL': 'CA:CB:CG2:HG21',
                 'CHI4': 'CG:CD:CE:CZ',
                 'CHI4_ARG': 'CG:CD:NE:CZ',
                 'CHI4_PRO': 'CG:CD:N:CA',

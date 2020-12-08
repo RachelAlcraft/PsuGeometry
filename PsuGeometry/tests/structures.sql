@@ -12,3 +12,4 @@ AND p.resolution < 1.1
 AND rfree <= 0.19
 AND rvalue <= 0.3
 ORDER BY resolution ASC
+but with 2cny removed

@@ -460,7 +460,7 @@ class GeoPlot:
             from PsuGeometry import GeoPdb as geopdb
             pdbmanager = geopdb.GeoPdbs(self.parent.pdbDataPath, self.parent.edDataPath, self.parent.ed, self.parent.dssp)
             for pdb in self.parent.pdbCodes:
-                apdb = pdbmanager.getPdb(pdb)
+                apdb = pdbmanager.getPdb(pdb,False)
                 data = apdb.getGeoemtryCsv(calcList, hueList)
                 dfs.append(data)
             self.data = pd.concat(dfs, ignore_index=True)

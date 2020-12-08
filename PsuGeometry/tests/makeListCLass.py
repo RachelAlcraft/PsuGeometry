@@ -53,7 +53,7 @@ for pdb in pdbList1000:
     fileText +="'" + pdb.lower() + "'"
 fileText +="]\n"
 
-fileText +="listJask = ["
+fileText +="listJaskolski = ["
 isFirst = True
 for pdb in pdbListJask:
     if not isFirst:

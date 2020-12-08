@@ -18,7 +18,7 @@ pdbList = ['1ejg','1us0','1tt8','1i1w','1ucs','1yk4','1hje','1r6j','1pjx']
 pdbList = ['2cnq','1ejg','5nqo','1us0','1pjx','3nir']
 pdbList = ['3nir']
 pdbList = ['1tt8','1i1w','1ucs','1yk4','1hje']
-#pdbList = ['5nqo']
+pdbList = ['2cnu']
 
 
 
@@ -47,8 +47,16 @@ else:
         #georep.printReport('Sp2Planarity',pdb + '_sp2')
         #georep.printReport('BackboneOutliers', pdb + '_bbone')
         #georep.printReport('MainChainHistograms',pdb + '_main')
-        georep.printReport('RachelsChoice', pdb + '_rae')
-        georep.printReport('DataPerPdb', pdb + '_data')
+        #georep.printReport('RachelsChoice', pdb + '_rae')
+        #georep.printReport('DataPerPdb', pdb + '_data')
+
+        geoList = ['C-1:C']
+        hueList = ['resolution','aa','pdbCode']
+        data = georep.getGeoemtryCsv(geoList,hueList)
+        #data = data[data['C-1:C'] > 5]
+        data.to_csv(printPath + pdb+"wonky.csv", index=False)
+        georep.addScatter(geoX='PHI', geoY='C-1:C', hue='dssp', title='PHI/C-1:C', palette='gist_ncar', sort='NON')
+        georep.printToHtml('C-1', 3, pdb + 'c1')
 
         geoRep = None
 
