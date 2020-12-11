@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from PsuGeometry import GeoPlot as geop
 from PsuGeometry import GeoPdb as geopdb
@@ -570,6 +571,54 @@ class GeoReport:
         #    html = '<td width=' + width + '%>' + 'Error:' + geoPlA.geoX + ' ' + geoPlA.geoY + '</td>\n'
 
         return (html)
+
+
+    def addSlices(self, slices, palette='viridis', title='',logged=False,centre=False):
+        mat = []
+        for s in slices:
+            if mat == []:
+                mat = s
+            else:
+                mat = mat + s
+        gp = geop.GeoPlot(data=None, geoX='', title=title, palette=palette, plot='surface', report=self,centre=centre)
+        gp.surface = mat
+        gp.logged=logged
+        self.plots.append(gp)
+        return mat
+
+    def addSlice(self, slice, palette='viridis', title='',logged=False,centre=False):
+        gp = geop.GeoPlot(data=None,geoX='',title=title, palette=palette, plot='surface', report=self,centre=centre)
+        gp.surface = slice
+        gp.logged=logged
+        gp.differ=0
+        self.plots.append(gp)
+
+    def saveSlice(self,dataarray, filepath):
+        with open(filepath, 'w') as outfile:
+            x, y = dataarray.shape
+            for i in range(0,x):
+                for j in range(0, y):
+                    val = dataarray[i,j]
+                    if j > 0:
+                        outfile.write(str(','))
+                    elif i > 0:
+                        outfile.write(str('\n'))
+                    outfile.write(str(val))
+
+    def loadSlice(self,filepath):
+
+        with open(filepath,'r') as f:
+            ed_data = f.read().splitlines()
+
+        rows = len(ed_data)
+        ed_slice = np.zeros((rows,rows))
+        for i in range(0,rows):
+            row = ed_data[i].split(',')
+            for j in range(0, rows):
+                val = float(row[j])
+                ed_slice[i,j] = val
+
+        return ed_slice
 
 
     def flush(self):
