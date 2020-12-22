@@ -31,7 +31,7 @@ for res in residues:
     georep.addSlice(slice, palette='cubehelix_r',title=res)
     georep.addSlice(slice, palette='cubehelix_r', logged=True, title=res + " logged")
     georep.addSlice(slicediff, palette='seismic', logged=False,centre=True, title= res + ' difference')
-
+ 
 
 
 georep.addSlices(slices, palette='cubehelix_r', title='Average', logged=False, centre=False)
