@@ -1,25 +1,39 @@
-from PsuGeometry import GeoSlice as gsl
+from PsuGeometry import GeoReport as psu
+
+
 #printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/slices/'
 printPath = 'F:/Code/ProteinDataFiles/ccp4_data/'
 
-gs = gsl.GeoSlice()
-slice1 = gs.load(printPath + "1ejg.ccp4_slice.csv")
-slice1d = gs.load(printPath + "1ejg_diff.ccp4_slice.csv")
-slice2 = gs.load(printPath + "1us0.ccp4_slice.csv")
-slice2d = gs.load(printPath + "1us0_diff.ccp4_slice.csv")
-slice3 = gs.load(printPath + "6jvv.ccp4_slice.csv")
-slice3d = gs.load(printPath + "6jvv_diff.ccp4_slice.csv")
+pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
+edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
 
-gs.addDensitySlice(slice1,palette='cubehelix_r')
-gs.addDensitySlice(slice1,palette='cubehelix_r',logged=True)
-gs.addDensitySlice(slice1d,palette='seismic',centre=True)
 
-gs.addDensitySlice(slice2,palette='cubehelix_r')
-gs.addDensitySlice(slice2,palette='cubehelix_r',logged=True)
-gs.addDensitySlice(slice2d,palette='seismic',centre=True)
+georep = psu.GeoReport([],pdbDataPath,edDataPath,printPath,ed=True,dssp=True)
 
-gs.addDensitySlice(slice3,palette='cubehelix_r')
-gs.addDensitySlice(slice3,palette='cubehelix_r',logged=True)
-gs.addDensitySlice(slice3d,palette='seismic',centre=True)
 
-gs.printToHtml('Slices from Density Flight',3,printPath + 'ccp4_slices.html')
+#slice0d = georep.loadSlice(printPath + "1ejg_diff.ccp4_slice.csv")
+#slice1 = georep.loadSlice(printPath + "1ejg.ccp4_slice1.csv")
+slice00 = georep.loadSlice(printPath + "1ejg.ccp4_slice0.csv")
+slice01 = georep.loadSlice(printPath + "1ejg.ccp4_slice1.csv")
+slice02 = georep.loadSlice(printPath + "1ejg.ccp4_slice2.csv")
+
+slice00x = georep.loadSlice(printPath + "1p7h.ccp4_slice0.csv")
+slice01x = georep.loadSlice(printPath + "1p7h.ccp4_slice1.csv")
+slice02x = georep.loadSlice(printPath + "1p7h.ccp4_slice2.csv")
+#slice26 = georep.loadSlice(printPath + "61ejg.ccp4_slice2.csv")
+
+
+georep.addSlice(slice00,palette='cubehelix_r')
+georep.addSlice(slice01,palette='seismic')
+georep.addSlice(slice02,palette='cubehelix')
+
+georep.addSlice(slice00x,palette='cubehelix_r')
+georep.addSlice(slice01x,palette='seismic')
+georep.addSlice(slice02x,palette='cubehelix')
+#georep.addSlice(slice06,palette='cubehelix_r')
+#georep.addSlice(slice26,palette='cubehelix')
+
+
+
+
+georep.printToHtml('Slices from Density Flight',3,'ccp4_slices_diffs')
