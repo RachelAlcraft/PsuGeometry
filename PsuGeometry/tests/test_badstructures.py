@@ -12,7 +12,7 @@ geoPsi = ['N:O','CB:O','N:CA:C:N+1']
 geoListMain = ['CA:C','N:CA','C:O']
 hueList = ['dssp','aa','bfactor','2FoFc','rid'] # note the hues are the sum od the atoms
 
-pdbList = ['2cnq','1i1w'] # structures with errors
+pdbList = ['2lc9','2lcb','2cnq','1i1w'] # structures with errors
 
 for pdbCode in pdbList:
 
@@ -52,7 +52,7 @@ for pdbCode in pdbList:
 
     csv = georep.getGeoemtryCsv(['N:CA'],['bfactor'])
     pdbmanager = geopdb.GeoPdbs(pdbDataPath, edDataPath)
-    data = pdbmanager.getPdb(pdbCode).getDataFrame()
+    data = pdbmanager.getPdb(pdbCode,True).getDataFrame()
     geoFileName = printPath + pdbCode.lower() + 'geo.csv'
     dataFileName = printPath + pdbCode.lower() + '_data.csv'
     csv.to_csv(geoFileName, index=False)

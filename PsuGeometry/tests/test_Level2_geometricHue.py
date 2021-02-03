@@ -16,6 +16,7 @@ pdbList = []
 pdbdata = pd.read_csv('structures09.csv')
 pdbList = pdbdata['pdb_code']
 
+
 georep = geor.GeoReport(pdbList, pdbDataPath, edDataPath, printPath, ed=False, dssp=False)
 
 geoList = ['PHI','PSI','TAU','C-1:C','C-1:N:CA','CHI1','CA-1:CA','OMEGA','CA:CA+1','C-1:N:CA:C']

@@ -15,6 +15,7 @@ class GeoDensity:
     def __init__(self,pdbCode,normalisation,pdbDataPath,edDataPath):
         # this defines the data we allow in the atom
         # Structure information
+        import pdb_eda
         self.pdbCode = pdbCode
         self.norm = normalisation
         pdb_eda.densityAnalysis.ccp4folder =edDataPath

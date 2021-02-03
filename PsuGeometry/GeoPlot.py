@@ -9,7 +9,7 @@ import io
 import base64
 import math
 
-
+kde = 0.3
 
 class GeoPlot:
     def __init__(self,data,geoX,geoY='',title='',hue='bfactor',splitKey='',palette='viridis_r',
@@ -60,6 +60,8 @@ class GeoPlot:
             return self.plotHistogram(fig, ax)
         elif self.plot == 'scatter' or self.plot=='contact':
             return self.plotScatter(fig, ax)
+        elif self.plot == 'hexbin':
+            return self.plotHexbin(fig, ax)
         elif self.plot == 'probability':
             return self.plotProbability(fig, ax)
         elif self.plot == 'surface':
@@ -240,6 +242,10 @@ class GeoPlot:
             except:
                 self.palette = self.palette
 
+        if self.operation == 'ABS':
+            self.data = self.data[self.data[self.geoX] == abs(self.data[self.geoX])]
+
+
         if self.sort == 'DESC':
             self.data = self.data.sort_values(by=self.hue, ascending=False)
         elif self.hue == 'resolution':
@@ -250,7 +256,7 @@ class GeoPlot:
             self.data = self.data.sort_values(by=self.hue, ascending=True)
 
         lw = 0.5
-        alpha = 0.65
+        alpha = 0.65#0.65
         ecol = 'grey'
         if self.palette == 'gist_gray_r':
             lw = 0  # this gives a crystollagraphic image look
@@ -339,17 +345,20 @@ class GeoPlot:
         return encoded
 
     def getAxes(self):
-        xMin = min(self.data[self.geoX])
-        xMax = max(self.data[self.geoX])
-        yMin = min(self.data[self.geoY])
-        yMax = max(self.data[self.geoY])
+        xMin,yMin,xMax,yMax = 0,0,0,0
+        if len(self.data[self.geoX])> 0:
+            xMin = min(self.data[self.geoX])
+            xMax = max(self.data[self.geoX])
+        if len(self.data[self.geoY]) > 0:
+            yMin = min(self.data[self.geoY])
+            yMax = max(self.data[self.geoY])
         return ([xMin,xMax,yMin,yMax])
 
     def plotProbability(self,fig, ax):
 
         # These shold be settings
         contours = 12
-        kde = 0.10
+
         bins=50
         minX,maxX = self.axX[0],self.axX[1]
         minY,maxY = self.axY[0],self.axY[1]
@@ -497,11 +506,14 @@ class GeoPlot:
 
     def getMatrix(self):
 
-        kde = 0.10
+        #kde = 3
         bins = 50
         minX,maxX,minY,maxY = self.axX[0],self.axX[1],self.axY[0],self.axY[1]
-        xgrid, ygrid, zgrid = self.kde2D_scipy(kde, [minX, maxX, minY, maxY], bins)
-        return xgrid, ygrid, zgrid
+        try:
+            xgrid, ygrid, zgrid = self.kde2D_scipy(kde, [minX, maxX, minY, maxY], bins)
+            return xgrid, ygrid, zgrid
+        except:
+            return np.zeros([1,1]),np.zeros([1,1]),np.zeros([1,1])
 
 
 

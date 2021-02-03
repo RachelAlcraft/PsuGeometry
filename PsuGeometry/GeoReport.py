@@ -47,6 +47,18 @@ class GeoReport:
             self.plots.append(
                 geop.GeoOverlay(gp, '', title='ghost', report=self))
 
+    def addHexBins(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',hue='bfactor',palette='viridis_r',restrictions={},exclusions={}):
+        isNew = False
+        if data is None:
+            isNew = True
+        gp = geop.GeoPlot(data, geoX, geoY=geoY, title=title, newData=isNew, operation=operation,
+                          hue=hue,palette=palette,plot='hexbin',restrictions=restrictions,exclusions=exclusions,report=self)
+        if not ghost:
+            self.plots.append(gp)
+        else:
+            self.plots.append(
+                geop.GeoOverlay(gp, '', title='ghost', report=self))
+
     def addProbability(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',centre=False,vmin=0,vmax=0,categorical=False,restrictions={},exclusions={}):
         isNew = False
         if data is None:

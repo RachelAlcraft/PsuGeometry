@@ -15,4 +15,5 @@ georep.addScatter(geoX='PHI', geoY='PSI', title='Ramachandran Plot')
 georep.addScatter(geoX='N:O', geoY='CB:O', title='NO-CBO')
 georep.addScatter(geoX='PSI', geoY='N:O', title='PSI-NO')
 georep.addScatter(geoX='PSI', geoY='CB:O', title='PSI-CBO')
+
 georep.printToHtml('Simple Correlations', 2, 'SimpleCorr')

@@ -41,5 +41,18 @@ georep.addCloseContact('4rek', 'C', 'CB', 6,1)
 georep.addCloseContact('4rek', 'C', 'O', 6,1)
 georep.addCloseContact('4rek', 'N', 'CA', 6,0)
 
+#TEST
+georep.addHistogram(geoX='N:CA', title='N:CA')
+georep.addHistogram(geoX='CA:C', title='CA:C')
+georep.addHistogram(geoX='C:O', title='C:O')
+georep.addHistogram(geoX='CA:C:O', title='CA:C:O')
+georep.addHistogram(geoX='N:CA:C)', title='N:CA:C')
+georep.addHistogram(geoX='CA:O', title='CA:O')
+georep.addHistogram(geoX='N:O', title='N:O')
+georep.addHistogram(geoX='N:C', title='N:C')
+georep.addHistogram(geoX='N:CA:C:O', title='N:CA:C:O')
+
+
+
 
 georep.printToHtml('Carbonyl analysis',3,'carbonyl')

@@ -132,6 +132,7 @@ class GeoPdb:
     def __gatherAtoms(self):
         # try:
         if True:
+            import Bio.PDB as bio
             self.hasPDB = True
             pdbCode = self.pdbCode.lower()
             print('PSU: load from BioPython', self.pdbCode)
@@ -194,6 +195,7 @@ class GeoPdb:
         return (self.hasPDB)
 
     def __applyDssp(self):
+        import Bio.PDB as bio
         print('PSU: applying dssp')
         from Bio.PDB.DSSP import DSSP
         p = bio.PDBParser()
