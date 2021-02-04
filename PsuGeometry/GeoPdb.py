@@ -142,8 +142,16 @@ class GeoPdb:
             try:
                 structure = parser.get_structure(pdbCode, self.pdbDataPath + 'pdb' + pdbCode + '.ent')
             except:
+                import time
                 biodl.download_pdb_files([pdbCode], pdir=self.pdbDataPath, file_format='pdb')
-                structure = parser.get_structure(pdbCode, self.pdbDataPath + 'pdb' + pdbCode + '.ent')
+                time.sleep(1)
+                try:
+                    structure = parser.get_structure(pdbCode, self.pdbDataPath + 'pdb' + pdbCode + '.ent')
+                except:
+                    import time
+                    time.sleep(10)
+                    structure = parser.get_structure(pdbCode, self.pdbDataPath + 'pdb' + pdbCode + '.ent')
+
             resolution = structure.header['resolution']
             atomNo = 0
             resnum = 1
