@@ -47,12 +47,13 @@ class GeoReport:
             self.plots.append(
                 geop.GeoOverlay(gp, '', title='ghost', report=self))
 
-    def addHexBins(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',hue='bfactor',palette='viridis_r',restrictions={},exclusions={}):
+    def addHexBins(self,geoX='',geoY='',data=None,title='',gridsize=50,bins=100,ghost=False,operation='',hue='bfactor',palette='viridis_r',restrictions={},exclusions={}):
         isNew = False
         if data is None:
             isNew = True
         gp = geop.GeoPlot(data, geoX, geoY=geoY, title=title, newData=isNew, operation=operation,
-                          hue=hue,palette=palette,plot='hexbin',restrictions=restrictions,exclusions=exclusions,report=self)
+                          hue=hue,palette=palette,plot='hexbin',restrictions=restrictions,exclusions=exclusions,report=self,gridsize=gridsize)
+
         if not ghost:
             self.plots.append(gp)
         else:

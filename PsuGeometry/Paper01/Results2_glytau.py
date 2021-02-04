@@ -13,66 +13,95 @@ printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/
 ###############################################################################################
 
 pdbList1000 = geol.GeoPdbLists().getListPaper()
-pdbList1000 = pdbList1000[:100]
+#pdbList1000 = pdbList1000[:100]
+
+dihs = ['PSI','PHI','CA-2:CA-1:CA:CA+1','CA-1:CA:CA+1:CA+2']
+distances = ['CA-1:N+1','N:CA','CA:C','N:C','O-1:O','CA-1:CA','CA:CA+1','N-1:N','N:N+1','N:O','O-1:N','O:O+1','O-1:O+1','O-1:N+1']
+angles = ['N:CA:C','CA:C:O']
+aas = ['GLY','ALA']
+
+hueList = ['aa', 'rid', 'bfactor','dssp']
+
+palette1 = 'cubehelix_r'
+palette2 = 'jet'
+palette3 = 'gist_ncar'
+bins='log'
+gridsize=50
+
+###################################################################################
 
 
 
-georepGLY = psu.GeoReport(pdbList1000, pdbDataPath, edDataPath, printPath, ed=False, dssp=True, includePdbs=False)
-georepALA = psu.GeoReport(pdbList1000, pdbDataPath, edDataPath, printPath, ed=False, dssp=True, includePdbs=False)
 
-geoList = ['TAU', 'PSI','PHI','OMEGA','N:O','N:C','N:CA','CA:C','CA:C:O','CA:O','C-1:N:CA','CA-1:CA','CA:C:N+1','CA-2:CA-1:CA:CA+1','N-1:N','N:N+1','CA-1:CA','CA:CA+1']
-hueList = ['aa', 'rid', 'bfactor','dssp']  # note the hues are the sum of the atoms
+
+
+georepData = psu.GeoReport(pdbList1000, pdbDataPath, edDataPath, printPath, ed=False, dssp=True, includePdbs=False)
+
+geoList = []
+for geo in dihs:
+    geoList.append((geo))
+for geo in distances:
+    geoList.append((geo))
+for geo in angles:
+    geoList.append((geo))
+
 # Create the dataframe
-data = georepALA.getGeoemtryCsv(geoList, hueList)
-datagly = data.query('aa =="GLY"')
-dataala = data.query('aa =="ALA"')
+dataAll = georepData.getGeoemtryCsv(geoList, hueList)
 
-georepALA.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='PSI', restrictionsA={'aa': 'ALA'},exclusionsB={'aa': 'ALA,GLY'})
-georepGLY.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='PSI', restrictionsA={'aa': 'GLY'},exclusionsB={'aa': 'GLY'})
+data1 = dataAll.query('TAU <= 100')
+data2 = dataAll.query('TAU > 100')
+data3 = dataAll.query('PSI<-100')
+data4 = dataAll.query('PSI>100')
+data5 = dataAll.query('PSI>=-100 and PSI <=100')
 
-georepALA.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='CA:C:O', restrictionsA={'aa': 'ALA'},exclusionsB={'aa': 'ALA,GLY'})
-georepGLY.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='CA:C:O', restrictionsA={'aa': 'GLY'},exclusionsB={'aa': 'GLY'})
+datas = [data2,data3,data4,data5]
+tags = ['all','lower','upper','middle']
+for i in range(0,len(datas)):
+    data = datas[i]
+    tag = tags[i]
+    for aa in aas:
+        sql = 'aa == "' + aa + '"'
+        dataa = data.query(sql)
+        georep = psu.GeoReport(pdbList1000, pdbDataPath, edDataPath, printPath, ed=False, dssp=True, includePdbs=False)
 
-georepALA.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='CA-1:CA', restrictionsA={'aa': 'ALA'},exclusionsB={'aa': 'ALA,GLY'})
-georepGLY.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='CA-1:CA', restrictionsA={'aa': 'GLY'},exclusionsB={'aa': 'GLY'})
+        try:
+            georep.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='PSI', restrictionsA={'aa': aa},exclusionsB={'aa': aa})
+            georep.addHistogram(geoX='TAU', data=dataa, title=aa, hue='dssp')
+        except:
+            print('No data')
 
-georepALA.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='CA:CA+1', restrictionsA={'aa': 'ALA'},exclusionsB={'aa': 'ALA,GLY'})
-georepGLY.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='CA:CA+!', restrictionsA={'aa': 'GLY'},exclusionsB={'aa': 'GLY'})
-
-georepALA.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='CA-2:CA-1:CA:CA+1', restrictionsA={'aa': 'ALA'},exclusionsB={'aa': 'ALA,GLY'})
-georepGLY.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='CA-2:CA-1:CA:CA+1', restrictionsA={'aa': 'GLY'},exclusionsB={'aa': 'GLY'})
-
-georepALA.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='N:O', restrictionsA={'aa': 'ALA'},exclusionsB={'aa': 'ALA,GLY'})
-georepGLY.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='N:O', restrictionsA={'aa': 'GLY'},exclusionsB={'aa': 'GLY'})
-
-georepALA.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='N-1:N', restrictionsA={'aa': 'ALA'},exclusionsB={'aa': 'ALA,GLY'})
-georepGLY.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='N-1:N', restrictionsA={'aa': 'GLY'},exclusionsB={'aa': 'GLY'})
-
-georepALA.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='N:N+1', restrictionsA={'aa': 'ALA'},exclusionsB={'aa': 'ALA,GLY'})
-georepGLY.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='N:N+1', restrictionsA={'aa': 'GLY'},exclusionsB={'aa': 'GLY'})
-
-georepALA.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='N:CA', restrictionsA={'aa': 'ALA'},exclusionsB={'aa': 'ALA,GLY'})
-georepGLY.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='N:CA', restrictionsA={'aa': 'GLY'},exclusionsB={'aa': 'GLY'})
-
-georepALA.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='CA:C', restrictionsA={'aa': 'ALA'},exclusionsB={'aa': 'ALA,GLY'})
-georepGLY.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='CA:C', restrictionsA={'aa': 'GLY'},exclusionsB={'aa': 'GLY'})
-
-georepALA.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='N:C', restrictionsA={'aa': 'ALA'},exclusionsB={'aa': 'ALA,GLY'})
-georepGLY.addDifference(dataA=data, dataB=data, geoX='TAU', geoY='N:C', restrictionsA={'aa': 'GLY'},exclusionsB={'aa': 'GLY'})
+        georep.addHexBins(data=dataa, geoX='PHI', geoY='PSI', hue='count', palette=palette1,bins=bins, gridsize=gridsize)
+        georep.addHexBins(data=dataa, geoX='PHI', geoY='PSI', hue='TAU', palette=palette2,bins=bins, gridsize=gridsize)
+        georep.addScatter(data=dataa, geoX='PHI', geoY='PSI', hue='TAU', title=geo, palette=palette2, sort='NON')
+        georep.addScatter(data=dataa, geoX='PHI', geoY='PSI', hue='dssp', title=geo, palette=palette3, sort='NON')
 
 
-georepALA.addHistogram(geoX='N:CA:C',data=dataala,title='TAU')
-georepGLY.addHistogram(geoX='N:CA:C',data=datagly,title='TAU')
+        for geo in dihs:
+            georep.addHexBins(data=dataa, geoX='TAU', geoY=geo, hue='count', palette=palette1,bins=bins, gridsize=gridsize)
+            if geo == 'PSI':
+                georep.addHexBins(data=dataa, geoX='TAU', geoY=geo, hue='PHI', palette=palette2,bins=bins, gridsize=gridsize)
+                georep.addScatter(data=dataa, geoX='TAU', geoY=geo, hue='PHI', title=geo, palette=palette2, sort='NON')
+            else:
+                georep.addHexBins(data=dataa, geoX='TAU', geoY=geo, hue='PSI', palette=palette2,bins=bins, gridsize=gridsize)
+                georep.addScatter(data=dataa, geoX='TAU', geoY=geo, hue='PSI', title=geo, palette=palette2, sort='NON')
+            georep.addScatter(data=dataa, geoX='TAU', geoY=geo, hue='dssp', title=geo, palette=palette3, sort='NON')
 
-georepALA.addScatter(data=dataala, geoX='N:CA:C', geoY='PHI', hue='PSI', title='Tau/Phi', palette='jet', sort='NON')
-georepGLY.addScatter(data=datagly, geoX='N:CA:C', geoY='PHI', hue='PSI', title='Tau/Phi', palette='jet', sort='NON')
 
-georepALA.addScatter(data=dataala, geoX='N:CA:C', geoY='PHI', hue='dssp', title='Tau/Phi', palette='gist_ncar', sort='NON')
-georepGLY.addScatter(data=datagly, geoX='N:CA:C', geoY='PHI', hue='dssp', title='Tau/Phi', palette='gist_ncar', sort='NON')
+        for geo in angles:
+            georep.addHexBins(data=dataa, geoX='TAU', geoY=geo, hue='count', palette=palette1,bins=bins, gridsize=gridsize)
+            georep.addHexBins(data=dataa, geoX='TAU', geoY=geo, hue='PSI', palette=palette2,bins=bins, gridsize=gridsize)
+            georep.addScatter(data=dataa, geoX='TAU', geoY=geo, hue='PSI', title=geo, palette=palette2, sort='NON')
+            georep.addScatter(data=dataa, geoX='TAU', geoY=geo, hue='dssp', title=geo, palette=palette3, sort='NON')
 
-print('Creating reports')
-georepALA.printToHtml('Multi-modal Tau ALA Plots', 3, 'Results2_ala_tau')
-georepGLY.printToHtml('Multi-modal Tau Gly Plots', 3, 'Results2_gly_tau')
+
+        for geo in distances:
+            georep.addHexBins(data=dataa, geoX='TAU', geoY=geo, hue='count', palette=palette1,bins=bins, gridsize=gridsize)
+            georep.addHexBins(data=dataa, geoX='TAU', geoY=geo, hue='PSI', palette=palette2,bins=bins, gridsize=gridsize)
+            georep.addScatter(data=dataa, geoX='TAU', geoY=geo, hue='PSI', title=geo, palette=palette2, sort='NON')
+            georep.addScatter(data=dataa, geoX='TAU', geoY=geo, hue='dssp', title=geo, palette=palette3, sort='NON')
+
+        print('Creating reports')
+        georep.printToHtml('Multi-modal Tau ' + aa + ' Plots ' + tag, 4, 'Results2_' + aa + '_tau_' + tag)
 
 
 

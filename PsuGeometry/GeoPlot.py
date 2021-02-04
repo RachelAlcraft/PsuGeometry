@@ -14,7 +14,7 @@ kde = 0.3
 class GeoPlot:
     def __init__(self,data,geoX,geoY='',title='',hue='bfactor',splitKey='',palette='viridis_r',
                  centre=False,vmin=0,vmax=0,operation='',newData=False,plot='scatter',categorical=False,
-                 restrictions={},exclusions={},report=None,count=False,sort='ASC'):
+                 restrictions={},exclusions={},report=None,count=False,sort='ASC',gridsize=50,bins=100):
         self.parent=report
         self.plot = plot
         self.data = data
@@ -23,6 +23,8 @@ class GeoPlot:
         self.title=title
         self.hue = hue
         self.splitKey=splitKey
+        self.gridsize=gridsize
+        self.bins = bins
         self.palette=palette
         self.centre = centre
         self.vmin=vmin
@@ -42,7 +44,7 @@ class GeoPlot:
         if self.geoY == '' and plot not in 'surfaces':
             self.plot = 'histogram'
         self.count=count # only for histograms, probability or count
-            #if self.hue=='bfactor':
+            #if self.hue=='bfactor':gp.gridsize = 50
             #    self.hue = 'pdbCode'
         if self.hue in 'aa,dssp,element,pdbCode':
             self.categorical=True
@@ -63,7 +65,10 @@ class GeoPlot:
         elif self.plot == 'hexbin':
             return self.plotHexbin(fig, ax)
         elif self.plot == 'probability':
-            return self.plotProbability(fig, ax)
+            try:
+                return self.plotProbability(fig, ax)
+            except:
+                return 'Error in probability'
         elif self.plot == 'surface':
             return self.plotSurface(fig, ax)
         elif self.plot == 'surfaces':
@@ -419,6 +424,40 @@ class GeoPlot:
                 title += 'Count=' + str(count)
             else:
                 title += '\nCount=' + str(count)
+
+        plt.title(title)
+        return ''
+
+    def plotHexbin(self,fig, ax):
+        # These shold be settings
+        contours = 12
+        x = self.data[self.geoX]#.ravel()
+        y = self.data[self.geoY]#.ravel()
+
+        if self.hue.lower() == 'count':
+            plt.hexbin(x, y, bins=self.bins, cmap=self.palette,gridsize=self.gridsize)
+            cb = plt.colorbar()
+            cb.set_label('Count')
+        else:
+            z = self.data[self.hue]  # .ravel()
+            self.vmin = z.min()
+            self.vmax = z.max()
+            #ax = self.data.plot.hexbin(x=self.geoX,y=self.geoY,C=self.hue,gridsize=10,cmap=self.palette)
+            plt.hexbin(x,y,C=z,bins=self.bins,cmap=self.palette,vmin=self.vmin,vmax=self.vmax,gridsize=self.gridsize)
+            cb = plt.colorbar()
+            cb.set_label('Average ' + self.hue)
+
+        plt.axis([x.min(), x.max(), y.min(), y.max()])
+
+        #Labelling
+        ax.set_xlabel(self.geoX)
+        ax.set_ylabel(self.geoY)
+        count = len(self.data.index)
+        title = self.title
+        if title == '':
+            title += 'Count=' + str(count)
+        else:
+            title += '\nCount=' + str(count)
 
         plt.title(title)
         return ''
