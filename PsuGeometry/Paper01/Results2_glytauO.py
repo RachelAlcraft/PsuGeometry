@@ -10,13 +10,11 @@ pdbList1000 = geol.GeoPdbLists().getListPaper()
 pdbList1000 = pdbList1000[:200]
 #pdbList1000 = ['5zj8']
 
-dihs = ['PSI','PHI','OMEGA','N:CA:C:O','O:C:N+1:CA+1']
-angles = ['TAU']
-distances = ['C-1:N','N:CA','CA:C','C:N+1','C:O',  #backbone bond lengths
-             'N-2:N+2', 'N-2:N+1', 'N-2:N', 'N-2:N-1', 'N-1:N+2', 'N-1:N+1', 'N-1:N', 'N:N+2','N:N+1', # N
-             'C-2:C+2', 'C-2:C+1', 'C-2:C', 'C-2:C-1', 'C-1:C+2', 'C-1:C+1', 'C-1:C', 'C:C+2','C:C+1', # C
-             'N-2:O+2', 'N-2:O+1', 'N-2:O', 'N-2:O-1', 'N-1:O+2', 'N-1:O+1', 'N-1:O', 'N:O+2','N:O+1','N:O', # NO
-             'C-2:N+2', 'C-2:N+1', 'C-2:N', 'C-2:N-1', 'C-1:N+2', 'C-1:N+1', 'C:N+2', 'C:N+1', 'C:N']#CN
+dihs = ['PSI','PHI']
+angles = ['TAU','CA:C:O','C-1:N:CA','CA:C:N+1','N-1:N:N+1','C-1:C:C+1','O-1:O:O+1']
+distances = ['O-2:O+2', 'O-2:O+1', 'O-2:O', 'O-2:O-1', 'O-1:O+2', 'O-1:O+1', 'O-1:O', 'O:O+2','O:O+1', # O
+             'O-2:N+2', 'O-2:N+1', 'O-2:N', 'O-2:N-1', 'O-1:N+2', 'O-1:N+1', 'O-1:N', 'O:N+2','O:N+1','O:N'] # ON
+
 
 
 
@@ -116,7 +114,7 @@ for i in range(0,len(datas)):
                 georepData.addScatter(data=dataUpper, geoX=xax, geoY=geo, hue=hu, title=geo + ' Upper ' + aa + aa, palette=p2, sort='NON')
 
         print('Creating reports')
-        georepData.printToHtml('Tau Correlations ' + aa + ' Plots, Pdbs=' + tag + str(len(pdbList1000)) , 5, 'Results2_' + aa + '_tau_' + tag + str(len(pdbList1000)))
+        georepData.printToHtml('Tau Correlations ' + aa + ' Plots, Pdbs=' + tag + str(len(pdbList1000)) , 5, 'Results2_' + aa + '_tauO_' + tag + str(len(pdbList1000)))
 
 
 

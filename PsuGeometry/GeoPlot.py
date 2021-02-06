@@ -435,17 +435,35 @@ class GeoPlot:
         y = self.data[self.geoY]#.ravel()
 
         if self.hue.lower() == 'count':
-            plt.hexbin(x, y, bins=self.bins, cmap=self.palette,gridsize=self.gridsize)
-            cb = plt.colorbar()
-            cb.set_label('Count')
+            hb = plt.hexbin(x, y, bins=self.bins, cmap=self.palette,gridsize=self.gridsize)
+
+            #cb = plt.colorbar()
+            #cb.set_label('Count')
         else:
             z = self.data[self.hue]  # .ravel()
             self.vmin = z.min()
             self.vmax = z.max()
             #ax = self.data.plot.hexbin(x=self.geoX,y=self.geoY,C=self.hue,gridsize=10,cmap=self.palette)
-            plt.hexbin(x,y,C=z,bins=self.bins,cmap=self.palette,vmin=self.vmin,vmax=self.vmax,gridsize=self.gridsize)
+            hb = plt.hexbin(x,y,C=z,bins=self.bins,
+                       cmap=self.palette,gridsize=self.gridsize,reduce_C_function=np.mean)
+                        #,vmin = self.vmin, vmax = self.vmax)
+
             cb = plt.colorbar()
             cb.set_label('Average ' + self.hue)
+            #cb.set_ticks(z.min(),z.max())
+            cb.set_ticks(np.linspace(hb.get_array().min(), hb.get_array().max(), 10))
+            lbls = np.linspace(round(z.min(),2), round(z.max(),2), 10)
+            diff = z.max()-z.min()
+            lblsrounded = []
+            for lbl in lbls:
+                if diff < 5:
+                    lblsrounded.append(round(lbl,2))
+                elif diff < 10:
+                    lblsrounded.append(round(lbl, 1))
+                else:
+                    lblsrounded.append(int(round(lbl, 0)))
+            #cb.set_ticklabels(np.linspace(round(z.min(),2), round(z.max(),2), 10))
+            cb.set_ticklabels(lblsrounded)
 
         plt.axis([x.min(), x.max(), y.min(), y.max()])
 
