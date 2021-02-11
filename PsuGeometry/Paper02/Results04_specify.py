@@ -5,10 +5,10 @@ from PsuGeometry import GeoPdbLists as geol
 TAU correlations
 '''
 ###############################################################################################
-myWindowsLaptop = True
+myWindowsLaptop = False
 pdbList1000 = geol.GeoPdbLists().getListPaper()
 #randomise the data as it is by pdb res no
-#pdbList1000 = pdbList1000[:4]
+pdbList1000 = pdbList1000[:40]
 
 geoList = ['N:N+1','CA-2:CA-1:CA:CA+1','TAU','PHI','PSI','CA-1:CA:CA+1:CA+2','N:O','CA-1:CA:CA+1','C-1:C','O-1:O','CA-2:CA:CA+2']
 hueList = ['dssp','aa', 'rid', 'bfactor']
@@ -41,20 +41,20 @@ for aa in aas:
 
     #Ramachandran on average tau and dssp
     georep.addHexBins(data=dataaa, geoX='PHI', geoY='PSI', hue='TAU', title='Ramachandran with Average tau ' + aa, palette='jet',bins='log', gridsize=50)
-    georep.addScatter(data=dataaa, geoX='PHI', geoY='PSI', hue=dsspHue, title='Ramachandran with dssp ' + aa, palette='rainbow', sort='NON')
+    georep.addScatter(data=dataaa, geoX='PHI', geoY='PSI', hue=dsspHue, title='Ramachandran with dssp ' + aa, palette='tab10', sort='NON')
 
     #Tau vs PHI AND PSI
     georep.addHexBins(data=dataaa, geoX='TAU', geoY='PSI', hue='count', title='TAU vs PSI Density Plot ' + aa,palette='cubehelix_r', bins='log', gridsize=50)
-    georep.addScatter(data=dataaa, geoX='TAU', geoY='PSI', hue=dsspHue, title='TAU vs PSI with dssp ' + aa,  palette='rainbow', sort='NON')
+    georep.addScatter(data=dataaa, geoX='TAU', geoY='PSI', hue=dsspHue, title='TAU vs PSI with dssp ' + aa,  palette='tab10', sort='NON')
 
     georep.addHexBins(data=dataaa, geoX='TAU', geoY='PHI', hue='count', title='TAU vs PHI Density Plot ' + aa, palette='cubehelix_r', bins='log', gridsize=50)
-    georep.addScatter(data=dataaa, geoX='TAU', geoY='PHI', hue=dsspHue, title='TAU vs PHI with dssp ' + aa, palette='rainbow', sort='NON')
+    georep.addScatter(data=dataaa, geoX='TAU', geoY='PHI', hue=dsspHue, title='TAU vs PHI with dssp ' + aa, palette='tab10', sort='NON')
 
     georep.addHexBins(data=dataaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='PSI vs N:N+1 with Average Tau ' + aa, palette='jet', bins='log', gridsize=50)
-    georep.addScatter(data=dataaa, geoX='PSI', geoY='N:N+1', hue=dsspHue, title='PSI vs N:N+1 with dssp ' + aa, palette='rainbow', sort='NON')
+    georep.addScatter(data=dataaa, geoX='PSI', geoY='N:N+1', hue=dsspHue, title='PSI vs N:N+1 with dssp ' + aa, palette='tab10', sort='NON')
 
     georep.addHexBins(data=dataaa, geoX='PHI', geoY='C-1:C', hue='TAU', title='PHI vs C-1:C with Average Tau ' + aa,palette='jet', bins='log', gridsize=50)
-    georep.addScatter(data=dataaa, geoX='PHI', geoY='C-1:C', hue=dsspHue, title='PHI vs C-1:C with dssp ' + aa, palette='rainbow', sort='NON')
+    georep.addScatter(data=dataaa, geoX='PHI', geoY='C-1:C', hue=dsspHue, title='PHI vs C-1:C with dssp ' + aa, palette='tab10', sort='NON')
 
     georep.addHexBins(data=dataaa, geoX='PHI', geoY='O-1:O', hue='TAU', title='PHI vs O-1:O with Average Tau ' + aa,palette='jet', bins='log', gridsize=50)
     georep.addHexBins(data=dataaa, geoX='PHI', geoY='O-1:O', hue='count', title='PHI vs O-1:O with Density Plot ' + aa,palette='cubehelix_r', bins='log', gridsize=50)
@@ -62,8 +62,8 @@ for aa in aas:
     georep.addHexBins(data=dataaa, geoX='CA-1:CA:CA+1', geoY='CA-1:CA:CA+1:CA+2', hue='TAU', title='Kleywegt/Lyons CAlpha Plot with Average Tau ' + aa,palette='jet', bins='log', gridsize=50)
     georep.addHexBins(data=dataaa, geoX='CA-1:CA:CA+1', geoY='CA-1:CA:CA+1:CA+2', hue='count',title='Kleywegt/Lyons CAlpha Density Plot ' + aa, palette='cubehelix_r', bins='log', gridsize=50)
 
-    georep.addScatter(data=dataaa, geoX='CA-1:CA:CA+1', geoY='CA-1:CA:CA+1:CA+2', hue=dsspHue, title='Kleywegt/Lyons CAlpha Plot with dssp ' + aa,palette='rainbow', sort='NON')
-    georep.addScatter(data=dataaa, geoX='CA-2:CA:CA+2', geoY='CA-2:CA-1:CA:CA+1', hue=dsspHue, title='CAlpha +- 2 Plot with dssp ' + aa,palette='rainbow', sort='NON')
+    georep.addScatter(data=dataaa, geoX='CA-1:CA:CA+1', geoY='CA-1:CA:CA+1:CA+2', hue=dsspHue, title='Kleywegt/Lyons CAlpha Plot with dssp ' + aa,palette='tab10', sort='NON')
+    georep.addScatter(data=dataaa, geoX='CA-2:CA:CA+2', geoY='CA-2:CA-1:CA:CA+1', hue=dsspHue, title='CAlpha +- 2 Plot with dssp ' + aa,palette='tab10', sort='NON')
 
     georep.addHexBins(data=dataaa, geoX='CA-2:CA:CA+2', geoY='CA-2:CA-1:CA:CA+1', hue='TAU', title='CAlpha +- 2 Plot with Average Tau ' + aa, palette='jet', bins='log', gridsize=50)
     georep.addHexBins(data=dataaa, geoX='CA-2:CA:CA+2', geoY='CA-2:CA-1:CA:CA+1', hue='count',title='CAlpha +- 2  Density Plot ' + aa, palette='cubehelix_r', bins='log', gridsize=50)
