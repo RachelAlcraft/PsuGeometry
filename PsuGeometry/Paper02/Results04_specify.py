@@ -8,9 +8,9 @@ TAU correlations
 myWindowsLaptop = True
 pdbList1000 = geol.GeoPdbLists().getListPaper()
 #randomise the data as it is by pdb res no
-pdbList1000 = pdbList1000[:400]
+#pdbList1000 = pdbList1000[:4]
 
-geoList = ['N:N+1','CA-2:CA-1:CA:CA+1','TAU','PHI','PSI','CA-1:CA:CA+1:CA+2','N:O','CA-1:CA:CA+1','C-1:C','O-1:O']
+geoList = ['N:N+1','CA-2:CA-1:CA:CA+1','TAU','PHI','PSI','CA-1:CA:CA+1:CA+2','N:O','CA-1:CA:CA+1','C-1:C','O-1:O','CA-2:CA:CA+2']
 hueList = ['dssp','aa', 'rid', 'bfactor']
 aas = ['GLY','ALA']
 includeDSSP = True
@@ -58,6 +58,15 @@ for aa in aas:
 
     georep.addHexBins(data=dataaa, geoX='PHI', geoY='O-1:O', hue='TAU', title='PHI vs O-1:O with Average Tau ' + aa,palette='jet', bins='log', gridsize=50)
     georep.addHexBins(data=dataaa, geoX='PHI', geoY='O-1:O', hue='count', title='PHI vs O-1:O with Density Plot ' + aa,palette='cubehelix_r', bins='log', gridsize=50)
+
+    georep.addHexBins(data=dataaa, geoX='CA-1:CA:CA+1', geoY='CA-1:CA:CA+1:CA+2', hue='TAU', title='Kleywegt/Lyons CAlpha Plot with Average Tau ' + aa,palette='jet', bins='log', gridsize=50)
+    georep.addHexBins(data=dataaa, geoX='CA-1:CA:CA+1', geoY='CA-1:CA:CA+1:CA+2', hue='count',title='Kleywegt/Lyons CAlpha Density Plot ' + aa, palette='cubehelix_r', bins='log', gridsize=50)
+
+    georep.addScatter(data=dataaa, geoX='CA-1:CA:CA+1', geoY='CA-1:CA:CA+1:CA+2', hue=dsspHue, title='Kleywegt/Lyons CAlpha Plot with dssp ' + aa,palette='rainbow', sort='NON')
+    georep.addScatter(data=dataaa, geoX='CA-2:CA:CA+2', geoY='CA-2:CA-1:CA:CA+1', hue=dsspHue, title='CAlpha +- 2 Plot with dssp ' + aa,palette='rainbow', sort='NON')
+
+    georep.addHexBins(data=dataaa, geoX='CA-2:CA:CA+2', geoY='CA-2:CA-1:CA:CA+1', hue='TAU', title='CAlpha +- 2 Plot with Average Tau ' + aa, palette='jet', bins='log', gridsize=50)
+    georep.addHexBins(data=dataaa, geoX='CA-2:CA:CA+2', geoY='CA-2:CA-1:CA:CA+1', hue='count',title='CAlpha +- 2  Density Plot ' + aa, palette='cubehelix_r', bins='log', gridsize=50)
 
 
 
