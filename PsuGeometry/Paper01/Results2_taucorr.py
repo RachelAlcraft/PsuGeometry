@@ -4,15 +4,15 @@ from PsuGeometry import GeoPdbLists as geol
 '''
 Proof of bimodal tau
 '''
-myWindowsLaptop = False
+myWindowsLaptop = True
 ###############################################################################################
 pdbList1000 = geol.GeoPdbLists().getListPaper()
-#pdbList1000 = pdbList1000[:10]
+pdbList1000 = pdbList1000[:200]
 #pdbList1000 = ['4zmz']
 
 geos = ['TAU','PSI','N:O','N:N+1','O-1:N+1',
         'CA-2:CA-1:CA:CA+1','CA-1:N+1','N:CA','N-1:N:N+1','C:O',
-        'C-1:N','PHI','CA:C','C:N+1','CA-2:CA+2','CA-1:CA:CA+1','CA-2:CA:CA+2']
+        'C-1:N','PHI','CA:C','C:N+1','CA-2:CA+2','CA-1:CA:CA+1','CA-2:CA:CA+2','CA-1:CA:CA+1:CA+2','CA-1:CA+1']
 aas = ['GLY','ALA']
 hus = ['TAU','PSI']
 #plots = ['hex','scatter','count','probability','dssp']

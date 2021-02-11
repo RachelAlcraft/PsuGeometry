@@ -4,7 +4,7 @@ from PsuGeometry import GeoPdbLists as geol
 '''
 Proof of bimodal tau
 '''
-myWindowsLaptop = False
+myWindowsLaptop = True
 ###############################################################################################
 pdbList1000 = geol.GeoPdbLists().getListPaper()
 pdbList1000 = pdbList1000[:200]

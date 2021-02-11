@@ -5,13 +5,16 @@ from PsuGeometry import GeoPdbLists as geol
 TAU correlations
 '''
 ###############################################################################################
-myWindowsLaptop = False
+myWindowsLaptop = True
 pdbList1000 = geol.GeoPdbLists().getListPaper()
-pdbList1000 = pdbList1000[:200]
-geoList = ['N:N+1','CA-2:CA-1:CA:CA+1','TAU','PHI','PSI','CA-1:CA:CA+1:CA+2','N:O','CA-1:CA:CA+1']
-hueList = ['aa', 'rid', 'bfactor']
+#randomise the data as it is by pdb res no
+pdbList1000 = pdbList1000[:400]
+
+geoList = ['N:N+1','CA-2:CA-1:CA:CA+1','TAU','PHI','PSI','CA-1:CA:CA+1:CA+2','N:O','CA-1:CA:CA+1','C-1:C','O-1:O']
+hueList = ['dssp','aa', 'rid', 'bfactor']
 aas = ['GLY','ALA']
-includeDSSP = False
+includeDSSP = True
+dsspHue = 'dssp'
 ###################################################################################
 pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
@@ -19,8 +22,12 @@ printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/
 if myWindowsLaptop:
     pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_data/'
     edDataPath = 'F:/Code/ProteinDataFiles/ccp4_data/'
-    printPath = 'F:/Code/ProteinDataFiles/results_psu/Paper01/'
+    printPath = 'F:/Code/ProteinDataFiles/results_psu/Paper02/'
     includeDSSP = False  # on my windows computer
+    hueList = hueList[1:]
+    dsspHue = 'aa'
+
+
 
 ###########################################################################################
 georep = psu.GeoReport(pdbList1000, pdbDataPath, edDataPath, printPath, ed=False, dssp=includeDSSP, includePdbs=False)
@@ -32,11 +39,50 @@ for aa in aas:
     sql = 'aa == "' + aa + '"'
     dataaa = data.query(sql)
 
-    georep.addScatter(data=dataaa, geoX='PHI', geoY='PSI', hue='CA-2:CA-1:CA:CA+1', title='PHI|PSI|CA-2:CA-1:CA:CA+1 ',palette='jet', sort='NON')
-    georep.addScatter(data=dataaa, geoX='N:N+1', geoY='N:O', hue='TAU', title='N:N+1|N:O|TAU', palette='jet', sort='NON')
-    georep.addScatter(data=dataaa, geoX='N:N+1', geoY='CA-2:CA-1:CA:CA+1', hue='TAU', title='N:N+1|CA-2:CA-1:CA:CA+1|TAU', palette='jet', sort='NON')
-    georep.addScatter(data=dataaa, geoX='N:N+1', geoY='CA-1:CA:CA+1:CA+2', hue='TAU', title='N:N+1|CA-1:CA:CA+1:CA+2|TAU ', palette='jet', sort='NON')
-    georep.addScatter(data=dataaa, geoX='CA-1:CA:CA+1:CA+2', geoY='CA-1:CA:CA+1', hue='TAU',title='CA-1:CA:CA+1:CA+2|CA-1:CA:CA+1|TAU ', palette='jet', sort='NON')
+    #Ramachandran on average tau and dssp
+    georep.addHexBins(data=dataaa, geoX='PHI', geoY='PSI', hue='TAU', title='Ramachandran with Average tau ' + aa, palette='jet',bins='log', gridsize=50)
+    georep.addScatter(data=dataaa, geoX='PHI', geoY='PSI', hue=dsspHue, title='Ramachandran with dssp ' + aa, palette='rainbow', sort='NON')
+
+    #Tau vs PHI AND PSI
+    georep.addHexBins(data=dataaa, geoX='TAU', geoY='PSI', hue='count', title='TAU vs PSI Density Plot ' + aa,palette='cubehelix_r', bins='log', gridsize=50)
+    georep.addScatter(data=dataaa, geoX='TAU', geoY='PSI', hue=dsspHue, title='TAU vs PSI with dssp ' + aa,  palette='rainbow', sort='NON')
+
+    georep.addHexBins(data=dataaa, geoX='TAU', geoY='PHI', hue='count', title='TAU vs PHI Density Plot ' + aa, palette='cubehelix_r', bins='log', gridsize=50)
+    georep.addScatter(data=dataaa, geoX='TAU', geoY='PHI', hue=dsspHue, title='TAU vs PHI with dssp ' + aa, palette='rainbow', sort='NON')
+
+    georep.addHexBins(data=dataaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='PSI vs N:N+1 with Average Tau ' + aa, palette='jet', bins='log', gridsize=50)
+    georep.addScatter(data=dataaa, geoX='PSI', geoY='N:N+1', hue=dsspHue, title='PSI vs N:N+1 with dssp ' + aa, palette='rainbow', sort='NON')
+
+    georep.addHexBins(data=dataaa, geoX='PHI', geoY='C-1:C', hue='TAU', title='PHI vs C-1:C with Average Tau ' + aa,palette='jet', bins='log', gridsize=50)
+    georep.addScatter(data=dataaa, geoX='PHI', geoY='C-1:C', hue=dsspHue, title='PHI vs C-1:C with dssp ' + aa, palette='rainbow', sort='NON')
+
+    georep.addHexBins(data=dataaa, geoX='PHI', geoY='O-1:O', hue='TAU', title='PHI vs O-1:O with Average Tau ' + aa,palette='jet', bins='log', gridsize=50)
+    georep.addHexBins(data=dataaa, geoX='PHI', geoY='O-1:O', hue='count', title='PHI vs O-1:O with Density Plot ' + aa,palette='cubehelix_r', bins='log', gridsize=50)
+
+
+
+
+
+    #georep.addHexBins(data=dataaa, geoX='TAU', geoY='CA-1:CA:CA+1:CA+2', hue='PSI', title='', palette='jet', bins='log',gridsize=50)
+    #georep.addHexBins(data=dataaa, geoX='TAU', geoY='CA-1:CA:CA+1:CA+2', hue='PHI', title='', palette='jet',bins='log', gridsize=50)
+    #georep.addHexBins(data=dataaa, geoX='CA-1:CA:CA+1', geoY='CA-1:CA:CA+1:CA+2', hue='TAU', title='', palette='jet',bins='log', gridsize=50)
+
+    #georep.addScatter(data=dataaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='PSI|N:N+1|TAU', palette='jet',sort='NON')
+    #georep.addScatter(data=dataaa, geoX='PSI', geoY='N:N+1', hue='dssp', title='PSI|N:N+1|dssp', palette='jet',sort='NON')
+    #georep.addHexBins(data=dataaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='PSI|N:N+1|TAU', palette='jet',bins='log', gridsize=50)
+
+    #georep.addScatter(data=dataaa, geoX='PHI', geoY='C-1:C', hue='TAU', title='PHI|C-1:C|TAU', palette='jet', sort='NON')
+    #georep.addScatter(data=dataaa, geoX='PHI', geoY='C-1:C', hue='dssp', title='PHI|C-1:C|dssp', palette='jet',sort='NON')
+    #georep.addHexBins(data=dataaa, geoX='PHI', geoY='C-1:C', hue='TAU', title='PHI|C-1:C|TAU', palette='jet',bins='log', gridsize=50)
+
+    #georep.addScatter(data=dataaa, geoX='O-1:O', geoY='C-1:C', hue='TAU', title='O-1:O|C-1:C|TAU', palette='jet',sort='NON')
+    #georep.addScatter(data=dataaa, geoX='N:N+1', geoY='C-1:C', hue='TAU', title='N:N+1|C-1:C|TAU', palette='jet',sort='NON')
+
+    #georep.addScatter(data=dataaa, geoX='PHI', geoY='PSI', hue='CA-2:CA-1:CA:CA+1', title='PHI|PSI|CA-2:CA-1:CA:CA+1 ',palette='jet', sort='NON')
+    #georep.addScatter(data=dataaa, geoX='N:N+1', geoY='N:O', hue='TAU', title='N:N+1|N:O|TAU', palette='jet', sort='NON')
+    #georep.addScatter(data=dataaa, geoX='N:N+1', geoY='CA-2:CA-1:CA:CA+1', hue='TAU', title='N:N+1|CA-2:CA-1:CA:CA+1|TAU', palette='jet', sort='NON')
+    #georep.addScatter(data=dataaa, geoX='N:N+1', geoY='CA-1:CA:CA+1:CA+2', hue='TAU', title='N:N+1|CA-1:CA:CA+1:CA+2|TAU ', palette='jet', sort='NON')
+    #georep.addScatter(data=dataaa, geoX='CA-1:CA:CA+1:CA+2', geoY='CA-1:CA:CA+1', hue='TAU',title='CA-1:CA:CA+1:CA+2|CA-1:CA:CA+1|TAU ', palette='jet', sort='NON')
 
     print('Creating reports')
     georep.printToHtml('Tau Plots, Pdbs=' + str(len(pdbList1000)) , 2, 'Results4_specify_' + aa + str(len(pdbList1000)))
