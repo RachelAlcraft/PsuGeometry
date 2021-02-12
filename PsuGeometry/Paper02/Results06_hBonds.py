@@ -55,17 +55,14 @@ data = dataX.query('TAU > 100')
 data = data.query('TAU < 125')
 dataRed = data.copy()
 
-dataRed = dataRed[dataRed['N:O-2'] < 4]
-dataRed = dataRed[dataRed['N:O-3'] < 4]
-dataRed = dataRed[dataRed['N:O-4'] < 4]
-
-
 for aa in aas:
     sql = 'aa == "' + aa + '"'
     dataaa = data.query(sql)
 
     for geo in distances:
         print(aa,geo)
+        dataRed = dataaa.copy()
+        dataRed = dataaa[dataaa[geo] < 4]
         georepData.addHexBins(data=dataaa, geoX='TAU', geoY=geo, hue='count', title=geo + 'HB count ' + aa, palette='cubehelix_r', bins='log', gridsize=50)
         georepData.addHexBins(data=dataRed, geoX='TAU', geoY=geo, hue='count', title=geo + ' < 4 HB count ' + aa,palette='cubehelix_r', bins='log', gridsize=50)
         georepData.addScatter(data=dataRed, geoX='TAU', geoY=geo, hue=dsspHue, title=geo + ' < 4 HB dssp ' + aa, palette='tab10',sort='NON')
