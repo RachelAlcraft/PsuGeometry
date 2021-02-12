@@ -431,6 +431,11 @@ class GeoPlot:
     def plotHexbin(self,fig, ax):
         # These shold be settings
         contours = 12
+
+        if self.operation == 'ABS':
+            self.data[self.geoX] == abs(self.data[self.geoX])
+
+
         x = self.data[self.geoX]#.ravel()
         y = self.data[self.geoY]#.ravel()
 

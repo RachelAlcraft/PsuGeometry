@@ -1,14 +1,15 @@
 # -- ©Rachel Alcraft 2020, PsuGeometry --
 from PsuGeometry import GeoReport as psu
 from PsuGeometry import GeoPdbLists as geol
+import random
 '''
 TAU correlations
 '''
 ###############################################################################################
 myWindowsLaptop = False
 pdbList1000 = geol.GeoPdbLists().getListPaper()
-#randomise the data as it is by pdb res no
-pdbList1000 = pdbList1000[:40]
+random.shuffle(pdbList1000)
+#pdbList1000 = pdbList1000[:200]
 
 geoList = ['N:N+1','CA-2:CA-1:CA:CA+1','TAU','PHI','PSI','CA-1:CA:CA+1:CA+2','N:O','CA-1:CA:CA+1','C-1:C','O-1:O','CA-2:CA:CA+2']
 hueList = ['dssp','aa', 'rid', 'bfactor']
@@ -35,13 +36,29 @@ data = georep.getGeoemtryCsv(geoList, hueList)
 data = data.query('TAU > 100')
 data = data.query('TAU < 125')
 
+dataPhiPlus = data.query('PHI > 0')
+dataPhiMinus = data.query('PHI <= 0')
+
+dataPhiMinus['PHIABS'] = dataPhiMinus['PHI']*-1
+dataPhiMinus['PSINEG'] = dataPhiMinus['PSI']*-1
+
 for aa in aas:
     sql = 'aa == "' + aa + '"'
     dataaa = data.query(sql)
+    dataPhiMinusaa = dataPhiMinus.query(sql)
+    dataPhiPlusaa = dataPhiPlus.query(sql)
 
     #Ramachandran on average tau and dssp
     georep.addHexBins(data=dataaa, geoX='PHI', geoY='PSI', hue='TAU', title='Ramachandran with Average tau ' + aa, palette='jet',bins='log', gridsize=50)
     georep.addScatter(data=dataaa, geoX='PHI', geoY='PSI', hue=dsspHue, title='Ramachandran with dssp ' + aa, palette='tab10', sort='NON')
+
+    georep.addHexBins(data=dataPhiPlusaa, geoX='PHI', geoY='PSI', hue='TAU', title='Rama PSI/+ve PHI with avg tau ' + aa, palette='jet', bins='log', gridsize=50)
+    georep.addHexBins(data=dataPhiMinusaa, geoX='PHIABS', geoY='PSINEG', hue='TAU',title='Rama -ve PSI/abs(-ve PHI) abs with avg tau ' + aa, palette='jet', bins='log',gridsize=50)
+
+    georep.addScatter(data=dataPhiPlusaa, geoX='PHI', geoY='PSI', hue='TAU', title='Rama PSI/+ve PHI with tau ' + aa, palette='jet',vmin=100,vmax=125)
+    georep.addScatter(data=dataPhiMinusaa, geoX='PHIABS', geoY='PSINEG', hue='TAU', title='Rama -ve PSI/abs(-ve PHI) abs with tau ' + aa, palette='jet',vmin=100,vmax=125)
+
+
 
     #Tau vs PHI AND PSI
     georep.addHexBins(data=dataaa, geoX='TAU', geoY='PSI', hue='count', title='TAU vs PSI Density Plot ' + aa,palette='cubehelix_r', bins='log', gridsize=50)

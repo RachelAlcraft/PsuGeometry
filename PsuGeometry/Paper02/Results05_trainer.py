@@ -2,7 +2,8 @@
 from PsuGeometry import GeoReport as psu
 from PsuGeometry import GeoPdbLists as geol
 from sklearn.model_selection import cross_validate
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestRegressor
+import random
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -10,9 +11,13 @@ import matplotlib.pyplot as plt
 TAU correlations
 '''
 ###############################################################################################
-myWindowsLaptop = True
+myWindowsLaptop = False
 pdbList1000 = geol.GeoPdbLists().getListPaper()
 pdbList1000 = pdbList1000[:400]
+
+#randomise list for regression
+random.shuffle(pdbList1000)
+
 geoList = ['N:N+1','TAU','PSI']
 hueList = ['aa']
 aas = ['GLY','ALA']
@@ -47,7 +52,7 @@ data = data.drop('N:CA:C', axis=1)
 #randomise the data as it is by pdb res no
 data = data.sample(frac=1)
 
-Y =  (data['TAU']*10).round(0).astype(int)
+Y =  data['TAU']
 X = data.drop(['TAU'],axis=1)
 print(X)
 print(Y)
@@ -58,26 +63,26 @@ Y_train = Y.iloc[test_set_size:]
 X_test = X.iloc[:test_set_size]
 Y_test = Y.iloc[:test_set_size]
 
-clf = RandomForestClassifier()
+clf = RandomForestRegressor(max_depth=2, random_state=0)
+
 clf = clf.fit(X_train, Y_train)
 
-from sklearn.metrics import precision_score
 Y_pred = clf.predict(X_test)
-print('Actual',Y_test)
-print('Predicted',Y_pred)
-print("Precision Score : ",precision_score(Y_test,Y_pred,average='weighted'))
+#print('Actual',Y_test)
+#print('Predicted',Y_pred)
+
+score = clf.score(X_test, Y_test)
+
+for i in range(0,len(Y_pred)):
+    pr = Y_pred[i]
+    ac = Y_test.to_numpy()[i]
+    percent = abs((pr-ac)*100/ac)
+    print(ac,':',pr,' %=',percent)
 
 psi = 176
 NN1 = 3.5
 print('Prediction for',psi,NN1,clf.predict([[NN1,psi]]))
-print('Score on training set=',clf.score(X_test, Y_test))
-
-for i in range(0,len(Y_pred)):
-    pr = Y_pred[i]/10
-    ac = Y_test.to_numpy()[i]/10
-    percent = abs((pr-ac)*100/ac)
-    print(ac,':',pr,' %=',percent)
-
+print('Score on training set=',score)
 
 
 
