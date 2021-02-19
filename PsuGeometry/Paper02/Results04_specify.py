@@ -9,11 +9,12 @@ TAU correlations
 myWindowsLaptop = False
 pdbList1000 = geol.GeoPdbLists().getListPaper()
 random.shuffle(pdbList1000)
-#pdbList1000 = pdbList1000[:200]
+pdbList1000 = pdbList1000[:40]
 
 geoList = ['N:N+1','CA-2:CA-1:CA:CA+1','TAU','PHI','PSI','CA-1:CA:CA+1:CA+2','N:O','CA-1:CA:CA+1','C-1:C','O-1:O','CA-2:CA:CA+2']
 hueList = ['dssp','aa', 'rid', 'bfactor']
 aas = ['GLY','ALA']
+aas = ['ALA', 'CYS', 'ASP', 'GLU', 'PHE', 'GLY', 'HIS', 'ILE', 'LYS', 'LEU', 'MET', 'ASN', 'PRO', 'GLN', 'ARG','SER', 'THR', 'VAL', 'TRP', 'TYR']
 includeDSSP = True
 dsspHue = 'dssp'
 ###################################################################################
@@ -48,15 +49,24 @@ for aa in aas:
     dataPhiMinusaa = dataPhiMinus.query(sql)
     dataPhiPlusaa = dataPhiPlus.query(sql)
 
+    georep.addScatter(data=dataaa, geoX='PHI', geoY='PSI', hue='TAU', title='PHI|PSI|TAU' + aa, palette='jet', sort='NON',vmin=100,vmax=125)
+    georep.addScatter(data=dataaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='PSI|N:N+1|TAU' + aa, palette='jet', sort='NON',vmin=100,vmax=125)
+    georep.addScatter(data=dataaa, geoX='PHI', geoY='C-1:C', hue='TAU', title='PHI|C-1:C|TAU' + aa, palette='jet',sort='NON', vmin=100, vmax=125)
+    georep.addScatter(data=dataaa, geoX='PHI', geoY='O-1:O', hue='TAU', title='PHI|O-1:O|TAU' + aa, palette='jet',sort='NON', vmin=100, vmax=125)
+    georep.addScatter(data=dataaa, geoX='CA-1:CA:CA+1', geoY='CA-1:CA:CA+1:CA+2', hue='TAU', title='Kleywegt' + aa, palette='jet',sort='NON', vmin=100, vmax=125)
+    georep.addScatter(data=dataaa, geoX='CA-1:CA:CA+1', geoY='CA-2:CA-1:CA:CA+1', hue='TAU', title='Kleywegt-1' + aa, palette='jet', sort='NON', vmin=100, vmax=125)
+    georep.addScatter(data=dataaa, geoX='CA-2:CA:CA+2', geoY='CA-1:CA:CA+1:CA+2', hue='TAU', title='Kleywegt2' + aa, palette='jet', sort='NON', vmin=100, vmax=125)
+    georep.addScatter(data=dataaa, geoX='CA-2:CA:CA+2', geoY='CA-2:CA-1:CA:CA+1', hue='TAU', title='Kleywegt2-1' + aa, palette='jet', sort='NON', vmin=100, vmax=125)
+
     #Ramachandran on average tau and dssp
     georep.addHexBins(data=dataaa, geoX='PHI', geoY='PSI', hue='TAU', title='Ramachandran with Average tau ' + aa, palette='jet',bins='log', gridsize=50)
     georep.addScatter(data=dataaa, geoX='PHI', geoY='PSI', hue=dsspHue, title='Ramachandran with dssp ' + aa, palette='tab10', sort='NON')
 
-    georep.addHexBins(data=dataPhiPlusaa, geoX='PHI', geoY='PSI', hue='TAU', title='Rama PSI/+ve PHI with avg tau ' + aa, palette='jet', bins='log', gridsize=50)
-    georep.addHexBins(data=dataPhiMinusaa, geoX='PHIABS', geoY='PSINEG', hue='TAU',title='Rama -ve PSI/abs(-ve PHI) abs with avg tau ' + aa, palette='jet', bins='log',gridsize=50)
+    #georep.addHexBins(data=dataPhiPlusaa, geoX='PHI', geoY='PSI', hue='TAU', title='Rama PSI/+ve PHI with avg tau ' + aa, palette='jet', bins='log', gridsize=50)
+    #georep.addHexBins(data=dataPhiMinusaa, geoX='PHIABS', geoY='PSINEG', hue='TAU',title='Rama -ve PSI/abs(-ve PHI) abs with avg tau ' + aa, palette='jet', bins='log',gridsize=50)
 
-    georep.addScatter(data=dataPhiPlusaa, geoX='PHI', geoY='PSI', hue='TAU', title='Rama PSI/+ve PHI with tau ' + aa, palette='jet',vmin=100,vmax=125)
-    georep.addScatter(data=dataPhiMinusaa, geoX='PHIABS', geoY='PSINEG', hue='TAU', title='Rama -ve PSI/abs(-ve PHI) abs with tau ' + aa, palette='jet',vmin=100,vmax=125)
+    #georep.addScatter(data=dataPhiPlusaa, geoX='PHI', geoY='PSI', hue='TAU', title='Rama PSI/+ve PHI with tau ' + aa, palette='jet',vmin=100,vmax=125)
+    #georep.addScatter(data=dataPhiMinusaa, geoX='PHIABS', geoY='PSINEG', hue='TAU', title='Rama -ve PSI/abs(-ve PHI) abs with tau ' + aa, palette='jet',vmin=100,vmax=125)
 
 
 

@@ -9,7 +9,7 @@ import io
 import base64
 import math
 
-kde = 0.3
+kde = 0.1
 
 class GeoPlot:
     def __init__(self,data,geoX,geoY='',title='',hue='bfactor',splitKey='',palette='viridis_r',
@@ -232,7 +232,8 @@ class GeoPlot:
             self.data.loc[self.data[self.hue] == '', self.hue] = 'X'
 
             gradients = {}
-            gradsorig = self.data.sort_values(by=self.hue, ascending=True)[self.hue].unique()
+            dataforgrad = self.data.copy()
+            gradsorig = dataforgrad.sort_values(by=self.hue, ascending=True)[self.hue].unique()
             grads = self.getHueLists(self.hue,gradsorig)
             evenly_spaced_interval = np.linspace(0, 1, len(grads))
 
@@ -259,6 +260,9 @@ class GeoPlot:
             self.data = self.data.sort_values(by='ridA', ascending=False)
         elif self.sort== 'ASC':
             self.data = self.data.sort_values(by=self.hue, ascending=True)
+        elif self.sort == 'RAND':
+            self.data = self.data.sample(frac=1)
+
 
         lw = 0.5
         alpha = 0.65#0.65
