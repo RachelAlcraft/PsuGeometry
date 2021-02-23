@@ -57,11 +57,5 @@ georep.addScatter(data=data, geoX='TAU', geoY='N:O', hue='aa', title='', palette
 georep.addScatter(data=data, geoX='TAU', geoY='PSI', hue='aa', title='', palette='plasma', sort='ASC',restrictions={'aa':'SER,VAL'})
 georep.addScatter(data=data, geoX='TAU', geoY='PSI', hue='aa', title='', palette='plasma', sort='DESC',restrictions={'aa':'SER,VAL'})
 
-
 print('Creating reports')
 georep.printToHtml('Tau Plots, Pdbs=' + str(len(pdbList1000)) , 3, 'Results8_aa_' + str(len(pdbList1000)))
-
-
-
-
-
