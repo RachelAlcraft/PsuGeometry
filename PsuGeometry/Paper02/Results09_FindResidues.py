@@ -6,12 +6,14 @@ import random
 TAU correlations
 '''
 ###############################################################################################
-myWindowsLaptop = False
+myWindowsLaptop = True
+keepDisordered = True
+bfactorFactor = -1
 pdbList1000 = geol.GeoPdbLists().getListPaper()
 #random.shuffle(pdbList1000)
-pdbList1000 = pdbList1000[:100]
+pdbList1000 = pdbList1000[:400]
 
-geoList = ['N:N+1','CA-2:CA-1:CA:CA+1','TAU','PHI','PSI','CA-1:CA:CA+1:CA+2','N:O','CA-1:CA:CA+1','C-1:C','O-1:O','CA-2:CA:CA+2']
+geoList = ['N:N+1','TAU','PHI','PSI','N:O','OMEGA','C-1:N:CA','CA:C:N+1']
 hueList = ['dssp','aa', 'rid', 'bfactor']
 aas = ['GLY']
 ###################################################################################
@@ -25,29 +27,38 @@ if myWindowsLaptop:
 
 
 ###########################################################################################
-georep = psu.GeoReport(pdbList1000, pdbDataPath, edDataPath, printPath, ed=False, dssp=False, includePdbs=False)
-data = georep.getGeoemtryCsv(geoList, hueList)
-data = data.query('TAU > 100')
-data = data.query('TAU < 125')
-dataPsiRange = data.query('PSI > -5')
-dataPsiRange = dataPsiRange.query('PSI < 5')
+georep = psu.GeoReport(pdbList1000, pdbDataPath, edDataPath, printPath, ed=False, dssp=False, keepDisordered=keepDisordered,includePdbs=False)
+data = georep.getGeoemtryCsv(geoList, hueList,bfactorFactor)
+#data = data.query('TAU > 100')
+#data = data.query('TAU < 125')
+dataPsiRange = data.query('PSI > -50')
+dataPsiRange = dataPsiRange.query('PSI < 50')
 
 for aa in aas:
     sql = 'aa == "' + aa + '"'
-    dataaa = data.query(sqPSI > -5 and l)
+    dataaa = data.query(sql)
     dataPsiRangeaa = dataPsiRange.query(sql)
 
     georep.addScatter(data=dataaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='PSI|N:N+1|TAU' + aa, palette='jet', sort='NON')
     georep.addScatter(data=dataPsiRangeaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='PSI|N:N+1|TAU' + aa, palette='jet',sort='NON')
 
-    georep.addScatter(data=dataaa, geoX='PSI', geoY='N:N+1', hue='pdbCode', title='PSI|N:N+1|TAU' + aa, palette='jet_r',sort='NON')
-    georep.addScatter(data=dataPsiRangeaa, geoX='PSI', geoY='N:N+1', hue='pdbCode', title='PSI|N:N+1|TAU' + aa, palette='jet_r',sort='NON')
+    georep.addHexBins(data=dataaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='PSI|N:N+1|TAU' + aa, palette='jet',bins='log', gridsize=50)
+    georep.addHexBins(data=dataPsiRangeaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='PSI|N:N+1|TAU' + aa,palette='jet', bins='log', gridsize=50)
 
     georep.addScatter(data=dataaa, geoX='PSI', geoY='N:N+1', hue='rid', title='PSI|N:N+1|TAU' + aa, palette='jet_r',sort='NON')
     georep.addScatter(data=dataPsiRangeaa, geoX='PSI', geoY='N:N+1', hue='rid', title='PSI|N:N+1|TAU' + aa,palette='jet_r', sort='NON')
 
+    georep.addScatter(data=dataaa, geoX='TAU', geoY='N:N+1', hue='bfactor', title='' + aa, palette='cubehelix_r', sort='RAND')
+    georep.addScatter(data=dataPsiRangeaa, geoX='TAU', geoY='N:N+1', hue='bfactor', title='' + aa,palette='cubehelix_r', sort='RAND')
+
+    append = 'ordered_' + str(bfactorFactor) + '_'
+    if keepDisordered:
+        append = 'disordered_' + str(bfactorFactor) + '_'
     print('Creating reports')
-    georep.printToHtml('Tau Plots, Pdbs=' + str(len(pdbList1000)) , 2, 'Results9_residues2_' + aa + str(len(pdbList1000)))
+    georep.printToHtml('Results 9 Tau Plots, Pdbs=' + str(len(pdbList1000)) , 2, 'Results9_residues_' + aa  + append + str(len(pdbList1000)))
+
+    fullFileName = printPath + 'Results9_Data_' + str(bfactorFactor) + '_'+ aa + '.csv'
+    dataPsiRangeaa.to_csv(fullFileName, index=False)
 
 
 

@@ -7,12 +7,13 @@ from PsuGeometry import CloseContact as geocc
 
 class GeoReport:
 
-    def __init__(self,listPdbs,pdbDataPath,edDataPath,outDataPath,includePdbs=True,ed=True,dssp=True):
+    def __init__(self,listPdbs,pdbDataPath,edDataPath,outDataPath,includePdbs=True,ed=True,dssp=True,keepDisordered=True):
         self.pdbDataPath = pdbDataPath
         self.edDataPath = edDataPath
         self.outDataPath = outDataPath
         self.ed = ed
         self.dssp=dssp
+        self.keepDisordered = keepDisordered
         self.pdbCodes = listPdbs
         self.plots = []
         self.includePdbs=includePdbs
@@ -124,16 +125,16 @@ class GeoReport:
         return mat
 
 
-    def getGeoemtryCsv(self,calcList, hueList):
+    def getGeoemtryCsv(self,calcList, hueList,bfactorFactor=-1):
         dfs = []
-        pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
+        pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp,self.keepDisordered)
         count = 0
         for pdb in self.pdbCodes:
             count = count + 1
             if not pdbmanager.existsPdb(pdb):
                 print('PSU: get',pdb,count,'/',len(self.pdbCodes))
             apdb = pdbmanager.getPdb(pdb,False)
-            data = apdb.getGeoemtryCsv(calcList, hueList)
+            data = apdb.getGeoemtryCsv(calcList, hueList,bfactorFactor)
             dfs.append(data)
         df = pd.concat(dfs, ignore_index=True)
         return (df)

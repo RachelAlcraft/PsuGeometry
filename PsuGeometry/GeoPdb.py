@@ -14,12 +14,13 @@ https://python-3-patterns-idioms-test.readthedocs.io/en/latest/Singleton.html
 '''
 class GeoPdbs:
     class __GeoPdbs:
-        def __init__(self,pdbDirectory,edDirectory,ed=True,dssp=True):
+        def __init__(self,pdbDirectory,edDirectory,ed=True,dssp=True,keepDisordered=True):
             self.pdbs = {}
             self.pdbDirectory = pdbDirectory
             self.edDirectory = edDirectory
             self.ed = ed
             self.dssp=dssp
+            self.keepDisordered = keepDisordered
         def __getPdb__(self,pdbCode):
             return self.pdbs[pdbCode]
         def __existsPdb__(self,pdbCode):
@@ -27,9 +28,9 @@ class GeoPdbs:
         def __addPdb__(self,pdbCode,pdb):
             self.pdbs[pdbCode] = pdb
     instance=None
-    def __init__(self,pdbDirectory,edDirectory,ed=True,dssp=True):
+    def __init__(self,pdbDirectory,edDirectory,ed=True,dssp=True,keepDisordered=True):
         if not GeoPdbs.instance:
-            GeoPdbs.instance = GeoPdbs.__GeoPdbs(pdbDirectory,edDirectory,ed,dssp)
+            GeoPdbs.instance = GeoPdbs.__GeoPdbs(pdbDirectory,edDirectory,ed,dssp,keepDisordered)
         #else:
         #    GeoPdbs.instance.pdbDirectory = pdbDirectory
         #    GeoPdbs.instance.edDirectory = edDirectory
@@ -45,13 +46,13 @@ class GeoPdbs:
         if self.instance.__existsPdb__(pdbCode):
             return self.instance.__getPdb__(pdbCode)
         else:
-            gp = GeoPdb(pdbCode,self.instance.pdbDirectory,self.instance.edDirectory,self.instance.ed,self.instance.dssp,useAll)
+            gp = GeoPdb(pdbCode,self.instance.pdbDirectory,self.instance.edDirectory,self.instance.ed,self.instance.dssp,self.instance.keepDisordered,useAll)
             self.instance.__addPdb__(pdbCode,gp)
             return gp
 
 
 class GeoPdb:
-    def __init__(self,pdbCode,pdbDataPath,edDataPath,ed,dssp,useAll):
+    def __init__(self,pdbCode,pdbDataPath,edDataPath,ed,dssp,keepDisordered,useAll):
         pdbCode = pdbCode.lower()
         self.pdbCode = pdbCode
         self.pdbDataPath= pdbDataPath
@@ -63,6 +64,8 @@ class GeoPdb:
         self.dataFrame = pd.DataFrame()
         self.ghost = False
         self.useAll = useAll
+        self.keepDisordered = keepDisordered
+        self.averageBfactor = 0
         if self.pdbCode == 'ghost':
             self.ghost = True
             #self.pdbCode =  '2q1j'
@@ -131,6 +134,8 @@ class GeoPdb:
     #########################################################################################################################
     def __gatherAtoms(self):
         # try:
+        bfactorCount = 0
+        bfactorTotal = 0
         if True:
             import Bio.PDB as bio
             self.hasPDB = True
@@ -168,39 +173,53 @@ class GeoPdb:
                         #decision as to whether r is to be used. for density maps yes, for geoemtry no
                         if (r in self.getAAList() and 'H' not in hetatm) or (self.useAll and r!='HOH'):# != 'HOH':  # bio.is_aa(residue):
                             for atom in residue:
+                                useAtom = True
                                 if atom.is_disordered():
-                                    if atom.disordered_has_id("A"):
-                                        atom.disordered_select("A")
-                                # print('Atom:', atom)
-                                oneAtom = atm.GeoAtom()
-                                oneAtom.setStructureInfo(pdbCode, resolution)
-                                oneAtom.setResidueInfo(chain, rid, ridx,r)
-                                atomNo += 1
-                                name = atom.get_name()
-                                occupant = atom.get_full_id()[4][1]
-                                if occupant == ' ':
-                                    occupant = 'A'
-                                x = atom.get_vector()[0]
-                                y = atom.get_vector()[1]
-                                z = atom.get_vector()[2]
-                                bfactor = atom.get_bfactor()
-                                occupancy = atom.get_occupancy()
-                                oneAtom.setAtomInfo(name, atomNo, x, y, z, bfactor, occupant, occupancy)
-                                #if rid < 3:
-                                #    print(oneAtom)
-                                # add density if we can
-                                if self.hasDensity:
-                                    tFoFc, FoFc, Fo, Fc = self.geoDen.getDensityXYZ(x, y, z)
-                                    oneAtom.setDensityInfo(tFoFc, FoFc, Fo, Fc)
+                                    if self.keepDisordered:
+                                        if atom.disordered_has_id("A"):
+                                            atom.disordered_select("A")
+                                    else:
+                                        useAtom = False
 
-                                # print('Atom:',atomNo)
-                                self.atoms.append(oneAtom)
+                                if useAtom:
+                                # print('Atom:', atom)
+                                    oneAtom = atm.GeoAtom()
+                                    oneAtom.setStructureInfo(pdbCode, resolution)
+                                    oneAtom.setResidueInfo(chain, rid, ridx,r)
+                                    atomNo += 1
+                                    name = atom.get_name()
+                                    occupant = atom.get_full_id()[4][1]
+                                    if occupant == ' ':
+                                        occupant = 'A'
+                                    x = atom.get_vector()[0]
+                                    y = atom.get_vector()[1]
+                                    z = atom.get_vector()[2]
+                                    bfactor = atom.get_bfactor()
+                                    if name == 'CA':
+                                        bfactorCount += 1
+                                        bfactorTotal += bfactor
+
+                                    occupancy = atom.get_occupancy()
+                                    oneAtom.setAtomInfo(name, atomNo, x, y, z, bfactor, occupant, occupancy)
+                                    #if rid < 3:
+                                    #    print(oneAtom)
+                                    # add density if we can
+                                    if self.hasDensity:
+                                        tFoFc, FoFc, Fo, Fc = self.geoDen.getDensityXYZ(x, y, z)
+                                        oneAtom.setDensityInfo(tFoFc, FoFc, Fo, Fc)
+
+                                    # print('Atom:',atomNo)
+                                    self.atoms.append(oneAtom)
+
+            self.averageBfactor = bfactorTotal/bfactorCount
             print('PSU: loaded successfully from BioPython', self.pdbCode)
 
 
         # except:
         #    self.hasPDB = False
         return (self.hasPDB)
+
+
 
     def __applyDssp(self):
         import Bio.PDB as bio
@@ -230,7 +249,7 @@ class GeoPdb:
         return self.densCSV
 
 
-    def getGeoemtryCsv(self,geoListEntered, hues):
+    def getGeoemtryCsv(self,geoListEntered, hues,bfactorFactor = -1):
         # geo in format C-1, C+1, C
         #print('PSU: creating geometry dataframe')
         dics = []
@@ -306,6 +325,9 @@ class GeoPdb:
                     if thisResidue == None:
                         #print(thisChain,thisResid,thisOcc)
                         a=2
+                    elif bfactorFactor != -1 and self.__getResidueBFactor(thisChain, thisResid,thisOcc) > self.averageBfactor * bfactorFactor:
+                        # print(thisChain,thisResid,thisOcc)
+                        a = 2
                     else:
                         allValid = True
                         aa = thisResidue.values['aa']
@@ -481,6 +503,7 @@ class GeoPdb:
                 return atm
         return None
 
+
     def __getAtom(self, chain, rid, occ,atom):
         # The atom number cannot be less than 1
         if rid < 1:
@@ -489,6 +512,13 @@ class GeoPdb:
             if atm.values['chain'] == chain and atm.values['rid'] == rid and atm.values['occupant'] == occ and atm.values['atom'] == atom:
                 return atm
         return None
+
+    def __getResidueBFactor(self, chain, rid, occ):
+        # The atom number cannot be less than 1
+        for atm in self.atoms:
+            if atm.values['chain'] == chain and atm.values['rid'] == rid and atm.values['occupant'] == occ and atm.values['atom'] == 'CA':
+                return atm.values['bfactor']
+        return 0
 
     def __getChainsUnique(self, atoms):
         chains = []
