@@ -51,7 +51,8 @@ class GeoAtom:
         self.values['ridx'] = int(ridx)
         self.values['aa'] = aa
 
-    def setAtomInfo(self,atom,atomNo,x,y,z,bfactor,occupant,occupancy):
+    def setAtomInfo(self,residue,atom,atomNo,x,y,z,bfactor,occupant,occupancy):
+        self.values['residue'] = residue
         self.values['atom'] = atom
         self.values['atomNo'] = int(atomNo)
         self.values['x'] = x

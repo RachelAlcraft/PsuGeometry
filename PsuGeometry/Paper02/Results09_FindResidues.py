@@ -6,12 +6,12 @@ import random
 TAU correlations
 '''
 ###############################################################################################
-myWindowsLaptop = True
+myWindowsLaptop = False
 keepDisordered = True
 bfactorFactor = -1
 pdbList1000 = geol.GeoPdbLists().getListPaper()
 #random.shuffle(pdbList1000)
-pdbList1000 = pdbList1000[:400]
+#pdbList1000 = pdbList1000[:200]
 
 geoList = ['N:N+1','TAU','PHI','PSI','N:O','OMEGA','C-1:N:CA','CA:C:N+1']
 hueList = ['dssp','aa', 'rid', 'bfactor']
@@ -50,6 +50,9 @@ for aa in aas:
 
     georep.addScatter(data=dataaa, geoX='TAU', geoY='N:N+1', hue='bfactor', title='' + aa, palette='cubehelix_r', sort='RAND')
     georep.addScatter(data=dataPsiRangeaa, geoX='TAU', geoY='N:N+1', hue='bfactor', title='' + aa,palette='cubehelix_r', sort='RAND')
+
+    georep.addScatter(data=dataaa, geoX='TAU', geoY='N:N+1_motif', hue='PSI', title='' + aa, palette='viridis',sort='RAND')
+    georep.addScatter(data=dataPsiRangeaa, geoX='TAU', geoY='N:N+1_motif', hue='PSI', title='' + aa, palette='viridis',sort='RAND')
 
     append = 'ordered_' + str(bfactorFactor) + '_'
     if keepDisordered:

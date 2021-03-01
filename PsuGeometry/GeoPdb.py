@@ -200,7 +200,7 @@ class GeoPdb:
                                         bfactorTotal += bfactor
 
                                     occupancy = atom.get_occupancy()
-                                    oneAtom.setAtomInfo(name, atomNo, x, y, z, bfactor, occupant, occupancy)
+                                    oneAtom.setAtomInfo(r,name, atomNo, x, y, z, bfactor, occupant, occupancy)
                                     #if rid < 3:
                                     #    print(oneAtom)
                                     # add density if we can
@@ -211,7 +211,10 @@ class GeoPdb:
                                     # print('Atom:',atomNo)
                                     self.atoms.append(oneAtom)
 
-            self.averageBfactor = bfactorTotal/bfactorCount
+            if bfactorCount > 0:
+                self.averageBfactor = bfactorTotal/bfactorCount
+            else:
+                self.averageBfactor = 0
             print('PSU: loaded successfully from BioPython', self.pdbCode)
 
 
@@ -395,11 +398,15 @@ class GeoPdb:
                                                              datasA[1].values['x'], datasA[1].values['y'], datasA[1].values['z'],
                                                              datasA[2].values['x'], datasA[2].values['y'], datasA[2].values['z'],
                                                              datasA[3].values['x'], datasA[3].values['y'], datasA[3].values['z'])
+
+                                        motif = datasA[0].values['residue']+datasA[1].values['residue']+datasA[2].values['residue']+datasA[3].values['residue']
+
                                         for hue in hues:
                                             aHue = datasA[0].values[hue]
                                             bHue = datasA[0].values[hue]
                                             cHue = datasA[0].values[hue]
                                             dHue = datasA[0].values[hue]
+
                                             try:
                                                 float(aHue)
                                                 thisHue = (aHue + bHue + cHue + dHue)/4
@@ -415,6 +422,7 @@ class GeoPdb:
                                     valA = calcs.angle(datasA[0].values['x'], datasA[0].values['y'], datasA[0].values['z'],
                                                          datasA[1].values['x'], datasA[1].values['y'], datasA[1].values['z'],
                                                          datasA[2].values['x'], datasA[2].values['y'], datasA[2].values['z'])
+                                    motif = datasA[0].values['residue'] + datasA[1].values['residue'] + datasA[2].values['residue']
                                     for hue in hues:
                                         aHue = datasA[0].values[hue]
                                         bHue = datasA[0].values[hue]
@@ -431,6 +439,8 @@ class GeoPdb:
                                 elif len(datasA) == 2:  # distance
                                     valA = calcs.distance(datasA[0].values['x'], datasA[0].values['y'], datasA[0].values['z'],
                                                          datasA[1].values['x'], datasA[1].values['y'], datasA[1].values['z'])
+                                    motif = datasA[0].values['residue'] + datasA[1].values['residue']
+
                                     for hue in hues:
                                         aHue = datasA[0].values[hue]
                                         bHue = datasA[0].values[hue]
@@ -447,6 +457,7 @@ class GeoPdb:
 
                                 #geoData.loc[thisRow, geo] = valA
                                 dic[geo] = valA
+                                dic[geo+'_motif'] = motif
                                 # hue could be an average or an
                                 for hue in hues:
                                     #geoData.loc[thisRow, hue] = reshues[hue]

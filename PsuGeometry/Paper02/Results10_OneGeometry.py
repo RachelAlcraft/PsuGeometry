@@ -6,11 +6,12 @@ import random
 TAU correlations
 '''
 ###############################################################################################
-myWindowsLaptop = True
-bfactorFactor = -1
+myWindowsLaptop = False
+bfactorFactor = 1.3
+keepDisordered = False
 pdbList = ['6aiq','4m7g'] # disordered list
-#pdbList = ['3goe','1mxt','1gvw','4g9s','6rhh','4a7u','6g1i','3wcq'] # ordered list
-pdbList = ['4g9s'] # ordered list
+pdbList = ['3goe','4g9s','6rhh','4a7u','6g1i'] # ordered
+
 
 geoList = ['N:N+1','TAU','PSI']
 hueList = ['aa', 'rid', 'bfactor']
@@ -26,7 +27,7 @@ if myWindowsLaptop:
 
 
 ###########################################################################################
-georep = psu.GeoReport(pdbList, pdbDataPath, edDataPath, printPath, ed=False, dssp=False, includePdbs=True)
+georep = psu.GeoReport(pdbList, pdbDataPath, edDataPath, printPath, ed=False, dssp=False, includePdbs=True,keepDisordered=keepDisordered)
 pdbmanager = geopdb.GeoPdbs(georep.pdbDataPath, georep.edDataPath, georep.ed, georep.dssp)
 
 data = georep.getGeoemtryCsv(geoList, hueList,bfactorFactor)
@@ -48,17 +49,20 @@ for aa in aas:
     dataaa = data.query(sql)
     dataPsiRangeaa = dataPsiRange.query(sql)
 
-    georep.addScatter(data=dataaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='' + aa, palette='jet_r', sort='NON')
-    georep.addScatter(data=dataPsiRangeaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='' + aa, palette='jet_r',sort='NON')
+    georep.addScatter(data=dataaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='' + aa, palette='jet_r', sort='RAND')
+    georep.addScatter(data=dataPsiRangeaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='' + aa, palette='jet_r',sort='RAND')
 
-    georep.addScatter(data=dataaa, geoX='TAU', geoY='N:N+1', hue='bfactor', title='' + aa, palette='cubehelix_r', sort='RAND')
-    georep.addScatter(data=dataPsiRangeaa, geoX='TAU', geoY='N:N+1', hue='bfactor', title='' + aa, palette='cubehelix_r', sort='RAND')
+    georep.addScatter(data=dataaa, geoX='PSI', geoY='N:N+1', hue='bfactor', title='' + aa, palette='cubehelix_r', sort='RAND')
+    georep.addScatter(data=dataPsiRangeaa, geoX='PSI', geoY='N:N+1', hue='bfactor', title='' + aa, palette='cubehelix_r',sort='RAND')
 
-    georep.addScatter(data=dataaa, geoX='TAU', geoY='N:N+1', hue='rid', title='' + aa, palette='jet_r', sort='RAND',  categorical=False)
-    georep.addScatter(data=dataPsiRangeaa, geoX='TAU', geoY='N:N+1', hue='rid', title='' + aa, palette='jet_r',sort='RAND', categorical=True)
+    georep.addScatter(data=dataaa, geoX='TAU', geoY='N:N+1_motif', hue='PSI', title='' + aa, palette='viridis', sort='RAND')
+    georep.addScatter(data=dataPsiRangeaa, geoX='TAU', geoY='N:N+1_motif', hue='PSI', title='' + aa, palette='viridis', sort='RAND')
+
+    georep.addScatter(data=dataaa, geoX='PSI', geoY='N:N+1', hue='N:N+1_motif', title='' + aa, palette='jet_r', sort='RAND',categorical=True)
+    georep.addScatter(data=dataPsiRangeaa, geoX='PSI', geoY='N:N+1', hue='N:N+1_motif', title='' + aa, palette='jet_r', sort='RAND',categorical=True)
 
     print('Creating reports')
-    georep.printToHtml('Tau Plots', 2, 'Results10_' + aa + str(bfactorFactor))
+    georep.printToHtml('Results 10 Tau Plots', 2, 'Results10_' + aa + str(bfactorFactor))
 
     for pdb in pdbList:
         sql = 'pdbCode == "' + pdb + '"'
