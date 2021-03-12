@@ -22,10 +22,10 @@ runs.append('Good')
 runs.append('Bad')
 runs.append('Better')
 
-pdbReDataPath = 'F:/Code/ProteinDataFiles/pdb_out/original/'
+pdbReDataPath = 'F:/Code/ProteinDataFiles/pdb_out/good/'
 pdbdata = pd.read_csv('../PdbLists/Pdbs_Under1.csv') # This is a list of pdbs <= 1.1A non homologous to 90%
 
-pdbListIn = pdbdata['PDB'].tolist()[0:]
+pdbListIn = pdbdata['PDB'].tolist()[0:50]
 pdbList = []
 for pdb in pdbListIn:
     import os.path
