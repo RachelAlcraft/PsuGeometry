@@ -18,6 +18,7 @@ def distance(x1, y1, z1, x2, y2, z2):
     returns: distance between atoms and details of the calculation
     """
     calc = ''
+    mag = 0
     if z2 != '':
         xd = float(x2) - float(x1)
         yd = float(y2) - float(y1)
@@ -41,6 +42,7 @@ def angle(x1, y1, z1, x2, y2, z2, x3, y3, z3):
     returns: angle between atoms and details of the calculation
     """
     calc = ''
+    theta_deg = 0
     if z3 != '':
         try:
             xd = float(x2) - float(x1)
@@ -91,6 +93,7 @@ def torsion(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4):
     returns: angle between atoms and details of the calculation
     """
     calc = ''
+    theta_deg = 0
     if z4 != '':
         try:
             xA = float(x2) - float(x1)
@@ -162,5 +165,11 @@ def torsion(x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4):
 
         except:
             calc = 'error, could be a divide by zero'
+            print("x=(",x1, x2, x3,x4,") y=(",y1,y2,y3,y4,") z=(",z1,z2,z3,z4)
+            theta_deg = 0
+    else:
+        calc = 'error, no 4th atom'
+        print(x1,x2,x3)
+        theta_deg = 0
 
     return (round(theta_deg, 3))

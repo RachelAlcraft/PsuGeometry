@@ -21,13 +21,18 @@ class GeoPdbs:
             self.ed = ed
             self.dssp=dssp
             self.keepDisordered = keepDisordered
+
         def __getPdb__(self,pdbCode):
             return self.pdbs[pdbCode]
         def __existsPdb__(self,pdbCode):
             return pdbCode in self.pdbs
         def __addPdb__(self,pdbCode,pdb):
             self.pdbs[pdbCode] = pdb
+        def __clear__(self):
+            self.pdbs.clear()
+
     instance=None
+
     def __init__(self,pdbDirectory,edDirectory,ed=True,dssp=True,keepDisordered=True):
         if not GeoPdbs.instance:
             GeoPdbs.instance = GeoPdbs.__GeoPdbs(pdbDirectory,edDirectory,ed,dssp,keepDisordered)
@@ -36,6 +41,10 @@ class GeoPdbs:
         #    GeoPdbs.instance.edDirectory = edDirectory
         #    GeoPdbs.instance.ed = ed
         #    GeoPdbs.instance.dssp = dssp
+
+    def clear(self):
+        self.instance.__clear__()
+        GeoPdbs.instance = None
 
     def existsPdb(self, pdbCode):
         pdbCode = pdbCode.lower()
@@ -148,6 +157,7 @@ class GeoPdb:
                 structure = parser.get_structure(pdbCode, self.pdbDataPath + 'pdb' + pdbCode + '.ent')
             except:
                 import time
+                print('!!! Downloading from pdb: ',pdbCode)
                 biodl.download_pdb_files([pdbCode], pdir=self.pdbDataPath, file_format='pdb')
                 time.sleep(1)
                 try:

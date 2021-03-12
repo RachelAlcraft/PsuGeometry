@@ -7,64 +7,153 @@ import pandas as pd
 TAU correlations
 '''
 ###############################################################################################
-myWindowsLaptop = False
+myWindowsLaptop = True #only works on windows
 bfactorFactor = 1.3
 keepDisordered = False
-pdbList = ['6aiq','4m7g'] # disordered list
-#pdbList = ['3goe','1mxt','1gvw','4g9s','6rhh','4a7u','6g1i','3wcq'] # ordered list
-pdbList = ['4g9s'] # ordered list
 
-geoList = ['N:N+1','TAU','PSI']
-hueList = ['aa', 'rid', 'bfactor']
+geoList = ['N:N+1','TAU','PSI','PHI']
+geoListTau = ['TAU']
+hueList = ['aa', 'rid', 'bfactor','pdbCode']
 aas = ['GLY']
-###################################################################################
-pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
-edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
-printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/Paper02/'
-if myWindowsLaptop:
+
+runs = []
+runs.append('Orig')
+runs.append('Good')
+runs.append('Bad')
+runs.append('Better')
+
+pdbReDataPath = 'F:/Code/ProteinDataFiles/pdb_out/original/'
+pdbdata = pd.read_csv('../PdbLists/Pdbs_Under1.csv') # This is a list of pdbs <= 1.1A non homologous to 90%
+
+pdbListIn = pdbdata['PDB'].tolist()[0:]
+pdbList = []
+for pdb in pdbListIn:
+    import os.path
+    if os.path.isfile((pdbReDataPath + 'pdb' + pdb + '.ent').lower()):
+        pdbList.append(pdb.lower())
+    else:
+        print('No file:',(pdbReDataPath + 'pdb' + pdb + '.ent').lower())
+
+print(pdbList)
+
+for dataSet in runs:
+    ###################################################################################
+    tag=dataSet
     pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_data/'
     edDataPath = 'F:/Code/ProteinDataFiles/ccp4_data/'
     printPath = 'F:/Code/ProteinDataFiles/results_psu/Paper02/'
+    if dataSet == 'Good':
+        pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_out/good/'
+    elif dataSet == 'Better':
+        pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_out/better/'
+    elif dataSet == 'Bad':
+        pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_out/bad/'
 
 
-pdbdata = pd.read_csv('../PdbLists/Pdbs_1_1.csv') # This is a list of pdbs <= 1.1A non homologous to 90%
-pdbList = pdbdata['PDB'].tolist()[0:]
 
-print('Creating ordered report')
-georep = psu.GeoReport(pdbList, pdbDataPath, edDataPath, printPath, ed=False, dssp=False, includePdbs=False,keepDisordered=False)
-print('Creating DISordered report')
-georepDIS = psu.GeoReport(pdbList, pdbDataPath, edDataPath, printPath, ed=False, dssp=False, includePdbs=False,keepDisordered=True)
+    #pdbList = ['6e6o']
+    print('Creating ordered report')
+    pdbmanager = geopdb.GeoPdbs(pdbDataPath, edDataPath, False,False,False)
+    georep = psu.GeoReport(pdbList, pdbDataPath, edDataPath, printPath, ed=False, dssp=False, includePdbs=False,keepDisordered=False)
 
-print('Getting dataframes of geometry -- 1')
-dataA = georep.getGeoemtryCsv(geoList, hueList,bfactorFactor)
-print('Getting dataframes of geometry -- 2')
-dataB = georep.getGeoemtryCsv(geoList, hueList,-1)
-print('Getting dataframes of geometry -- 3')
-dataC = georepDIS.getGeoemtryCsv(geoList, hueList,bfactorFactor)
-print('Getting dataframes of geometry -- 4')
-dataD = georepDIS.getGeoemtryCsv(geoList, hueList,-1)
 
-for aa in aas:
-    print(aa)
-    sql = 'aa == "' + aa + '"'
-    dataAaa = dataA.query(sql)
-    dataBaa = dataB.query(sql)
-    dataCaa = dataC.query(sql)
-    dataDaa = dataD.query(sql)
+    print('Getting dataframes of geometry -- 1')
+    dataA = georep.getGeoemtryCsv(geoList, hueList,bfactorFactor)
+    dataATau = georep.getGeoemtryCsv(geoListTau, hueList, bfactorFactor)
+    if dataATau.shape[0] > 0:
+        #print(dataATau)
 
-    georep.addScatter(data=dataAaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='Ordered factor=1.3 ' + aa, palette='jet', sort='NON')
-    georep.addHistogram(data=dataAaa, geoX='TAU', title='Ordered factor=1.3 ' + aa)
-    georep.addScatter(data=dataBaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='Ordered factor=any ' + aa, palette='jet', sort='NON')
-    georep.addHistogram(data=dataBaa, geoX='TAU', title='Ordered factor=any ' + aa)
+        for aa in aas:
+            print(aa)
+            sql = 'aa == "' + aa + '"'
+            if dataA.shape[0] > 0:
+                dataAaa = dataA.query(sql)
+            else:
+                dataAaa = dataA
 
-    georep.addScatter(data=dataCaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='Disordered factor=1.3 ' + aa, palette='jet', sort='NON')
-    georep.addHistogram(data=dataCaa, geoX='TAU', title='Disordered factor=1.3 ' + aa)
-    georep.addScatter(data=dataDaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='Disordered factor=any ' + aa, palette='jet', sort='NON')
-    georep.addHistogram(data=dataDaa, geoX='TAU', title='Disordered factor=any ' + aa)
+            dataAaaTau = dataATau.query(sql)
+            #print('TAU',dataAaaTau)
 
-    print('Creating reports')
-    #georep.printToHtml('Results 11. Tau Plots, Pdbs=' + str(len(pdbList)) , 2, 'Results11_' + aa + str(len(pdbList)))
-    georep.printToHtml('Results 11. Tau Plots\nPdbs=' + str(len(pdbList)) + '\nWith bFactorFactor of ' + str(bfactorFactor), 2, 'Results11_' + aa)
+            if dataAaaTau.shape[0] > 0:
+
+                if dataAaa.shape[0] > 0:
+                    dataAmin = dataAaa.query('TAU > 100')
+                    dataAmin = dataAmin.query('TAU < 125')
+
+
+                dataAminTau = dataAaaTau.query('TAU > 100')
+                dataAminTau = dataAminTau.query('TAU < 125')
+
+                if dataAaa.shape[0] > 0:
+                    georep.addScatter(data=dataAaa, geoX='PHI', geoY='PSI', hue='TAU', title='Ordered factor=1.3 ' + aa,palette='jet', sort='NON')
+                georep.addHistogram(data=dataAaaTau, geoX='TAU', title='Ordered factor=1.3 ' + aa)
+                if dataAaa.shape[0] > 0:
+                    georep.addScatter(data=dataAaa, geoX='PSI', geoY='N:N+1', hue='TAU', title='Ordered factor=1.3 ' + aa, palette='jet', sort='NON')
+
+                if dataAaa.shape[0] > 0:
+                    georep.addScatter(data=dataAmin, geoX='PHI', geoY='PSI', hue='TAU', title='Ordered factor=1.3 ' + aa,palette='jet', sort='NON')
+                georep.addHistogram(data=dataAminTau, geoX='TAU', title='Ordered factor=1.3 ' + aa)
+                if dataAaa.shape[0] > 0:
+                    georep.addScatter(data=dataAmin, geoX='PSI', geoY='N:N+1', hue='TAU', title='Ordered factor=1.3 ' + aa, palette='jet', sort='NON')
+
+
+                print('Creating reports')
+
+                dicPdbs = []
+                dicPdbsStd = []
+                #now look at each pdb
+                for pdb in pdbList:
+                    sql = 'pdbCode == "' + pdb.lower() + '"'
+                    dataPdb = dataAaaTau.query(sql)
+                    dfdesc = dataPdb['TAU'].describe()
+                    #print(dfdesc)
+                    if dfdesc['count'] > 0:
+                        dicPdb = {}
+                        dicPdb['pdbCode'] = pdb
+                        dicPdb['TAU_MEAN'] = dfdesc['mean']
+                        dicPdb['TAU_MEDIAN'] = dfdesc['50%']
+                        dicPdb['TAU_STD'] = dfdesc['std']
+                        dicPdb['COUNT'] = dfdesc['count']
+                        dicPdbs.append(dicPdb)
+
+                    if dfdesc['count'] > 1:
+                        dicStd = {}
+                        dicStd['TAU_STD'] = 0
+                        dicStd['pdbCode'] = pdb
+                        dicPdbsStd.append(dicPdb)
+
+                dataFramePdbs = pd.DataFrame.from_dict(dicPdbs)
+                dataFramePdbsStd = pd.DataFrame.from_dict(dicPdbsStd)
+                #print(dataFramePdbs)
+                #print(dataFramePdbsStd)
+
+                georep.addHistogram(data=dataFramePdbs, geoX='COUNT', title='Count per pdb ' + aa)
+                georep.addHistogram(data=dataFramePdbs, geoX='TAU_MEDIAN', title='Median per pdb ' + aa)
+
+                georep.addHistogram(data=dataFramePdbs, geoX='TAU_MEAN', title='Mean per pdb ' + aa)
+                georep.addHistogram(data=dataFramePdbsStd, geoX='TAU_STD', title='Std per pdb ' + aa)
+
+                georep.printToHtml('Results 11. Tau Plots\nPdbs=' + str(len(pdbList)) + '\nWith bFactorFactor of ' + str(bfactorFactor), 3, 'Results11_' + tag + aa)
+                dataAaa.to_csv(printPath + "Results11" + tag + ".csv", index=False)
+                dataAaaTau.to_csv(printPath + "Results11" + tag + "Tau.csv", index=False)
+                dataFramePdbs.to_csv(printPath + "Results11" + tag + "_statsPdb.csv", index=False)
+
+        else:
+            print("No data for", aa)
+
+    else:
+        print("No data for",pdbDataPath)
+
+    dataFramePdbs = None
+    dataFramePdbsStd = None
+    dataAaa = None
+    dataAmin = None
+    dataAaaTau = None
+    dataAminTau = None
+    georep = None
+    pdbmanager.clear()
+
+
 
 
 

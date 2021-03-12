@@ -14,7 +14,7 @@ kde = 0.1
 class GeoPlot:
     def __init__(self,data,geoX,geoY='',title='',hue='bfactor',splitKey='',palette='viridis_r',
                  centre=False,vmin=0,vmax=0,operation='',newData=False,plot='scatter',categorical=False,
-                 restrictions={},exclusions={},report=None,count=False,sort='ASC',gridsize=50,bins=100):
+                 restrictions={},exclusions={},report=None,count=False,sort='ASC',gridsize=50,bins=100,Contour=True):
         self.parent=report
         self.plot = plot
         self.data = data
@@ -41,6 +41,7 @@ class GeoPlot:
         self.sort = sort
         self.restrictions=restrictions
         self.exclusions = exclusions
+        self.Contour=Contour
         if self.geoY == '' and plot not in 'surfaces':
             self.plot = 'histogram'
         self.count=count # only for histograms, probability or count
@@ -111,7 +112,8 @@ class GeoPlot:
         else:
             image = plt.imshow(surface, cmap=palette, interpolation='nearest', origin='low', aspect='equal',alpha=afa)
 
-        image = plt.contour(surface, colors=col, alpha=afa, linewidths=lw, levels=lvls)
+        if self.Contour:
+            image = plt.contour(surface, colors=col, alpha=afa, linewidths=lw, levels=lvls)
         #ax.grid(False)
         #cbar = fig.colorbar(image, ax=ax)
         plt.axis('off')

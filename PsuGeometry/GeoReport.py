@@ -32,6 +32,8 @@ class GeoReport:
         else:
             self.plots.append(geop.GeoOverlay(gp,'',title='ghost',report=self))
 
+        return gp
+
     def addScatter(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',
                    centre=False,vmin=0,vmax=0,categorical=False,sort='ASC',restrictions={},exclusions={}):
         isNew = False
@@ -562,6 +564,7 @@ class GeoReport:
                 geoPlB.getNewData()
 
             geoPlA.applyRestrictions()
+            geoPlA.applyRestrictions()
             geoPlA.applyExclusions()
             geoPlB.applyRestrictions()
             geoPlB.applyExclusions()
@@ -587,21 +590,21 @@ class GeoReport:
         return (html)
 
 
-    def addSlices(self, slices, palette='viridis', title='',logged=False,centre=False):
+    def addSlices(self, slices, palette='viridis', title='',logged=False,centre=False,Contour=True):
         mat = []
         for s in slices:
             if mat == []:
                 mat = s
             else:
                 mat = mat + s
-        gp = geop.GeoPlot(data=None, geoX='', title=title, palette=palette, plot='surface', report=self,centre=centre)
+        gp = geop.GeoPlot(data=None, geoX='', title=title, palette=palette, plot='surface', report=self,centre=centre,Contour=Contour)
         gp.surface = mat
         gp.logged=logged
         self.plots.append(gp)
         return mat
 
-    def addSlice(self, slice, palette='viridis', title='',logged=False,centre=False):
-        gp = geop.GeoPlot(data=None,geoX='',title=title, palette=palette, plot='surface', report=self,centre=centre)
+    def addSlice(self, slice, palette='viridis', title='',logged=False,centre=False,Contour=True):
+        gp = geop.GeoPlot(data=None,geoX='',title=title, palette=palette, plot='surface', report=self,centre=centre,Contour=Contour)
         gp.surface = slice
         gp.logged=logged
         gp.differ=0
