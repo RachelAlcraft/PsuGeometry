@@ -27,6 +27,8 @@ class GeoAtom:
         self.values['y'] = 0
         self.values['z'] = 0
         self.values['bfactor'] = 0
+        self.values['bfactorRatio'] = 0
+        self.values['disordered'] = 'N'
         self.values['occupant'] = ''
         self.values['occupancy'] = 0
         self.values['electrons'] = ''
@@ -51,7 +53,7 @@ class GeoAtom:
         self.values['ridx'] = int(ridx)
         self.values['aa'] = aa
 
-    def setAtomInfo(self,residue,atom,atomNo,x,y,z,bfactor,occupant,occupancy):
+    def setAtomInfo(self,residue,atom,atomNo,x,y,z,bfactor,occupant,occupancy,disordered):
         self.values['residue'] = residue
         self.values['atom'] = atom
         self.values['atomNo'] = int(atomNo)
@@ -59,6 +61,7 @@ class GeoAtom:
         self.values['y'] = y
         self.values['z'] = z
         self.values['bfactor'] = bfactor
+        self.values['disordered'] = disordered
         self.values['occupant'] = occupant
         self.values['occupancy'] = occupancy
         self.values['electrons'] = self.getElectrons(atom)

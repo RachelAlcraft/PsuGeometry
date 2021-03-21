@@ -11,21 +11,22 @@ myWindowsLaptop = True #only works on windows
 bfactorFactor = 1.3
 keepDisordered = False
 
-geoList = ['N:N+1','TAU','PSI','PHI']
+geoList = ['N:N+1','TAU','PSI','PHI','N:C','CA:C','C:O','N:CA']
 geoListTau = ['TAU']
 hueList = ['aa', 'rid', 'bfactor','pdbCode']
 aas = ['GLY']
 
 runs = []
-runs.append('Orig')
+#runs.append('Better')
 runs.append('Good')
-runs.append('Bad')
-runs.append('Better')
+#runs.append('Bad')
+#runs.append('Orig')
+
 
 pdbReDataPath = 'F:/Code/ProteinDataFiles/pdb_out/good/'
 pdbdata = pd.read_csv('../PdbLists/Pdbs_Under1.csv') # This is a list of pdbs <= 1.1A non homologous to 90%
 
-pdbListIn = pdbdata['PDB'].tolist()[0:50]
+pdbListIn = pdbdata['PDB'].tolist()[0:]
 pdbList = []
 for pdb in pdbListIn:
     import os.path
@@ -95,6 +96,21 @@ for dataSet in runs:
                 georep.addHistogram(data=dataAminTau, geoX='TAU', title='Ordered factor=1.3 ' + aa)
                 if dataAaa.shape[0] > 0:
                     georep.addScatter(data=dataAmin, geoX='PSI', geoY='N:N+1', hue='TAU', title='Ordered factor=1.3 ' + aa, palette='jet', sort='NON')
+                    georep.addScatter(data=dataAmin, geoX='N:C', geoY='CA:C', hue='C:O', title='' + aa, palette='jet', sort='NON')
+                    georep.addScatter(data=dataAmin, geoX='N:CA', geoY='CA:C', hue='C:O', title='' + aa, palette='jet', sort='NON')
+
+                    georep.addScatter(data=dataAmin, geoX='CA:C', geoY='C:O', hue='N:C', title='' + aa, palette='jet', sort='NON')
+                    georep.addScatter(data=dataAmin, geoX='CA:C', geoY='C:O', hue='TAU', title='' + aa, palette='jet', sort='NON')
+
+                    georep.addScatter(data=dataAmin, geoX='C:O', geoY='N:C', hue='CA:C', title='' + aa, palette='jet', sort='NON')
+                    georep.addScatter(data=dataAmin, geoX='C:O', geoY='N:CA', hue='CA:C', title='' + aa, palette='jet',sort='NON')
+
+                    georep.addScatter(data=dataAmin, geoX='N:C', geoY='CA:C', hue='TAU', title='' + aa, palette='jet', sort='NON')
+                    georep.addScatter(data=dataAmin, geoX='N:CA', geoY='CA:C', hue='TAU', title='' + aa, palette='jet',sort='NON')
+
+
+                    georep.addScatter(data=dataAmin, geoX='C:O', geoY='N:C', hue='TAU', title='' + aa, palette='jet', sort='NON')
+                    georep.addScatter(data=dataAmin, geoX='C:O', geoY='N:CA', hue='TAU', title='' + aa, palette='jet', sort='NON')
 
 
                 print('Creating reports')

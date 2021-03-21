@@ -8,12 +8,19 @@ TAU correlations
 '''
 ###############################################################################################
 myWindowsLaptop = True
-FileDir = 'Set3B'
+FileDir = 'Cat6'
 #Tag = 'Extreme values about PSI=0'
 #Tag = 'Wide N, PSI +ve near 180'
-Tag = 'Wide N, PSI -ve near 180'
+#Tag = 'Wide N, PSI -ve near 180'
 #Tag = 'Short N, PSI < 5'
 #Tag = 'Short N, PSI > 10'
+#Tag = "25 least exteme tau variations"
+#Tag = 'Category 1: Long N:N+1 and psi near +/- 180'
+#Tag = 'Category 2: Between values: -100< PSI <100 with N:N+1 between 3-3.4A'
+#Tag = 'Category 3: 0 psi and the bottom of the curve, tau < 114'
+#Tag = 'Category 4: Shortest N:N+1 < 2.8 at tau > 114'
+#Tag = 'Category 5: 2.8 < N:N+1 < 3 at tau > 114'
+Tag = 'Category 6: Psi <25 N:N+1 > 2.8'
 
 ###################################################################################
 pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
@@ -63,9 +70,9 @@ for i in range(0,len(pdbs)):
     sliceBetterRad = georep.loadSlice(edSlicePath + pdb + tag + "bradiant_slice.csv")
 
     georep.addSlice(sliceOrigVal, palette='cubehelix_r',title=pdb + tag + ' value, tau=' + str(round(tau,3)))
-    georep.addSlice(sliceBetterVal, palette='cubehelix_r',title=pdb + tag + ' better value, tau=' + str(round(btau,3)))
+    #georep.addSlice(sliceBetterVal, palette='cubehelix_r',title=pdb + tag + ' better value, tau=' + str(round(btau,3)))
     georep.addSlice(sliceOrigRad, palette='bone',title=pdb + tag + ' radiant',Contour=False)
-    georep.addSlice(sliceBetterRad, palette='bone',title=pdb + tag + ' better radiant',Contour=False)
+    #georep.addSlice(sliceBetterRad, palette='bone',title=pdb + tag + ' better radiant',Contour=False)
 
     origs.append(sliceOrigVal)
     betters.append(sliceBetterVal)
@@ -73,9 +80,9 @@ for i in range(0,len(pdbs)):
     brads.append(sliceBetterRad)
 
 georep.addSlices(origs, palette='cubehelix_r', title='Average values', logged=False, centre=False)
-georep.addSlices(betters, palette='cubehelix_r', title='Average better values', logged=False, centre=False)
+#georep.addSlices(betters, palette='cubehelix_r', title='Average better values', logged=False, centre=False)
 georep.addSlices(radiants, palette='bone', title='Average radiant', logged=False, centre=False,Contour=False)
-georep.addSlices(brads, palette='bone', title='Average better radiant', logged=False, centre=False,Contour=False)
+#georep.addSlices(brads, palette='bone', title='Average better radiant', logged=False, centre=False,Contour=False)
 
 
-georep.printToHtml(Tag,4,'_Results_ccp4_slices')
+georep.printToHtml(Tag,2,'_' + FileDir + 'Results_ccp4_slices')

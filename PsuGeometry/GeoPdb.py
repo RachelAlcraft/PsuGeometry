@@ -183,8 +183,10 @@ class GeoPdb:
                         #decision as to whether r is to be used. for density maps yes, for geoemtry no
                         if (r in self.getAAList() and 'H' not in hetatm) or (self.useAll and r!='HOH'):# != 'HOH':  # bio.is_aa(residue):
                             for atom in residue:
+                                disordered = 'N'
                                 useAtom = True
                                 if atom.is_disordered():
+                                    disordered = 'Y'
                                     if self.keepDisordered:
                                         if atom.disordered_has_id("A"):
                                             atom.disordered_select("A")
@@ -210,7 +212,7 @@ class GeoPdb:
                                         bfactorTotal += bfactor
 
                                     occupancy = atom.get_occupancy()
-                                    oneAtom.setAtomInfo(r,name, atomNo, x, y, z, bfactor, occupant, occupancy)
+                                    oneAtom.setAtomInfo(r,name, atomNo, x, y, z, bfactor, occupant, occupancy,disordered)
                                     #if rid < 3:
                                     #    print(oneAtom)
                                     # add density if we can
@@ -223,8 +225,14 @@ class GeoPdb:
 
             if bfactorCount > 0:
                 self.averageBfactor = bfactorTotal/bfactorCount
+                # Now set the bFactorRatio for all atoms
+                for atom in self.atoms:
+                    atom.values['bfactorRatio'] = atom.values['bfactor'] / self.averageBfactor
             else:
                 self.averageBfactor = 0
+
+
+
             print('PSU: loaded successfully from BioPython', self.pdbCode)
 
 

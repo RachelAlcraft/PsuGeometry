@@ -42,13 +42,14 @@ class GeoPlot:
         self.restrictions=restrictions
         self.exclusions = exclusions
         self.Contour=Contour
-        if self.geoY == '' and plot not in 'surfaces':
+        if self.geoY == '' and plot not in 'surfaces' and plot != 'compare':
             self.plot = 'histogram'
         self.count=count # only for histograms, probability or count
             #if self.hue=='bfactor':gp.gridsize = 50
             #    self.hue = 'pdbCode'
         if self.hue in 'aa,dssp,element,pdbCode':
             self.categorical=True
+        self.data2 = None
 
     #def getPlot(self,fig, ax):
     #    if self.plot == 'histogram':
@@ -74,6 +75,8 @@ class GeoPlot:
             return self.plotSurface(fig, ax)
         elif self.plot == 'surfaces':
             return self.plotSurfaces(fig, ax)
+        elif self.plot == 'compare':
+            return self.plotCompare()
 
     def plotSurface(self, fig, ax):
         afa = 1
@@ -222,6 +225,82 @@ class GeoPlot:
             return html
         else:
             return ''
+
+    def plotCompare(self):
+        #Create outliers
+        #Data A
+        self.data = self.data.sort_values(by=[self.geoX])
+        outliersA =self.data.iloc[[0,-1]]
+        print(outliersA)
+        pdbsA = outliersA['pdbCode'].values
+        chainsA = outliersA['chain'].values
+        ridsA = outliersA['rid'].values
+        tausA = outliersA[self.geoX].values
+        outMinA = ''
+        outMaxA = ''
+        if len(pdbsA) > 1:
+            outMinA = pdbsA[0] + ' ' + chainsA[0] + str(ridsA[0]) + ' ' + str(round(tausA[0],3))
+            outMaxA = pdbsA[1] + ' ' + chainsA[1] + str(ridsA[1]) + ' ' + str(round(tausA[1],3))
+
+        #Data B
+        self.data2 = self.data2.sort_values(by=[self.geoX])
+        outliersB = self.data2.iloc[[0, -1]]
+        print(outliersB)
+        pdbsB = outliersB['pdbCode'].values
+        chainsB = outliersB['chain'].values
+        ridsB = outliersB['rid'].values
+        tausB = outliersB[self.geoX].values
+        outMinB = ''
+        outMaxB = ''
+        if len(pdbsA) > 1:
+            outMinB = pdbsB[0] + ' ' + chainsB[0] + str(ridsB[0]) + ' ' + str(round(tausB[0],3))
+            outMaxB = pdbsB[1] + ' ' + chainsB[1] + str(ridsB[1]) + ' ' + str(round(tausB[1],3))
+
+        dataA = self.data[self.geoX].values
+        dataB = self.data2[self.geoX].values
+        dataA.sort()
+        dataB.sort()
+
+        meanA = round(dataA.mean(), 3)
+        meanB = round(dataB.mean(), 3)
+        sdA = round(dataA.std(), 3)
+        sdB = round(dataB.std(), 3)
+
+        #https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_1samp.html
+        from scipy import stats
+        '''
+        Use Mann-Whitney U (not necessarily gaussian)
+        Null hypothesis - the distributions of the 2 sets are identical        
+        '''
+        u_statistic, p_value = stats.mannwhitneyu(dataA, dataB)
+        u_statistic = round(u_statistic, 1)
+        p_value = round(p_value, 5)
+        hypothesis = 'Null hypothesis: the distributions of the 2 sets of data are identical.'
+        method = 'Method: If the P-Value < 0.05 we will reject.'
+        evidence = 'Evidence: The P-Value = ' + str(p_value)
+        conclusion = 'Conclusion: No evidence to reject the null hypothesis.'
+        if p_value <0.05:
+            conclusion = 'Conclusion: We reject the null hypothesis, the distributions are not the same.'
+
+        html = "<h3>" + self.title + "</h3>"
+        html += "<p>Data Set A: " + self.descA
+        html += "<br/>Data Set B: " + self.descB + "</p>"
+        html += "<p>" + "Mann-Whitney U Test" + "</p>"
+        html += "<p>" + hypothesis
+        html += "<br/>" + method + "</p>"
+        html += "<table class='innertable'>\n"
+        html += "<tr><td><red>Stats measure</red></td><td><red>" + self.geoX + " A</red></td><td><red>" + self.geoX + " B</red></td></tr>"
+        html += "<tr><td>mean</td><td>" + str(meanA) + "</td><td>" + str(meanB) + "</td></tr>"
+        html += "<tr><td>sd</td><td>" + str(sdA) + "</td><td>" + str(sdB) + "</td></tr>"
+        html += "<tr><td>Min</td><td>" + outMinA + "</td><td>" + outMinB + "</td></tr>"
+        html += "<tr><td>Max</td><td>" + outMaxA + "</td><td>" + outMaxB + "</td></tr>"
+        html += "<tr><td>" + 'U Statistic =' + "</td><td>" + str(u_statistic) + "</td><td></td></tr>"
+        html += "<tr><td>" + 'P-Value =' + "</td><td>" + str(p_value) + "</td><td></td></tr>"
+        html += "</table>"
+        html += "<p>" + evidence + "</p>"
+        html += "<p>" + conclusion + "</p>"
+        return html
+
 
     def plotScatter(self,fig, ax):
         #fig, ax = plt.subplots()
@@ -601,6 +680,7 @@ class GeoOverlay:
                 geoList.append(self.plotB.geoY)
             ghostdata = ghostReport.getGeoemtryCsv(geoList, ['pdbCode'])
             self.plotA = GeoPlot(ghostdata, self.plotB.geoX, geoY=self.plotB.geoY, title='ghost', hue='pdbCode', palette='Greys',plot=self.plotB.plot,operation=self.plotB.operation,report=report)
+
 
 class GeoDifference:
     def __init__(self,dataA,dataB,geoX,geoY='',title='',restrictionsA={},restrictionsB={},exclusionsA={},exclusionsB={}, newData=False,palette='seismic',report=None):
