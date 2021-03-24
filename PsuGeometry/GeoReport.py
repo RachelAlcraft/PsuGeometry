@@ -19,7 +19,7 @@ class GeoReport:
         self.includePdbs=includePdbs
 
     def addHistogram(self,geoX='',data=None,title='',ghost=False,operation='',splitKey='',hue='',
-                     palette='crimson',count=False,restrictions={},exclusions={}):
+                     palette='crimson',count=False,range=[],restrictions={},exclusions={}):
         isNew = False
         if data is None:
             isNew=True
@@ -27,6 +27,7 @@ class GeoReport:
             hue='pdbCode'
         gp = geop.GeoPlot(data,geoX,geoY='',title=title,newData=isNew,operation=operation,splitKey=splitKey,
                           plot='histogram',hue=hue,palette=palette,count=count,restrictions=restrictions,exclusions=exclusions,report=self)
+        gp.range=range
         if not ghost:
             self.plots.append(gp)
         else:

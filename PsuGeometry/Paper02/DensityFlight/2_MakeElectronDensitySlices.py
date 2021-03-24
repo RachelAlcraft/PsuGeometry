@@ -8,7 +8,9 @@ TAU correlations
 '''
 ###############################################################################################
 myWindowsLaptop = True
-FileDir = 'Cat6'
+FileDir = 'PDBs7'
+Tag = 'PDBS 601-700'
+firstRow = 601
 #Tag = 'Extreme values about PSI=0'
 #Tag = 'Wide N, PSI +ve near 180'
 #Tag = 'Wide N, PSI -ve near 180'
@@ -20,7 +22,8 @@ FileDir = 'Cat6'
 #Tag = 'Category 3: 0 psi and the bottom of the curve, tau < 114'
 #Tag = 'Category 4: Shortest N:N+1 < 2.8 at tau > 114'
 #Tag = 'Category 5: 2.8 < N:N+1 < 3 at tau > 114'
-Tag = 'Category 6: Psi <25 N:N+1 > 2.8'
+#Tag = 'Category 6: Psi <25 N:N+1 > 2.8'
+
 
 ###################################################################################
 pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
@@ -45,6 +48,7 @@ inputdata = pd.read_csv(edSlicePath + "_Results.csv")
 # BCentreC,BLinearV,BPlanarV,BAngle
 
 georep = psu.GeoReport([],pdbDataPath,edDataPath,edSlicePath,ed=False,dssp=False)
+georepPrint = psu.GeoReport([],pdbDataPath,edDataPath,edSlicePath,ed=False,dssp=False)
 
 pdbs = inputdata['PdbCode'].values
 tags = inputdata['Tag'].values
@@ -58,6 +62,9 @@ brads = []
 
 
 # Once the app has created the data we can load it
+
+
+
 for i in range(0,len(pdbs)):
     pdb = pdbs[i]
     tag = tags[i]
@@ -65,19 +72,22 @@ for i in range(0,len(pdbs)):
     btau = btaus[i]
 
     sliceOrigVal = georep.loadSlice(edSlicePath + pdb + tag + "value_slice.csv")
-    sliceBetterVal = georep.loadSlice(edSlicePath + pdb + tag + "bvalue_slice.csv")
+    #sliceBetterVal = georep.loadSlice(edSlicePath + pdb + tag + "bvalue_slice.csv")
     sliceOrigRad = georep.loadSlice(edSlicePath + pdb + tag + "radiant_slice.csv")
-    sliceBetterRad = georep.loadSlice(edSlicePath + pdb + tag + "bradiant_slice.csv")
+    #sliceBetterRad = georep.loadSlice(edSlicePath + pdb + tag + "bradiant_slice.csv")
 
     georep.addSlice(sliceOrigVal, palette='cubehelix_r',title=pdb + tag + ' value, tau=' + str(round(tau,3)))
     #georep.addSlice(sliceBetterVal, palette='cubehelix_r',title=pdb + tag + ' better value, tau=' + str(round(btau,3)))
     georep.addSlice(sliceOrigRad, palette='bone',title=pdb + tag + ' radiant',Contour=False)
     #georep.addSlice(sliceBetterRad, palette='bone',title=pdb + tag + ' better radiant',Contour=False)
 
+    georepPrint.addSlice(sliceOrigRad, palette='bone_r',title=str(firstRow) + " " + pdb + tag + ' radiant',Contour=False)
+
     origs.append(sliceOrigVal)
-    betters.append(sliceBetterVal)
+    #betters.append(sliceBetterVal)
     radiants.append(sliceOrigRad)
-    brads.append(sliceBetterRad)
+    #brads.append(sliceBetterRad)
+    firstRow += 1
 
 georep.addSlices(origs, palette='cubehelix_r', title='Average values', logged=False, centre=False)
 #georep.addSlices(betters, palette='cubehelix_r', title='Average better values', logged=False, centre=False)
@@ -86,3 +96,4 @@ georep.addSlices(radiants, palette='bone', title='Average radiant', logged=False
 
 
 georep.printToHtml(Tag,2,'_' + FileDir + 'Results_ccp4_slices')
+georepPrint.printToHtml(Tag,5,'_' + FileDir + 'Results_ccp4_slices_printable')

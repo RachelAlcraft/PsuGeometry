@@ -42,6 +42,7 @@ class GeoPlot:
         self.restrictions=restrictions
         self.exclusions = exclusions
         self.Contour=Contour
+        self.range = []
         if self.geoY == '' and plot not in 'surfaces' and plot != 'compare':
             self.plot = 'histogram'
         self.count=count # only for histograms, probability or count
@@ -194,7 +195,11 @@ class GeoPlot:
             #else:
             #sns.distplot(data[self.geoX], label='', norm_hist=True, bins=bins, kde=False,hist_kws=dict(alpha=0.8,EdgeColor='silver'))
 
-            plt.hist(data[self.geoX], EdgeColor='k', bins=bins, color=histCol, density=density,alpha=alpha)
+            if range == []:
+                plt.hist(data[self.geoX], EdgeColor='k', bins=bins, color=histCol, density=density,alpha=alpha)
+            else:
+                plt.xlim(xmin=self.range[0], xmax=self.range[1])
+                plt.hist(data[self.geoX], EdgeColor='k', bins=bins, color=histCol, density=density, alpha=alpha)
 
 
 
@@ -214,7 +219,12 @@ class GeoPlot:
             for r in range(0, rows):
                 html += "<td>"
                 try:
-                    html += str(round(dfdesc[r], 2))
+                    if dfdesc[r] < 10:
+                        html += str(round(dfdesc[r], 3))
+                    elif dfdesc[r] < 100:
+                        html += str(round(dfdesc[r], 2))
+                    else:
+                        html += str(round(dfdesc[r], 1))
                 except:
                     html += str(dfdesc[r])
                 html += "</td>\n"
@@ -231,7 +241,7 @@ class GeoPlot:
         #Data A
         self.data = self.data.sort_values(by=[self.geoX])
         outliersA =self.data.iloc[[0,-1]]
-        print(outliersA)
+        #print(outliersA)
         pdbsA = outliersA['pdbCode'].values
         chainsA = outliersA['chain'].values
         ridsA = outliersA['rid'].values
@@ -245,7 +255,7 @@ class GeoPlot:
         #Data B
         self.data2 = self.data2.sort_values(by=[self.geoX])
         outliersB = self.data2.iloc[[0, -1]]
-        print(outliersB)
+        #print(outliersB)
         pdbsB = outliersB['pdbCode'].values
         chainsB = outliersB['chain'].values
         ridsB = outliersB['rid'].values

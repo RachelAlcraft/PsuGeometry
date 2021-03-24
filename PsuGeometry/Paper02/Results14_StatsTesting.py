@@ -13,7 +13,6 @@ Best - of all those above, where the tau values are calculated as identical
 
 #AM I RECREATING THE DATA SET????
 SaveAgain = False
-bFactorFactor = 1.55
 
 #These are the paths
 pdbOriginalPath = 'F:/Code/ProteinDataFiles/pdb_data/'
@@ -42,7 +41,7 @@ for pdb in pdbListIn:
 print(pdbList)
 
 #This is all the data we are going to be looking at
-geoList = ['N:N+1','TAU','PSI','PHI','N:C','CA:C','C:O','N:CA','C-1:N','C:N+1']
+geoList = ['N:N+1','TAU','PSI','PHI','N:C','CA:C','C:O','N:CA','C-1:N','C:N+1','OMEGA','CA:C:O:N+1','O:N+1','CA:O','CA:N+1','CA:C:N+1','C-1:N:CA']
 hueList = ['aa', 'rid', 'bfactor','pdbCode','bfactorRatio','disordered']
 
 if SaveAgain:
@@ -84,67 +83,61 @@ dataBetter = pd.read_csv(printPath + "Results14_BetterStats.csv")
 
 #To find best supported we need to find a tau with no difference
 #Cut our data into the columns we wanr
-georep = psu.GeoReport([], pdbOriginalPath, edDataPath, printPath, ed=False, dssp=False, includePdbs=False,keepDisordered=False)
+geoListUse = geoList
+#geoListUse = ['N:N+1','TAU','PSI','CA:C','C:O','N:CA','C-1:N','C:N+1','CA:C:N+1','C-1:N:CA']
+for geoCheck in geoListUse:
+    georep = psu.GeoReport([], pdbOriginalPath, edDataPath, printPath, ed=False, dssp=False, includePdbs=False,keepDisordered=False)
 
-#aas = ['GLY','PRO','ALA']
-aas = ['ALA', 'CYS', 'ASP', 'GLU', 'PHE', 'GLY', 'HIS', 'ILE', 'LYS', 'LEU', 'MET', 'ASN', 'PRO', 'GLN', 'ARG','SER', 'THR', 'VAL', 'TRP', 'TYR']
-for aa in aas:
-    headerList = ['pdbCode','chain','rid','aa','C-1:N_motif','C:N+1_motif','bfactor','bfactorRatio','disordered','N:N+1','CA:C','C:O','N:CA','C-1:N','C:N+1','TAU','PSI','PHI']
-    dataUnrestrictedCut = dataUnrestricted[headerList]
-    dataGoodCut = dataGood[headerList]
-    dataBetterCut = dataBetter[headerList]
+    outliers = dataUnrestricted.sort_values(by=[geoCheck])
+    outliers = outliers.iloc[[0, -1]]
+    outliersV = outliers[geoCheck].values
+    range = [outliersV[0],outliersV[1]]
 
-    #Cut on amino acid
-    dataUnrestrictedCut = dataUnrestrictedCut.query("aa ==  '" + aa + "'")
-    dataGoodCut = dataGoodCut.query("aa ==  '" + aa + "'")
-    dataBetterCut = dataBetterCut.query("aa ==  '" + aa + "'")
+    #aas = ['GLY','PRO','ALA']
+    aas = ['ALL']
+    #aas = ['ALA', 'CYS', 'ASP', 'GLU', 'PHE', 'GLY', 'HIS', 'ILE', 'LYS', 'LEU', 'MET', 'ASN', 'PRO', 'GLN', 'ARG','SER', 'THR', 'VAL', 'TRP', 'TYR']
+    for aa in aas:
+        headerList = ['pdbCode','chain','rid','aa','C-1:N_motif','C:N+1_motif','bfactor','bfactorRatio','disordered','N:N+1','TAU','PSI','PHI','N:C','CA:C','C:O','N:CA','C-1:N','C:N+1','OMEGA','CA:C:O:N+1','O:N+1','CA:O','CA:N+1','CA:C:N+1','C-1:N:CA']
+        dataUnrestrictedCut = dataUnrestricted[headerList]
+        dataGoodCut = dataGood[headerList]
+        dataBetterCut = dataBetter[headerList]
 
-    print(dataBetterCut)
+        #Cut on amino acid
+        if aa != 'ALL':
+            dataUnrestrictedCut = dataUnrestrictedCut.query("aa ==  '" + aa + "'")
+            dataGoodCut = dataGoodCut.query("aa ==  '" + aa + "'")
+            dataBetterCut = dataBetterCut.query("aa ==  '" + aa + "'")
 
-    #Create the bfactor and occupant restricted sets
-    dataOccupantCut = dataUnrestrictedCut.query("disordered ==  'N'")
-    data_1_3_Cut = dataOccupantCut.query("bfactorRatio <  1.3")
-    data_1_6_Cut = dataOccupantCut.query("bfactorRatio <  1.6")
-    data_interim_Cut = dataOccupantCut.query("bfactorRatio <  1.6 and bfactorRatio >=  1.3")
+        #print(dataBetterCut)
 
-    #create a data set where the taus are identical
-    dataBestSupported = dataGoodCut
-    dataBestSupported['TAU2'] = dataBetterCut['TAU']
-    dataBestSupported['TAU_DIFF'] = abs(dataBestSupported['TAU2'] - dataBestSupported['TAU'])
-    dataNotSupported = dataBestSupported.query('TAU_DIFF > 0')
-    dataBestSupported = dataBestSupported.query('TAU_DIFF == 0')
-    #print(dataNotSupported)
-    #print(dataBestSupported)
+        #Create the bfactor and occupant restricted sets
+        dataOccupantCut = dataUnrestrictedCut.query("disordered ==  'N'")
+        data_1_3_Cut = dataOccupantCut.query("bfactorRatio <  1.3")
+        data_1_6_Cut = dataOccupantCut.query("bfactorRatio <  1.6")
+        data_interim_Cut = dataOccupantCut.query("bfactorRatio <  1.6 and bfactorRatio >=  1.3")
+
+        #create a data set where the taus are identical
+        dataBestSupported = dataGoodCut
+        dataBestSupported['TAU2'] = dataBetterCut['TAU']
+        dataBestSupported['TAU_DIFF'] = abs(dataBestSupported['TAU2'] - dataBestSupported['TAU'])
+        dataNotSupported = dataBestSupported.query('TAU_DIFF > 0')
+        dataBestSupported = dataBestSupported.query('TAU_DIFF == 0')
+        if aa == 'ALL':
+            dataBestSupported.to_csv(printPath + "Results14_BestSupported.csv", index=False)
+            data_1_3_Cut.to_csv(printPath + "Results14_Restricted.csv", index=False)
 
 
+        #Against ALL DATA
+        georep.addHistogram(data=dataUnrestrictedCut, geoX=geoCheck, title=aa + ' All bfactors and occupants',range=range)
+        georep.addStatsCompare(dataA=dataUnrestrictedCut, dataB=dataBestSupported,descA=aa + ' All bfactors and occupants', descB=aa + ' Best Supported Data', geoX=geoCheck, title=aa + ' ' + geoCheck + ' compare')
+        georep.addHistogram(data=dataBestSupported, geoX=geoCheck, title=aa + ' Best Supported Data',range=range)
 
-    #Against ALL DATA
-    georep.addHistogram(data=dataUnrestrictedCut, geoX='TAU', title=aa + ' All bfactors and occupants')
-    georep.addStatsCompare(dataA=dataUnrestrictedCut, dataB=dataBestSupported,descA=aa + ' All bfactors and occupants', descB=aa + ' Best Supported Data', geoX='TAU', title=aa + ' Tau compare')
-    georep.addHistogram(data=dataBestSupported, geoX='TAU', title=aa + ' Best Supported Data')
+        #Against restricted data on bfactor 1.3
+        georep.addStatsCompare(dataA=data_1_3_Cut, dataB=dataBestSupported,descA=aa + ' Single occupant and bfactor ratio 1.3', descB=aa + ' Best Supported Data', geoX=geoCheck, title=aa + ' ' + geoCheck + ' compare')
+        georep.addHistogram(data=data_1_3_Cut, geoX=geoCheck, title=aa + ' Single occupant and bfactor ratio 1.3',range=range)
 
-    #Against ALL DATA restricted on bfactor
-    #georep.addStatsCompare(dataA=data_1_6_Cut, dataB=dataBestSupported,descA='Single occupant and bfactor ratio 1.6', descB='Best Supported Data', geoX='TAU', title='Tau compare')
-    #georep.addHistogram(data=data_1_6_Cut, geoX='TAU', title='Single occupant and bfactor ratio 1.6')
-    #georep.addHistogram(data=dataBestSupported, geoX='TAU', title='Best Supported Data')
-
-    #Against restricted data on bfactor 1.3
-    georep.addStatsCompare(dataA=data_1_3_Cut, dataB=dataBestSupported,descA=aa + ' Single occupant and bfactor ratio 1.3', descB=aa + ' Best Supported Data', geoX='TAU', title=aa + ' Tau compare')
-    georep.addHistogram(data=data_1_3_Cut, geoX='TAU', title=aa + ' Single occupant and bfactor ratio 1.3')
-    #georep.addHistogram(data=dataBestSupported, geoX='TAU', title='Best Supported Data')
-
-    #Against restricted data on bfactor 1.5 -  1.6
-    #georep.addStatsCompare(dataA=data_interim_Cut, dataB=dataBestSupported,descA='Bfactor ratio 1.3-1.6', descB='Best Supported Data', geoX='TAU', title='Tau compare')
-    #georep.addHistogram(data=data_interim_Cut, geoX='TAU', title='Bfactor ratio 1.3-1.6')
-    #georep.addHistogram(data=dataBestSupported, geoX='TAU', title='Best Supported Data')
-
-    #Against good electron density
-    #georep.addStatsCompare(dataA=dataGoodCut, dataB=dataBestSupported,descA='Data with good electron density', descB='Best Supported Data', geoX='TAU', title='Tau compare')
-    #georep.addHistogram(data=dataGoodCut, geoX='TAU', title='Data with good electron density')
-    #georep.addHistogram(data=dataBestSupported, geoX='TAU', title='Best Supported Data')
-
-    #georep.printToHtml('Results 14. Tau Distributions Comparison', 3, 'Results14_StatsCompare' + aa)
-georep.printToHtml('Results 14. Tau Distributions Comparison', 5, 'Results14_StatsCompareAll')
+    geoSub = geoCheck.replace(':','_')
+    georep.printToHtml('Results 14. ' + geoCheck + ' Distributions Comparison', 5, 'Results14_StatsCompare' + geoSub)
 
 
 print('----------Finished----------')
