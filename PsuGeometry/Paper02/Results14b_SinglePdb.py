@@ -67,7 +67,7 @@ for pdb in pdbs:
         georep.addStatsCompare(dataA=data_1_3_Cut, dataB=dataGoodPdb, descA=aa + ' Good set, restricted on bfactor and occupant', descB=pdb + ' Restricted Data ' + aa, geoX='TAU', title=pdb + ' Tau compare')
         georep.addHistogram(data=dataGoodPdb, geoX='TAU', title=pdb + ' Restricted Data ' + aa)
 
-    georep.printToHtml('Results 14b. Single pdb=' + pdb, 3, 'Results14a_Pdb_' + pdb)
+    georep.printToHtml('Results 14b. Single pdb=' + pdb, 3, 'Results14b_Pdb_' + pdb)
 
 
 print('----------Finished----------')
