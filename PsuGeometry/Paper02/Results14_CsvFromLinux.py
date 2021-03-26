@@ -11,12 +11,21 @@ Good - of all the residues above, those with a nearby density peak (good local d
 Best - of all those above, where the tau values are calculated as identical
 '''
 
-#These are the paths
+myWindowsLaptop = True
+
 pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
 printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/Paper02/'
+dsspHue='dssp'
+includeDSSP = True
+if myWindowsLaptop:
+    pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_data/'
+    edDataPath = 'F:/Code/ProteinDataFiles/ccp4_data/'
+    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/1.TauCorrelations/Data/DataCsvOfSets/'
+    includeDSSP = False  # on my windows computer
 
-#From linux I am only interested in creat8ng the unrestricted data - it can be appended to the other data on windows
+
+#From linux I am only interested in creating the unrestricted data - it can be appended to the other data on windows
 
 #TIMER
 print('----------start report 14----------')
@@ -27,15 +36,22 @@ pdbdata = pd.read_csv('../PdbLists/Pdbs_TauPaper.csv') # This is a list of pdbs 
 pdbList = pdbdata['PDB'].tolist()[0:]
 
 #This is all the data we are going to be looking at
-geoList = ['N:N+1','TAU','PSI','PHI','N:C','CA:C','C:O','N:CA','C-1:N','C:N+1','OMEGA','CA:C:O:N+1','O:N+1','CA:O','CA:N+1','CA:C:N+1','C-1:N:CA','N:O-2','N:CA:C:O-2']
+geoList = [
+            #'N:N+1','TAU','PSI','PHI','N:C','CA:C','C:O','N:CA','C-1:N','C:N+1','OMEGA',
+            #'CA:C:O:N+1','O:N+1','CA:O','CA:N+1','CA:C:N+1','C-1:N:CA','N:O-2','N:CA:C:O-2',
+            'N:O-2:CA','N-1:CA:C','CA:HOH','CA:HETATM','N:HETATM:C','N:HOH:C','N:CA:C:HETATM','N:CA:C:HOH',
+            ]
 hueList = ['aa', 'rid', 'bfactor','pdbCode','bfactorRatio','disordered','dssp']
 
 
 print('Creating CSV files anew')
-georep = psu.GeoReport(pdbList, pdbDataPath, edDataPath, printPath, ed=False, dssp=True, includePdbs=False,keepDisordered=True)
+georep = psu.GeoReport(pdbList, pdbDataPath, edDataPath, printPath, ed=False, dssp=includeDSSP, includePdbs=False,keepDisordered=True)
 print('Create unrestricted csv')
-dataUnrestricted = georep.getGeoemtryCsv(geoList, hueList, -1)
-dataUnrestricted.to_csv(printPath + "Results14_UnrestrictedCsvFromLinux.csv", index=False)
+dataUnrestricted = georep.getGeoemtryCsv(geoList, hueList, -1,allAtoms=True)
+if myWindowsLaptop:
+    dataUnrestricted.to_csv(printPath + "Results14_UnrestrictedCsvFromWindows.csv", index=False)
+else:
+    dataUnrestricted.to_csv(printPath + "Results14_UnrestrictedCsvFromLinux.csv", index=False)
 
 print('----------Finished----------')
 endx = time.time()

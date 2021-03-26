@@ -68,6 +68,8 @@ class GeoPdb:
         self.hasDensity = False
         self.hasPDB = False
         self.atoms = []
+        self.hetatms = []
+        self.water = []
         self.densCSV = pd.DataFrame()
         self.hasDssp = dssp
         self.dataFrame = pd.DataFrame()
@@ -181,7 +183,9 @@ class GeoPdb:
                         ridx = resnum
                         resnum = resnum+1
                         #decision as to whether r is to be used. for density maps yes, for geoemtry no
-                        if (r in self.getAAList() and 'H' not in hetatm) or (self.useAll and r!='HOH'):# != 'HOH':  # bio.is_aa(residue):
+                        #print(residue.get_full_id())
+                        #print(r,hetatm)
+                        if (r in self.getAAList() and 'H' not in hetatm) or self.useAll:# and r!='HOH'):# != 'HOH':  # bio.is_aa(residue):
                             for atom in residue:
                                 disordered = 'N'
                                 useAtom = True
@@ -221,7 +225,12 @@ class GeoPdb:
                                         oneAtom.setDensityInfo(tFoFc, FoFc, Fo, Fc)
 
                                     # print('Atom:',atomNo)
-                                    self.atoms.append(oneAtom)
+                                    if r in self.getAAList():
+                                        self.atoms.append(oneAtom)
+                                    elif r == 'HOH':
+                                        self.water.append(oneAtom)
+                                    else:
+                                        self.hetatms.append(oneAtom)
 
             if bfactorCount > 0:
                 self.averageBfactor = bfactorTotal/bfactorCount
@@ -361,16 +370,22 @@ class GeoPdb:
                             geoPairs = self.__geosToPairs(geos)
 
                             datasA = []
+                            firstAtom = ''
                             for a in range(0, len(geoPairs)):
                                 geoPair = geoPairs[a]
                                 geoAtom = geoPair[0]
+                                if firstAtom == '':
+                                    firstAtom = geoAtom
                                 ridA = thisResid + geoPairs[a][1]  # add the offset
                                 atomA = self.__getAtom(thisChain, ridA,thisOcc,geoAtom)
+                                if geoAtom == 'HOH':
+                                    atomA = self.__getWaterAtom(thisChain, ridA, thisOcc, firstAtom)
+                                elif geoAtom == 'HETATM':
+                                    atomA = self.__getHetAtom(thisChain, ridA, thisOcc, firstAtom)
                                 # There should be 1 atom
                                 if atomA != None:
                                     datasA.append(atomA)
                                 else:
-                                    #print(thisChain, ridA, thisOcc,geoAtom)
                                     allValid = False
                             listCalcs.append([datasA,geo])
 
@@ -537,10 +552,43 @@ class GeoPdb:
         # The atom number cannot be less than 1
         if rid < 1:
             return None
+        #it could be HOH ar HETATM
         for atm in self.atoms:
             if atm.values['chain'] == chain and atm.values['rid'] == rid and atm.values['occupant'] == occ and atm.values['atom'] == atom:
                 return atm
         return None
+
+    def __getWaterAtom(self, chain, rid, occ,atom):
+        # The atom number cannot be less than 1
+        atm = self.__getAtom(chain, rid, occ,atom)
+        if atm == None:
+            return None
+
+        water = atm #return itself if there are none
+        dis = 1000
+        for hoh in self.water:
+            valDis = calcs.distance(atm.values['x'], atm.values['y'], atm.values['z'],
+                                    hoh.values['x'], hoh.values['y'], hoh.values['z'])
+            if valDis < dis:
+                dis = valDis
+                water = hoh
+        return water
+
+    def __getHetAtom(self, chain, rid, occ,atom):
+        # The atom number cannot be less than 1
+        atm = self.__getAtom(chain, rid, occ,atom)
+        if atm == None:
+            return None
+
+        hetatm = atm #return itself if there are none
+        dis = 1000
+        for het in self.hetatms:
+            valDis = calcs.distance(atm.values['x'], atm.values['y'], atm.values['z'],
+                                    het.values['x'], het.values['y'], het.values['z'])
+            if valDis < dis:
+                dis = valDis
+                hetatm = het
+        return hetatm
 
     def __getResidueBFactor(self, chain, rid, occ):
         # The atom number cannot be less than 1
