@@ -27,7 +27,7 @@ pdbdata = pd.read_csv('../PdbLists/Pdbs_TauPaper.csv') # This is a list of pdbs 
 pdbList = pdbdata['PDB'].tolist()[0:]
 
 #This is all the data we are going to be looking at
-geoList = ['N:N+1','TAU','PSI','PHI','N:C','CA:C','C:O','N:CA','C-1:N','C:N+1','OMEGA','CA:C:O:N+1','O:N+1','CA:O','CA:N+1','CA:C:N+1','C-1:N:CA']
+geoList = ['N:N+1','TAU','PSI','PHI','N:C','CA:C','C:O','N:CA','C-1:N','C:N+1','OMEGA','CA:C:O:N+1','O:N+1','CA:O','CA:N+1','CA:C:N+1','C-1:N:CA','N:O-2','N:CA:C:O-2']
 hueList = ['aa', 'rid', 'bfactor','pdbCode','bfactorRatio','disordered','dssp']
 
 
