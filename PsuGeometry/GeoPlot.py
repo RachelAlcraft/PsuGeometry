@@ -139,6 +139,21 @@ class GeoPlot:
         data = self.data.sort_values(by=self.geoX, ascending=True)
         title = self.title
 
+        #Create outlier tag
+        outliers = data.iloc[[0, -1]]
+        # print(outliersA)
+        pdbsA = outliers['pdbCode'].values
+        chainsA = outliers['chain'].values
+        ridsA = outliers['rid'].values
+        geoA = outliers[self.geoX].values
+        if len(pdbsA) > 1:
+            if type(geoA[0]) == float:
+                outMin = pdbsA[0] + ' ' + chainsA[0] + str(ridsA[0]) + ' ' + str(round(geoA[0], 3))
+                outMax = pdbsA[1] + ' ' + chainsA[1] + str(ridsA[1]) + ' ' + str(round(geoA[1], 3))
+            else:
+                outMin = pdbsA[0] + ' ' + chainsA[0] + str(ridsA[0]) + ' ' + str(geoA[0])
+                outMax = pdbsA[1] + ' ' + chainsA[1] + str(ridsA[1]) + ' ' + str(geoA[1])
+
         if self.operation == 'ABS':
             data = data[data[self.geoX] == abs(data[self.geoX])]
         elif self.operation == 'SQUARE':
@@ -159,8 +174,11 @@ class GeoPlot:
             lastHue = round(lastHue, 2)
         except:
             pass
-        title += '\nFirst:' + self.hue + ' ' + str(firstHue) + '=' + str(firstVal)
-        title += '\nLast:' + self.hue + ' ' + str(lastHue) + '=' + str(lastVal)
+
+        #title += '\nFirst:' + self.hue + ' ' + str(firstHue) + '=' + str(firstVal)
+        #title += '\nLast:' + self.hue + ' ' + str(lastHue) + '=' + str(lastVal)
+        title += '\nFirst = ' + outMin
+        title += '\n last = ' + outMax
 
         # sns.distplot(data[xName], norm_hist=True, bins=50, kde=False)
         histCol = self.palette
@@ -194,8 +212,7 @@ class GeoPlot:
             #    plt.legend()
             #else:
             #sns.distplot(data[self.geoX], label='', norm_hist=True, bins=bins, kde=False,hist_kws=dict(alpha=0.8,EdgeColor='silver'))
-
-            if range == []:
+            if self.range == []:
                 plt.hist(data[self.geoX], EdgeColor='k', bins=bins, color=histCol, density=density,alpha=alpha)
             else:
                 plt.xlim(xmin=self.range[0], xmax=self.range[1])

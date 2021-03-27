@@ -2,7 +2,7 @@
 
 
 
-def tauCategory(psi, phi, NN1,NO2):
+def tauCategory(psi, phi, NN1,NO2,NCACO2):
     '''
     These are what we are checking
     1. Is it hydrogen bonded to an oxygen 2 away?
@@ -12,5 +12,12 @@ def tauCategory(psi, phi, NN1,NO2):
     3. Is psi 0 despite not getting through the others?
     4. Is phi 0?
     '''
-    return 'A1'
+
+    if NO2 < 3.6 and abs(NCACO2) < 20:
+        if abs(psi)<50:
+            return 'A1'
+        else:
+            return 'A2'
+    else:
+        return 'X'
 
