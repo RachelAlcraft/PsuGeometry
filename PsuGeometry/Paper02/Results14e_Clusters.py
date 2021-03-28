@@ -16,7 +16,7 @@ data = data[data['CA:HOH'] != 0]
 #psi, phi, NN1,NO2,NCACO2
 data['CLUSTER'] = 'X'#cluster.tauCategory(data['PSI'],data['PHI'],data['N:N+1'],data['N:O-2'],data['N:CA:C:O-2'])
 #Apply my cluster function
-data['CLUSTER'] = data.apply(lambda row: cluster.tauCategory(row['PSI'],row['PHI'],row['N:N+1'],row['N:O-2'],row['N:CA:C:O-2']), axis=1)
+data['CLUSTER'] = data.apply(lambda row: cluster.tauCategory(row['PSI'],row['PHI'],row['N:N+1'],row['N:O-2'],row['N:CA:C:O-2'],row['O-2:C']), axis=1)
 
 #fewer have hetatms so that is a cut down data set
 dataHetatm = data.query("hetatm !=  'GLY'")
@@ -44,16 +44,21 @@ CA:HETATM,N:HETATM:C,N:CA:C:HETATM #anything interesting with heavy atoms
 #georep.addScatter(data=data, geoX='aa-2', geoY='aa-1', hue='TAU', title='',palette='jet', sort='NON')
 #georep.addScatter(data=data, geoX='aa-2', geoY='aa+1', hue='TAU', title='',palette='jet', sort='NON')
 
-histgeos = ['TAU','PSI','PHI','N:N+1','N:O-2','MOTIF']
-clusters = ['X','A1','A2']
+histgeos = ['TAU','PSI','PHI','N:N+1','N:O-2','N:CA','CA:C','MOTIF']
+clusters = ['X','A1','A2','A3','A4']
 for cat in clusters:
 
     dataCat = data.query("CLUSTER ==  '" + cat +"'")
     dataCatHet = dataHetatm.query("CLUSTER ==  '" + cat + "'")
 
+    dataED = dataCat['ED Request']
+
+    dataED.to_csv(printPath + "Results14e_EDRequest_Category_" + cat + ".csv", index=False,sep=' ')
+
+
     georep.addScatter(data=dataCat, geoX='PHI', geoY='PSI', hue='TAU', title='',palette='jet', categorical=False)
     georep.addScatter(data=dataCat, geoX='PSI', geoY='N:N+1', hue='TAU', title='',palette='jet', categorical=False)
-    georep.addScatter(data=dataCat, geoX='PSI', geoY='TAU', hue='dssp', title='',palette='tab10', categorical=True)
+    georep.addScatter(data=dataCat, geoX='PSI', geoY='N:N+1', hue='dssp', title='',palette='tab10', categorical=True)
 
     for hgeo in histgeos:
         georep.addHistogram(data=dataCat, geoX=hgeo, title='')

@@ -33,9 +33,11 @@ N:N+1,TAU,PSI,PHI,OMEGA,CA:C:O:N+1
 N:C,CA:C,C:O,N:CA,C-1:N,C:N+1,O:N+1,CA:O,CA:N+1,CA:C:N+1,C-1:N:CA 
 N:O-2, N:CA:C:O-2, #hydrogen bonded with 2 previous
 N-1:CA:C #previous residue in line with tau?
+O-2:C	O-2:N:CA	O-2:N:CA:N+1
 CA:HOH, N:HOH:C, N:CA:C:HOH # anything interesting with water
 CA:HETATM,N:HETATM:C,N:CA:C:HETATM #anything interesting with heavy atoms
 
+DSSP key:0=U:Unknown 1=H:a-helix 2=S:bend 3=G:3-helix 4=E:extended strand 5=-:Missing 6=T:h-bond turn 7=B:isolated b-bridge 8=I:5-helix
 '''
 
 #georep.addScatter(data=data, geoX='aa-2', geoY='aa-1', hue='TAU', title='',palette='jet', sort='NON')
@@ -43,11 +45,15 @@ CA:HETATM,N:HETATM:C,N:CA:C:HETATM #anything interesting with heavy atoms
 
 georep.addScatter(data=data, geoX='PHI', geoY='PSI', hue='TAU', title='',palette='jet', categorical=False)
 georep.addScatter(data=data, geoX='PHI', geoY='PSI', hue='N:O-2', title='',palette='jet', categorical=False)
-georep.addScatter(data=data, geoX='PHI', geoY='PSI', hue='N-1:CA:C', title='',palette='jet', categorical=False)
+georep.addScatter(data=data, geoX='PHI', geoY='PSI', hue='dssp', title='',palette='tab10', categorical=True)
 
 georep.addScatter(data=data, geoX='PSI', geoY='N:N+1', hue='TAU', title='',palette='jet', categorical=False)
 georep.addScatter(data=data, geoX='PSI', geoY='N:N+1', hue='N:O-2', title='',palette='jet', categorical=False)
-georep.addScatter(data=data, geoX='PSI', geoY='N:N+1', hue='N-1:CA:C', title='',palette='jet')
+georep.addScatter(data=data, geoX='PSI', geoY='N:N+1', hue='dssp', title='',palette='tab10', categorical=True)
+
+georep.addScatter(data=data, geoX='PSI', geoY='O-2:N:CA:N+1', hue='TAU', title='',palette='jet', categorical=False)
+georep.addScatter(data=data, geoX='N:O-2', geoY='O-2:N:CA:N+1', hue='TAU', title='',palette='jet')
+georep.addScatter(data=data, geoX='N:O-2', geoY='O-2:N:CA:N+1', hue='dssp', title='',palette='tab10', categorical=True)
 
 georep.addScatter(data=data, geoX='TAU', geoY='N:O-2', hue='N:CA:C:O-2', title='',palette='jet', sort='NON')
 georep.addScatter(data=data, geoX='N:O-2', geoY='N:CA:C:O-2', hue='TAU', title='',palette='jet', sort='NON')

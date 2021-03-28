@@ -8,9 +8,9 @@ TAU correlations
 '''
 ###############################################################################################
 myWindowsLaptop = True
-FileDir = 'PDBs7'
-Tag = 'PDBS 601-700'
-firstRow = 601
+FileDir = 'Cat_A1'
+Tag = 'Category A1'
+firstRow = 1
 #Tag = 'Extreme values about PSI=0'
 #Tag = 'Wide N, PSI +ve near 180'
 #Tag = 'Wide N, PSI -ve near 180'
@@ -48,7 +48,7 @@ inputdata = pd.read_csv(edSlicePath + "_Results.csv")
 # BCentreC,BLinearV,BPlanarV,BAngle
 
 georep = psu.GeoReport([],pdbDataPath,edDataPath,edSlicePath,ed=False,dssp=False)
-georepPrint = psu.GeoReport([],pdbDataPath,edDataPath,edSlicePath,ed=False,dssp=False)
+#georepPrint = psu.GeoReport([],pdbDataPath,edDataPath,edSlicePath,ed=False,dssp=False)
 
 pdbs = inputdata['PdbCode'].values
 tags = inputdata['Tag'].values
@@ -76,12 +76,12 @@ for i in range(0,len(pdbs)):
     sliceOrigRad = georep.loadSlice(edSlicePath + pdb + tag + "radiant_slice.csv")
     #sliceBetterRad = georep.loadSlice(edSlicePath + pdb + tag + "bradiant_slice.csv")
 
-    georep.addSlice(sliceOrigVal, palette='cubehelix_r',title=pdb + tag + ' value, tau=' + str(round(tau,3)))
+    georep.addSlice(sliceOrigVal, palette='cubehelix_r',title=pdb +' ' +  tag + ' value, tau=' + str(round(tau,3)))
     #georep.addSlice(sliceBetterVal, palette='cubehelix_r',title=pdb + tag + ' better value, tau=' + str(round(btau,3)))
-    georep.addSlice(sliceOrigRad, palette='bone',title=pdb + tag + ' radiant',Contour=False)
+    georep.addSlice(sliceOrigRad, palette='bone',title=pdb + ' ' + tag + ' radiant',Contour=False)
     #georep.addSlice(sliceBetterRad, palette='bone',title=pdb + tag + ' better radiant',Contour=False)
 
-    georepPrint.addSlice(sliceOrigRad, palette='bone_r',title=str(firstRow) + " " + pdb + tag + ' radiant',Contour=False)
+    #georepPrint.addSlice(sliceOrigRad, palette='bone_r',title=str(firstRow) + " " + pdb + tag + ' radiant',Contour=False)
 
     origs.append(sliceOrigVal)
     #betters.append(sliceBetterVal)
@@ -96,4 +96,4 @@ georep.addSlices(radiants, palette='bone', title='Average radiant', logged=False
 
 
 georep.printToHtml(Tag,2,'_' + FileDir + 'Results_ccp4_slices')
-georepPrint.printToHtml(Tag,5,'_' + FileDir + 'Results_ccp4_slices_printable')
+#georepPrint.printToHtml(Tag,5,'_' + FileDir + 'Results_ccp4_slices_printable')

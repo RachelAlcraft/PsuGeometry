@@ -382,6 +382,8 @@ class GeoPdb:
                                     atomA = self.__getWaterAtom(thisChain, ridA, thisOcc, firstAtom)
                                 elif geoAtom == 'HETATM':
                                     atomA = self.__getHetAtom(thisChain, ridA, thisOcc, firstAtom)
+                                elif '{' in geoAtom and '}' in geoAtom:
+                                    atomA = self.__getNearestAtom(thisChain, ridA, thisOcc, firstAtom,geoAtom)
                                 # There should be 1 atom
                                 if atomA != None:
                                     datasA.append(atomA)
@@ -589,6 +591,23 @@ class GeoPdb:
                 dis = valDis
                 hetatm = het
         return hetatm
+
+    def __getNearestAtom(self, chain, rid, occ,atom,newatom):
+        # The atom number cannot be less than 1
+        atm = self.__getAtom(chain, rid, occ,atom)
+        if atm == None:
+            return None
+
+        nearatm = atm #return itself if there are none
+        dis = 1000
+        for at in self.atoms:
+            if atm.values['atom'] in newatom: #could pass in a list of atoms to look for in the case of oxygen sidechains
+                valDis = calcs.distance(atm.values['x'], atm.values['y'], atm.values['z'],
+                                    at.values['x'], at.values['y'], at.values['z'])
+                if valDis < dis:
+                    dis = valDis
+                    nearatm = at
+        return nearatm
 
     def __getResidueBFactor(self, chain, rid, occ):
         # The atom number cannot be less than 1

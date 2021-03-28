@@ -40,7 +40,8 @@ geoList = [
             #'N:N+1','TAU','PSI','PHI','N:C','CA:C','C:O','N:CA','C-1:N','C:N+1','OMEGA',
             #'CA:C:O:N+1','O:N+1','CA:O','CA:N+1','CA:C:N+1','C-1:N:CA','N:O-2','N:CA:C:O-2',
             #'N:O-2:CA','N-1:CA:C','CA:HOH','CA:HETATM','N:HETATM:C','N:HOH:C','N:CA:C:HETATM','N:CA:C:HOH',
-            'O-2:N:C',
+            #'O-2:C','O-2:N:CA','O-2:N:CA:N+1',
+            'N:{O,OD1,OG1}','{O,OD1,OG1}:C','{O,OD1,OG1}:N:CA','{O,OD1,OG1}:N:CA:N+1',
             ]
 hueList = ['aa', 'rid', 'bfactor','pdbCode','bfactorRatio','disordered','dssp']
 
