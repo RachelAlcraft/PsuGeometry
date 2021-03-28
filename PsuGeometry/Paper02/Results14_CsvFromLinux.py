@@ -33,7 +33,7 @@ startx = time.time()
 
 #This gets the list of pdbs
 pdbdata = pd.read_csv('../PdbLists/Pdbs_TauPaper.csv') # This is a list of pdbs <= 1.1A non homologous to 90%
-pdbList = pdbdata['PDB'].tolist()[0:]
+pdbList = pdbdata['PDB'].tolist()[0:2]
 
 #This is all the data we are going to be looking at
 geoList = [
@@ -41,7 +41,9 @@ geoList = [
             #'CA:C:O:N+1','O:N+1','CA:O','CA:N+1','CA:C:N+1','C-1:N:CA','N:O-2','N:CA:C:O-2',
             #'N:O-2:CA','N-1:CA:C','CA:HOH','CA:HETATM','N:HETATM:C','N:HOH:C','N:CA:C:HETATM','N:CA:C:HOH',
             #'O-2:C','O-2:N:CA','O-2:N:CA:N+1',
-            'N:{O,OD1,OG1}','{O,OD1,OG1}:C','{O,OD1,OG1}:N:CA','{O,OD1,OG1}:N:CA:N+1',
+            #'N:{O,OD1,OG1}','{O,OD1,OG1}:C','{O,OD1,OG1}:N:CA','{O,OD1,OG1}:N:CA:N+1',
+            'N:{O}','C:{O}','CA:N:{O}','N+1:CA:N:{O}',
+            'N:{OD1,OG1}','C:{OD1,OG1}','CA:N:{OD1,OG1}','N+1:CA:N:{OD1,OG1}',
             ]
 hueList = ['aa', 'rid', 'bfactor','pdbCode','bfactorRatio','disordered','dssp']
 
@@ -50,6 +52,7 @@ print('Creating CSV files anew')
 georep = psu.GeoReport(pdbList, pdbDataPath, edDataPath, printPath, ed=False, dssp=includeDSSP, includePdbs=False,keepDisordered=True)
 print('Create unrestricted csv')
 dataUnrestricted = georep.getGeoemtryCsv(geoList, hueList, -1,allAtoms=True)
+#print(dataUnrestricted)
 if myWindowsLaptop:
     dataUnrestricted.to_csv(printPath + "Results14_UnrestrictedCsvFromWindows.csv", index=False)
 else:

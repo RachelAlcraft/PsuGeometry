@@ -435,6 +435,7 @@ class GeoPdb:
                                                              datasA[3].values['x'], datasA[3].values['y'], datasA[3].values['z'])
 
                                         motif = datasA[0].values['residue']+datasA[1].values['residue']+datasA[2].values['residue']+datasA[3].values['residue']
+                                        ridmotif = str(datasA[0].values['rid'])  + '_' +  str(datasA[1].values['rid'])  + '_' +  str(datasA[2].values['rid'])  + '_' +  str(datasA[3].values['rid'])
 
                                         for hue in hues:
                                             aHue = datasA[0].values[hue]
@@ -458,6 +459,7 @@ class GeoPdb:
                                                          datasA[1].values['x'], datasA[1].values['y'], datasA[1].values['z'],
                                                          datasA[2].values['x'], datasA[2].values['y'], datasA[2].values['z'])
                                     motif = datasA[0].values['residue'] + datasA[1].values['residue'] + datasA[2].values['residue']
+                                    ridmotif = str(datasA[0].values['rid']) + '_' + str(datasA[1].values['rid'])  + '_' +  str(datasA[2].values['rid'])
                                     for hue in hues:
                                         aHue = datasA[0].values[hue]
                                         bHue = datasA[0].values[hue]
@@ -475,6 +477,7 @@ class GeoPdb:
                                     valA = calcs.distance(datasA[0].values['x'], datasA[0].values['y'], datasA[0].values['z'],
                                                          datasA[1].values['x'], datasA[1].values['y'], datasA[1].values['z'])
                                     motif = datasA[0].values['residue'] + datasA[1].values['residue']
+                                    ridmotif = str(datasA[0].values['rid'] - datasA[1].values['rid'])
 
                                     for hue in hues:
                                         aHue = datasA[0].values[hue]
@@ -493,6 +496,7 @@ class GeoPdb:
                                 #geoData.loc[thisRow, geo] = valA
                                 dic[geo] = valA
                                 dic[geo+'_motif'] = motif
+                                dic[geo + '_ridmotif'] = ridmotif
                                 # hue could be an average or an
                                 for hue in hues:
                                     #geoData.loc[thisRow, hue] = reshues[hue]
@@ -601,9 +605,8 @@ class GeoPdb:
         nearatm = atm #return itself if there are none
         dis = 1000
         for at in self.atoms:
-            if atm.values['atom'] in newatom: #could pass in a list of atoms to look for in the case of oxygen sidechains
-                valDis = calcs.distance(atm.values['x'], atm.values['y'], atm.values['z'],
-                                    at.values['x'], at.values['y'], at.values['z'])
+            if at.values['atom'] in newatom and at.values['rid'] != rid and at.values['rid'] != rid-1 and at.values['rid'] != rid+1: #could pass in a list of atoms to look for in the case of oxygen sidechains
+                valDis = calcs.distance(atm.values['x'], atm.values['y'], atm.values['z'], at.values['x'], at.values['y'], at.values['z'])
                 if valDis < dis:
                     dis = valDis
                     nearatm = at
