@@ -15,6 +15,13 @@ https://python-3-patterns-idioms-test.readthedocs.io/en/latest/Singleton.html
 class GeoPdbs:
     class __GeoPdbs:
         def __init__(self,pdbDirectory,edDirectory,ed=True,dssp=True,keepDisordered=True):
+            '''
+            :param pdbDirectory:
+            :param edDirectory:
+            :param ed:
+            :param dssp:
+            :param keepDisordered:
+            '''
             self.pdbs = {}
             self.pdbDirectory = pdbDirectory
             self.edDirectory = edDirectory
@@ -279,7 +286,8 @@ class GeoPdb:
         return self.densCSV
 
 
-    def getGeoemtryCsv(self,geoListEntered, hues,bfactorFactor = -1):
+    def getGeoemtryCsv(self,geoListEntered, hues,bfactorFactor = -1,restrictedAa = 'ALL'):
+        print('PSY Geometry csv for - ', self.pdbCode)
         # geo in format C-1, C+1, C
         #print('PSU: creating geometry dataframe')
         dics = []
@@ -354,7 +362,10 @@ class GeoPdb:
                     thisResidue = self.__getResidue(thisChain, thisResid,thisOcc)# not really a residue but it does for getting aa
                     if thisResidue == None:
                         #print(thisChain,thisResid,thisOcc)
-                        a=2
+                        a = 2
+                    elif restrictedAa != 'ALL' and restrictedAa != thisResidue.values['aa']:
+                        #print('Skipping', thisResidue, restrictedAa)
+                        a = 2
                     elif bfactorFactor != -1 and self.__getResidueBFactor(thisChain, thisResid,thisOcc) > self.averageBfactor * bfactorFactor:
                         # print(thisChain,thisResid,thisOcc)
                         a = 2
@@ -477,7 +488,7 @@ class GeoPdb:
                                     valA = calcs.distance(datasA[0].values['x'], datasA[0].values['y'], datasA[0].values['z'],
                                                          datasA[1].values['x'], datasA[1].values['y'], datasA[1].values['z'])
                                     motif = datasA[0].values['residue'] + datasA[1].values['residue']
-                                    ridmotif = str(datasA[0].values['rid'] - datasA[1].values['rid'])
+                                    ridmotif = str(datasA[0].values['rid']) + "_" + str(datasA[1].values['rid'])
 
                                     for hue in hues:
                                         aHue = datasA[0].values[hue]

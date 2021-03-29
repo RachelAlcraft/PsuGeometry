@@ -19,6 +19,23 @@ dataHetatm = data.query("hetatm !=  'GLY'")
 dataHetatm = dataHetatm[dataHetatm['CA:HETATM'] < 10]
 dataHetatm = dataHetatm[dataHetatm['CA:HETATM'] != 0]
 
+#data good for nearest O
+dataO = data
+dataO['O_GAP'] = abs(data['N:{O}_ridmotif'])
+#dataO = dataO[dataO['O_GAP'] < 50]
+dataO = dataO[dataO['N:{O}'] < dataO['N:O-2']]
+
+dataOO = data
+dataOO['O_GAP'] = abs(data['N:{O}_ridmotif'])
+#dataO = dataO[dataO['O_GAP'] < 50]
+dataOO = dataOO[dataOO['N:{O}'] > dataOO['N:O-2']]
+
+dataOOO = data
+dataOOO['O_GAP'] = abs(data['N:{O}_ridmotif'])
+#dataO = dataO[dataO['O_GAP'] < 50]
+dataOOO = dataOOO[dataOOO['N:{O}'] == dataOOO['N:O-2']]
+
+
 
 pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_data/'
 edDataPath = 'F:/Code/ProteinDataFiles/ccp4_data/'
@@ -34,6 +51,10 @@ N:C,CA:C,C:O,N:CA,C-1:N,C:N+1,O:N+1,CA:O,CA:N+1,CA:C:N+1,C-1:N:CA
 N:O-2, N:CA:C:O-2, #hydrogen bonded with 2 previous
 N-1:CA:C #previous residue in line with tau?
 O-2:C	O-2:N:CA	O-2:N:CA:N+1
+Nearest oxygens
+'N:{O}','C:{O}','CA:N:{O}','N+1:CA:N:{O}',
+'N:{OD1,OG1}','C:{OD1,OG1}','CA:N:{OD1,OG1}','N+1:CA:N:{OD1,OG1}',
+
 CA:HOH, N:HOH:C, N:CA:C:HOH # anything interesting with water
 CA:HETATM,N:HETATM:C,N:CA:C:HETATM #anything interesting with heavy atoms
 
@@ -47,6 +68,49 @@ georep.addScatter(data=data, geoX='PHI', geoY='PSI', hue='TAU', title='',palette
 georep.addScatter(data=data, geoX='PHI', geoY='PSI', hue='N:O-2', title='',palette='jet', categorical=False)
 georep.addScatter(data=data, geoX='PHI', geoY='PSI', hue='dssp', title='',palette='tab10', categorical=True)
 
+georep.addScatter(data=data, geoX='PHI', geoY='PSI', hue='N:{O}', title='',palette='jet', categorical=False)
+georep.addScatter(data=data, geoX='PHI', geoY='PSI', hue='CA:N:{O}', title='',palette='jet', categorical=False)
+georep.addScatter(data=data, geoX='PHI', geoY='PSI', hue='N+1:CA:N:{O}', title='',palette='jet', categorical=False)
+
+#georep.addScatter(data=data, geoX='PHI', geoY='PSI', hue='N:{OD1:OG1}', title='',palette='jet', categorical=False)
+#georep.addScatter(data=data, geoX='PHI', geoY='PSI', hue='CA:N:{OD1:OG1}', title='',palette='jet', categorical=False)
+#georep.addScatter(data=data, geoX='PHI', geoY='PSI', hue='N+1:CA:N:{OD1:OG1}', title='',palette='jet', categorical=False)
+
+georep.addScatter(data=data, geoX='N:{O}', geoY='N:O-2', hue='TAU', title='',palette='jet', categorical=False)
+georep.addScatter(data=data, geoX='N:{O}', geoY='N:O-2', hue='dssp', title='',palette='tab10', categorical=True)
+georep.addScatter(data=data, geoX='N:{O}', geoY='N:O-2', hue='N:{O}_ridmotif', title='',palette='jet', categorical=False)
+
+georep.addScatter(data=data, geoX='N:O-2', geoY='N:O-2:CA:N+1', hue='TAU', title='',palette='jet', categorical=False)
+georep.addScatter(data=data, geoX='N:O-2', geoY='N:O-2:CA:N+1', hue='dssp', title='',palette='tab10', categorical=True)
+georep.addScatter(data=data, geoX='N:O-2', geoY='N:O-2:CA:N+1', hue='PSI', title='',palette='jet', categorical=False)
+
+georep.addScatter(data=data, geoX='N:{O}', geoY='N:{O}:CA:N+1', hue='TAU', title='',palette='jet', categorical=False)
+georep.addScatter(data=data, geoX='N:{O}', geoY='N:{O}:CA:N+1', hue='dssp', title='',palette='tab10', categorical=True)
+georep.addScatter(data=data, geoX='N:{O}', geoY='N:{O}:CA:N+1', hue='N:{O}_ridmotif', title='',palette='jet', categorical=False)
+
+georep.addScatter(data=data, geoX='N:{O}:CA:N+1', geoY='N:O-2:CA:N+1', hue='TAU', title='',palette='jet', categorical=False)
+georep.addScatter(data=data, geoX='N:{O}:CA:N+1', geoY='N:O-2:CA:N+1', hue='dssp', title='',palette='tab10', categorical=True)
+georep.addScatter(data=data, geoX='N:{O}:CA:N+1', geoY='N:O-2:CA:N+1', hue='N:{O}', title='',palette='jet', categorical=False)
+
+georep.addScatter(data=dataO, geoX='PSI', geoY='N:N+1', hue='TAU', title='',palette='jet', categorical=False)
+georep.addScatter(data=dataO, geoX='PSI', geoY='N:N+1', hue='N:O-2', title='',palette='jet', categorical=False)
+georep.addScatter(data=dataO, geoX='PSI', geoY='N:N+1', hue='dssp', title='',palette='tab10', categorical=True)
+
+georep.addScatter(data=dataO, geoX='N:{O}:CA:N+1', geoY='N:O-2:CA:N+1', hue='TAU', title='',palette='jet', categorical=False)
+georep.addScatter(data=dataO, geoX='N:{O}:CA:N+1', geoY='N:O-2:CA:N+1', hue='dssp', title='',palette='tab10', categorical=True)
+georep.addScatter(data=dataO, geoX='N:{O}:CA:N+1', geoY='N:{O}', hue='N:N+1', title='',palette='jet', categorical=False)
+
+georep.addScatter(data=dataO, geoX='N:{O}', geoY='N:O-2', hue='N:N+1', title='',palette='jet', categorical=False)
+georep.addScatter(data=dataO, geoX='N:{O}', geoY='N:O-2', hue='TAU', title='',palette='jet', categorical=False)
+georep.addScatter(data=dataO, geoX='N:{O}', geoY='N:O-2', hue='dssp', title='',palette='tab10', categorical=True)
+
+
+
+
+
+
+
+'''
 georep.addScatter(data=data, geoX='PSI', geoY='N:N+1', hue='TAU', title='',palette='jet', categorical=False)
 georep.addScatter(data=data, geoX='PSI', geoY='N:N+1', hue='N:O-2', title='',palette='jet', categorical=False)
 georep.addScatter(data=data, geoX='PSI', geoY='N:N+1', hue='dssp', title='',palette='tab10', categorical=True)
@@ -117,4 +181,5 @@ georep.addScatter(data=dataHetatm, geoX='CA:HETATM', geoY='N:HETATM:C', hue='N:N
 georep.addScatter(data=dataHetatm, geoX='N:CA:C:HETATM', geoY='CA:HETATM', hue='N:N+1', title='',palette='jet', sort='NON')
 georep.addScatter(data=dataHetatm, geoX='N:HETATM:C', geoY='N:CA:C:HETATM', hue='N:N+1', title='',palette='jet', sort='NON')
 
+'''
 georep.printToHtml('Results 14d. Gly Best Supported Plots', 3, 'Results14d_GLYBest')

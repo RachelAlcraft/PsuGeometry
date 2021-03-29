@@ -44,8 +44,8 @@ CA:HETATM,N:HETATM:C,N:CA:C:HETATM #anything interesting with heavy atoms
 #georep.addScatter(data=data, geoX='aa-2', geoY='aa-1', hue='TAU', title='',palette='jet', sort='NON')
 #georep.addScatter(data=data, geoX='aa-2', geoY='aa+1', hue='TAU', title='',palette='jet', sort='NON')
 
-histgeos = ['TAU','PSI','PHI','N:N+1','N:O-2','N:CA','CA:C','MOTIF']
-clusters = ['X','A1','A2','A3','A4']
+histgeos = ['TAU','PSI','PHI','N:N+1','N:O-2','N:CA','CA:C']
+clusters = ['X','A1','A2','A3','A4','B1','C1']
 for cat in clusters:
 
     dataCat = data.query("CLUSTER ==  '" + cat +"'")
@@ -57,10 +57,21 @@ for cat in clusters:
 
 
     georep.addScatter(data=dataCat, geoX='PHI', geoY='PSI', hue='TAU', title='',palette='jet', categorical=False)
+    georep.addScatter(data=dataCat, geoX='PHI', geoY='PSI', hue='O-2:N:CA:N+1', title='', palette='jet', categorical=False)
+    georep.addScatter(data=dataCat, geoX='PHI', geoY='PSI', hue='N:O-2', title='', palette='jet',categorical=False)
+    georep.addScatter(data=dataCat, geoX='PHI', geoY='PSI', hue='dssp', title='', palette='tab10', categorical=True)
+
     georep.addScatter(data=dataCat, geoX='PSI', geoY='N:N+1', hue='TAU', title='',palette='jet', categorical=False)
+    georep.addScatter(data=dataCat, geoX='PSI', geoY='N:N+1', hue='O-2:N:CA:N+1', title='', palette='jet', categorical=False)
+    georep.addScatter(data=dataCat, geoX='PSI', geoY='N:N+1', hue='N:O-2', title='', palette='jet', categorical=False)
     georep.addScatter(data=dataCat, geoX='PSI', geoY='N:N+1', hue='dssp', title='',palette='tab10', categorical=True)
+
+    georep.addScatter(data=dataCat, geoX='N:O-2', geoY='O-2:N:CA:N+1', hue='TAU', title='', palette='jet')
+    georep.addScatter(data=dataCat, geoX='N:O-2', geoY='O-2:N:CA:N+1', hue='PSI', title='', palette='jet')
+    georep.addScatter(data=dataCat, geoX='N:O-2', geoY='O-2:N:CA:N+1', hue='N:N+1', title='', palette='jet')
+    georep.addScatter(data=dataCat, geoX='N:O-2', geoY='O-2:N:CA:N+1', hue='dssp', title='', palette='tab10',categorical=True)
 
     for hgeo in histgeos:
         georep.addHistogram(data=dataCat, geoX=hgeo, title='')
 
-    georep.printToHtml('Results 14e. Gly Best Supported Cluster ' + cat, 3, 'Results14e_GLYBest_' + cat)
+    georep.printToHtml('Results 14e. Gly Best Supported Cluster ' + cat, 4, 'Results14e_GLYBest_' + cat)

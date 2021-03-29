@@ -34,6 +34,7 @@ startx = time.time()
 #This gets the list of pdbs
 pdbdata = pd.read_csv('../PdbLists/Pdbs_TauPaper.csv') # This is a list of pdbs <= 1.1A non homologous to 90%
 pdbList = pdbdata['PDB'].tolist()[0:2]
+pdbList = ['4a7u']
 
 #This is all the data we are going to be looking at
 geoList = [
@@ -43,7 +44,8 @@ geoList = [
             #'O-2:C','O-2:N:CA','O-2:N:CA:N+1',
             #'N:{O,OD1,OG1}','{O,OD1,OG1}:C','{O,OD1,OG1}:N:CA','{O,OD1,OG1}:N:CA:N+1',
             'N:{O}','C:{O}','CA:N:{O}','N+1:CA:N:{O}',
-            'N:{OD1,OG1}','C:{OD1,OG1}','CA:N:{OD1,OG1}','N+1:CA:N:{OD1,OG1}',
+            'N:O-2','C:O-2','CA:N:O-2','N+1:CA:N:O-2',
+            #'N:{OD1,OG1}','C:{OD1,OG1}','CA:N:{OD1,OG1}','N+1:CA:N:{OD1,OG1}',
             ]
 hueList = ['aa', 'rid', 'bfactor','pdbCode','bfactorRatio','disordered','dssp']
 
@@ -54,7 +56,7 @@ print('Create unrestricted csv')
 dataUnrestricted = georep.getGeoemtryCsv(geoList, hueList, -1,allAtoms=True)
 #print(dataUnrestricted)
 if myWindowsLaptop:
-    dataUnrestricted.to_csv(printPath + "Results14_UnrestrictedCsvFromWindows.csv", index=False)
+    dataUnrestricted.to_csv(printPath + "Results14_UnrestrictedCsvFromWindowsx.csv", index=False)
 else:
     dataUnrestricted.to_csv(printPath + "Results14_UnrestrictedCsvFromLinux.csv", index=False)
 

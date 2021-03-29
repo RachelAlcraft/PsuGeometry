@@ -135,7 +135,7 @@ class GeoReport:
         return mat
 
 
-    def getGeoemtryCsv(self,calcList, hueList,bfactorFactor=-1,allAtoms=False):
+    def getGeoemtryCsv(self,calcList, hueList,bfactorFactor=-1,allAtoms=False,restrictedAa = 'ALL'):
         dfs = []
         pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp,self.keepDisordered)
         count = 0
@@ -144,7 +144,7 @@ class GeoReport:
             if not pdbmanager.existsPdb(pdb):
                 print('PSU: get',pdb,count,'/',len(self.pdbCodes))
             apdb = pdbmanager.getPdb(pdb,allAtoms)
-            data = apdb.getGeoemtryCsv(calcList, hueList,bfactorFactor)
+            data = apdb.getGeoemtryCsv(calcList, hueList,bfactorFactor,restrictedAa)
             dfs.append(data)
         df = pd.concat(dfs, ignore_index=True)
         return (df)

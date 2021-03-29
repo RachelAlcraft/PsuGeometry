@@ -177,8 +177,12 @@ class GeoPlot:
 
         #title += '\nFirst:' + self.hue + ' ' + str(firstHue) + '=' + str(firstVal)
         #title += '\nLast:' + self.hue + ' ' + str(lastHue) + '=' + str(lastVal)
-        title += '\nFirst = ' + outMin
-        title += '\n last = ' + outMax
+        try:
+            title += '\nFirst = ' + round(outMin,3)
+            title += '\n last = ' + round(outMax,3)
+        except:
+            title += '\nFirst = ' + outMin
+            title += '\n last = ' + outMax
 
         # sns.distplot(data[xName], norm_hist=True, bins=50, kde=False)
         histCol = self.palette
