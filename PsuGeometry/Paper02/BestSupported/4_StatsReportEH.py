@@ -38,7 +38,7 @@ for geo in geos:
             useaa = aa
         ehCut = dataEH.query("aa ==  '" + useaa + "'")
         eh1991 = ehCut.query("EH_SET ==  '1991'")
-        eh2001 = ehCut.query("EH_SET ==  '1991'")
+        eh2001 = ehCut.query("EH_SET ==  '2001'")
         ehCutMean = dataEH[geo]
         ehCutSD = dataEH[geo + '_SD']
         mean1991 = round(eh1991[geo].values[0],3)

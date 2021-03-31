@@ -14,6 +14,7 @@ printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/1.TauCorrelations/Data/BestSu
 BestFileName = 'Set4_BestWithGeosALL.csv'
 dataBest = pd.read_csv(loadPath + BestFileName)
 
+produceRequests = True
 aas = ['GLY']
 geos = ['X']
 '''
@@ -34,11 +35,12 @@ for geo in geos:
         print(cats)
         for cat in cats:
             bestCutCat = bestCut.query("CLUSTER ==  '" + cat + "'")
-            bestCutCat['REQUEST'] = '?' # this prepares for the request to the electron density
-            bestCutCat['REQUEST'] = bestCutCat.apply(lambda row: cluster.clusterEdTauMaker(row['pdbCode'], row['rid'], row['chain'], row['aa']), axis=1)
-            saveCut = bestCutCat[['REQUEST']]
-            saveCut.to_csv(loadPath + "Category_" + cat + ".csv", index=False,sep=' ')
-            #And make a report for the category
+            if produceRequests:
+                bestCutCat['REQUEST'] = '?' # this prepares for the request to the electron density
+                bestCutCat['REQUEST'] = bestCutCat.apply(lambda row: cluster.clusterEdTauMaker(row['pdbCode'], row['rid'], row['chain'], row['aa']), axis=1)
+                saveCut = bestCutCat[['REQUEST']]
+                saveCut.to_csv(loadPath + "Category_" + cat + ".csv", index=False,sep=' ')
+                #And make a report for the category
             georep = psu.GeoReport([], pdbDataPath, edDataPath, printPath, ed=False, dssp=False, includePdbs=False,keepDisordered=False)
             georep.addScatter(data=bestCutCat, geoX='PHI', geoY='PSI', hue='TAU_x', title='', palette='jet')
             georep.addScatter(data=bestCutCat, geoX='PHI', geoY='PSI', hue='dssp', title='', palette='Dark2_r',categorical=True)
@@ -52,7 +54,9 @@ for geo in geos:
             georep.addScatter(data=bestCutCat, geoX='N:{O}', geoY='N:CA:C:{O}', hue='dssp', title='', palette='Dark2_r', categorical=True)
             georep.addScatter(data=bestCutCat, geoX='N:{O}', geoY='N:CA:N+1:{O}', hue='TAU_x', title='', palette='jet')
             georep.addScatter(data=bestCutCat, geoX='N:{O}', geoY='N:CA:N+1:{O}', hue='dssp', title='', palette='Dark2_r', categorical=True)
-            georep.printToHtml('Category ' + cat, 4, 'BS_CAT_' + cat)
+            title = 'DSSP key:H:a-helix S:bend G:3-helix E:extended strand \nT:h-bond turn B:isolated b-bridge I:5-helix'
+            georep.printToHtml('Category ' + cat + '\n' + title, 4, 'BS_CAT_' + cat)
+
 
 
 

@@ -12,33 +12,38 @@ def tauCategory(psi, phi, NN1,CO2,COX,NO2,NCACO2,NCANN1O2,NOX,NCACOX,NCANN1OX):
     4. Is phi 0?
     '''
 
-    #Is the )-2 oxygen the closest oxygen there is?
+    #Images
+    # 1. Big O in the right corner, planar
     if NO2 == NOX:
-        if NO2 < 3.6:
+        if NO2 < 3.2 and abs(NCACO2) < 15:# and abs(psi) < 5:
             return 'A1'
+        if NO2 < 3.6 and abs(NCACO2) < 15:# and abs(psi) < 5:
+            return 'A2'
 
-    #So now check if the nearest O is hydrogen bonded
-    if NOX < 3.6:
-        if abs(NCACOX) < 20:
-            if COX < 4.5:  # Then it is right hand image
-               return 'C1'
-            else:
-                return 'C2'
-        elif abs(NCANN1OX) < 20:
-            return 'D1'
+    if NOX < 3.2 and abs (NCACOX) < 15:
+        return 'A3'
+    if NOX < 3.6 and abs (NCACOX) < 15:
+        return 'A4'
 
-        if NO2 < NOX:
-            return 'E1'
-        if NOX < 3.6:
-            return 'E2'
-        if abs(NCACO2) < 10:
-            return 'E3'
-        if abs(NCANN1O2) < 10:
-            return 'E4'
-        if abs(NCACOX) < 10:
-            return 'E5'
-        if abs(NCANN1OX) < 10:
-            return 'E6'
+    # 2. Big O in the corner, not quite planar (planar with N+1)
+    if NO2 == NOX:
+        if NO2 < 3.2 and abs(NCANN1O2) < 15:  # and abs(psi) < 5:
+            return 'B1'
+        if NO2 < 3.6 and abs(NCANN1O2) < 15:  # and abs(psi) < 5:
+            return 'B2'
+
+    if NOX < 3.2 and abs(NCANN1OX) < 15:
+        return 'B3'
+    if NOX < 3.6 and abs(NCANN1OX) < 15:
+        return 'B4'
+
+    # 3. N-1 is linear with N-C
+
+
+    # 4. Big O on the left
+
+    # 5. Big O in the bottom left
+
 
     return 'X'
 

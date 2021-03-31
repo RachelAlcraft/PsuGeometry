@@ -146,13 +146,15 @@ class GeoPlot:
         chainsA = outliers['chain'].values
         ridsA = outliers['rid'].values
         geoA = outliers[self.geoX].values
+        outMin = 0
+        outMax = 0
         if len(pdbsA) > 1:
             if type(geoA[0]) == float:
                 outMin = pdbsA[0] + ' ' + chainsA[0] + str(ridsA[0]) + ' ' + str(round(geoA[0], 3))
                 outMax = pdbsA[1] + ' ' + chainsA[1] + str(ridsA[1]) + ' ' + str(round(geoA[1], 3))
             else:
-                outMin = pdbsA[0] + ' ' + chainsA[0] + str(ridsA[0]) + ' ' + str(geoA[0])
-                outMax = pdbsA[1] + ' ' + chainsA[1] + str(ridsA[1]) + ' ' + str(geoA[1])
+                outMin = pdbsA[0] + ' ' + chainsA[0] + str(ridsA[0]) + ' ' + str(geoA[0])[:6]
+                outMax = pdbsA[1] + ' ' + chainsA[1] + str(ridsA[1]) + ' ' + str(geoA[1])[:6]
 
         if self.operation == 'ABS':
             data = data[data[self.geoX] == abs(data[self.geoX])]
@@ -177,12 +179,16 @@ class GeoPlot:
 
         #title += '\nFirst:' + self.hue + ' ' + str(firstHue) + '=' + str(firstVal)
         #title += '\nLast:' + self.hue + ' ' + str(lastHue) + '=' + str(lastVal)
-        try:
-            title += '\nFirst = ' + round(outMin,3)
-            title += '\n last = ' + round(outMax,3)
-        except:
-            title += '\nFirst = ' + outMin
-            title += '\n last = ' + outMax
+        #try:
+        #    strMin = str(outMin)
+        #    strMax = str(outMax)
+        #    strMin = strMin[:6]
+        #    strMax = strMax[:6]
+        #    title += '\nFirst = ' + strMin
+        #    title += '\n last = ' + strMax
+        #except:
+        title += '\nFirst = ' + outMin
+        title += '\n last = ' + outMax
 
         # sns.distplot(data[xName], norm_hist=True, bins=50, kde=False)
         histCol = self.palette
