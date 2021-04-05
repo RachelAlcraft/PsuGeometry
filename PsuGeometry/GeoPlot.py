@@ -142,20 +142,23 @@ class GeoPlot:
         #Create outlier tag
         outliers = data.iloc[[0, -1]]
         # print(outliersA)
-        pdbsA = outliers['pdbCode'].values
-        chainsA = outliers['chain'].values
-        ridsA = outliers['rid'].values
-        geoA = outliers[self.geoX].values
-        outMin = 0
-        outMax = 0
-        if len(pdbsA) > 1:
-            if type(geoA[0]) == float:
-                outMin = pdbsA[0] + ' ' + chainsA[0] + str(ridsA[0]) + ' ' + str(round(geoA[0], 3))
-                outMax = pdbsA[1] + ' ' + chainsA[1] + str(ridsA[1]) + ' ' + str(round(geoA[1], 3))
-            else:
-                outMin = pdbsA[0] + ' ' + chainsA[0] + str(ridsA[0]) + ' ' + str(geoA[0])[:6]
-                outMax = pdbsA[1] + ' ' + chainsA[1] + str(ridsA[1]) + ' ' + str(geoA[1])[:6]
-
+        try:
+            pdbsA = outliers['pdbCode'].values
+            chainsA = outliers['chain'].values
+            ridsA = outliers['rid'].values
+            geoA = outliers[self.geoX].values
+            outMin = 0
+            outMax = 0
+            if len(pdbsA) > 1:
+                if type(geoA[0]) == float:
+                    outMin = pdbsA[0] + ' ' + chainsA[0] + str(ridsA[0]) + ' ' + str(round(geoA[0], 3))
+                    outMax = pdbsA[1] + ' ' + chainsA[1] + str(ridsA[1]) + ' ' + str(round(geoA[1], 3))
+                else:
+                    outMin = pdbsA[0] + ' ' + chainsA[0] + str(ridsA[0]) + ' ' + str(geoA[0])[:6]
+                    outMax = pdbsA[1] + ' ' + chainsA[1] + str(ridsA[1]) + ' ' + str(geoA[1])[:6]
+        except:
+            outMin = ''
+            outMax = ''
         if self.operation == 'ABS':
             data = data[data[self.geoX] == abs(data[self.geoX])]
         elif self.operation == 'SQUARE':
@@ -231,6 +234,7 @@ class GeoPlot:
 
 
         plt.title(title)
+        #self.title = title
         plt.xlabel(self.geoX)
 
         if self.title != 'ghost':
@@ -342,6 +346,7 @@ class GeoPlot:
     def plotScatter(self,fig, ax):
         #fig, ax = plt.subplots()
         ax.grid(b=True, which='major', color='Gainsboro', linestyle='-')
+        ax.set_axisbelow(True)
 
         if self.categorical or self.hue == 'dssp':
             #blanksdata = self.data[self.data[self.hue] == '']
@@ -384,6 +389,11 @@ class GeoPlot:
 
         lw = 0.5
         alpha = 0.65#0.65
+        #if the count is really low then we can have a greater alphs
+        if len(self.data[self.geoX]) < 100:
+            alpha = 1
+
+
         ecol = 'grey'
         if self.palette == 'gist_gray_r':
             lw = 0  # this gives a crystollagraphic image look
@@ -507,7 +517,10 @@ class GeoPlot:
         xgrid = np.linspace(minX, maxX, bins)
         ygrid = np.linspace(minY,maxY, bins)
 
-        ax.grid(True, which='major', axis='both', linestyle='-', color=(0.8, 0.8, 0.8), alpha=0.3)
+        # Don't allow the axis to be on top of your data
+
+        ax.grid(True, which='major', axis='both', linestyle='-', color=(0.5, 0.5, 0.5), alpha=0.1)
+
 
         if self.centre:
             self.data[self.hue + '2'] = self.data[self.hue] ** 2
@@ -527,6 +540,7 @@ class GeoPlot:
             im = plt.pcolormesh(xgrid, ygrid, zgrid, shading='gouraud', cmap=self.palette, vmin=self.vmin, vmax=self.vmax,alpha=alpha)
             cs = plt.contour(xgrid, ygrid, zgrid, contours, colors='tab:purple', linewidths=0.05,alpha=alpha)
 
+        ax.set_axisbelow(True)
         cbar = fig.colorbar(im, ax=ax)
         cbar.remove()
 

@@ -1,0 +1,126 @@
+# -- ©Rachel Alcraft 2020, PsuGeometry --
+from PsuGeometry import GeoReport as psu
+from PsuGeometry import GeoPdb as geopdb
+import random
+import pandas as pd
+'''
+TAU correlations
+'''
+###############################################################################################
+def createGoodDensitySlices(pdbSet,atomCe,atomLi,atomPl):
+
+    pdbOriginalPath = 'F:/Code/ProteinDataFiles/pdb_data/'
+    edDataPath = 'F:/Code/ProteinDataFiles/ccp4_data/'
+    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/1.TauCorrelations/EvidencedSet/SlicesG/'
+    loadPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/1.TauCorrelations/EvidencedSet/DataB/'
+
+    setFileName = 'Data_DefensibleWithGeosALL_' + pdbSet + '.csv'
+    print('Loading',loadPath + setFileName)
+    dataBest = pd.read_csv(loadPath + setFileName)
+
+
+    #Loop through the csv file and get the outliers
+    geos = ['N:CA', 'CA:C', 'C:O', 'C:N+1', 'TAU', 'C-1:N:CA', 'CA:C:N+1', 'CA:C:O', 'O:C:N+1', 'CA:C:N+1']
+    aas = ['ALA', 'CYS', 'ASP', 'GLU', 'PHE', 'GLY', 'HIS', 'ILE', 'LYS', 'LEU', 'MET', 'ASN', 'PRO', 'GLN','ARG', 'SER', 'THR', 'VAL', 'TRP', 'TYR']
+    for geo in geos:
+        dics = []
+        slicesList = []
+        for aa in aas:
+            bestCut = dataBest.query("aa ==  '" + aa + "'")
+            if len(bestCut) > 0:
+                print(aa,geo)
+                bestCut = bestCut.sort_values(geo)
+                dfHead = bestCut.head(1)
+                #print('HEAD',dfHead)
+                pdb = dfHead['pdbCode'].values[0]
+                rid = dfHead['rid'].values[0]
+                chain = dfHead['chain'].values[0]
+                if not [pdb, chain, rid] in slicesList:
+                    slicesList.append([pdb, chain, rid,aa])
+
+                dicH = {}
+                dicH['pdbCode'] = pdb
+                dicH['chain'] = chain
+                dicH['rid'] = rid
+                dicH['geo'] = geo
+                dicH['aa'] = aa
+                dicH['value'] = dfHead[geo].values[0]
+
+                dfTail = bestCut.tail(1)
+                #print('TAIL',dfTail)
+                pdb = dfTail['pdbCode'].values[0]
+                rid = dfTail['rid'].values[0]
+                chain = dfTail['chain'].values[0]
+                if not [pdb, chain, rid] in slicesList:
+                    slicesList.append([pdb, chain, rid,aa])
+
+                dicT = {}
+                dicT['pdbCode'] = pdb
+                dicT['chain'] = chain
+                dicT['rid'] = rid
+                dicT['aa'] = aa
+                dicT['geo'] = geo
+                dicT['value'] = dfTail[geo].values[0]
+
+                dics.append(dicH)
+                dics.append(dicT)
+                #print(dicH)
+                #print(dicT)
+
+        dataFrame = pd.DataFrame.from_dict(dics)
+        geoF = geo.replace('-', '_')
+        geoF = geo.replace(':', '_')
+        filePath = printPath + 'GoodOutliers_' + pdbSet + '_' + geoF +  '.csv'
+        print('...printing', filePath)
+        dataFrame.to_csv(filePath, index=False)
+        print(dataFrame)
+
+
+
+
+        bigstring = ""
+
+        for sl in slicesList:
+            print(sl)
+            georep = psu.GeoReport([sl[0]],pdbOriginalPath,edDataPath,printPath,ed=False,dssp=False)
+            pdbmanager = geopdb.GeoPdbs(pdbOriginalPath,edDataPath,ed=False,dssp=False)
+            apdb = pdbmanager.getPdb(sl[0],True)
+            pdbcsv = apdb.getDataFrame()
+            queryC = 'rid==' + str(sl[2]) + ' and chain=="' + sl[1] + '"' + ' and atom=="' + atomCe + '"'
+            queryL = 'rid==' + str(sl[2]) + ' and chain=="' + sl[1] + '"' + ' and atom=="' + atomLi + '"'
+            queryP = 'rid==' + str(sl[2]) + ' and chain=="' + sl[1] + '"' + ' and atom=="' + atomPl + '"'
+            dataC = pdbcsv.query(queryC)
+            dataL = pdbcsv.query(queryL)
+            dataP = pdbcsv.query(queryP)
+
+            if len(dataC) > 0 and len(dataL) > 0 and len(dataP)>0:
+                cx = round(dataC['x'].values[0],3)
+                cy = round(dataC['y'].values[0], 3)
+                cz = round(dataC['z'].values[0], 3)
+                lx = round(dataL['x'].values[0], 3)
+                ly = round(dataL['y'].values[0], 3)
+                lz = round(dataL['z'].values[0], 3)
+                px = round(dataP['x'].values[0], 3)
+                py = round(dataP['y'].values[0], 3)
+                pz = round(dataP['z'].values[0], 3)
+
+                row = sl[0] + "," + sl[3] + sl[1] + str(sl[2]) + "," + str(cx) + "," + str(cy) + "," + str(cz)
+                row +=  "," + str(lx) + "," + str(ly) + "," + str(lz)
+                row += "," + str(px) + "," + str(py) + "," + str(pz)
+
+                print(row)
+
+                bigstring += row + '\n'
+
+        print("########RESULTS#########")
+        print("")
+        print(bigstring)
+
+        f = open(printPath + 'GoodSlice_' + pdbSet + '_' + geoF + '_' + atomCe + atomLi+ atomPl + '.txt', "w")
+        f.write(bigstring)
+        f.close()
+
+
+########################################
+
+

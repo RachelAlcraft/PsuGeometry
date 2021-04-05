@@ -536,27 +536,27 @@ class GeoReport:
                 encoded = geoPl.getPlotImage(fig, ax)
                 htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
                 htmlstring += ret
-                html = '<td width=' + width + '%>' + htmlstring + '</td>\n'
+                html = '<td width=' + width + '%><p>' + geoPl.title + '</p>\n<p>' + htmlstring + '</p></td>\n'
             elif geoPl.hasMatrix:
                 fig, ax = plt.subplots()
                 ret = geoPl.plotToAxes(fig, ax)
                 encoded = geoPl.getPlotImage(fig, ax)
                 htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
                 htmlstring += ret
-                html = '<td width=' + width + '%>' + htmlstring + '</td>\n'
+                html = '<td width=' + width + '%>' + '<p>' + htmlstring + '</p></td>\n'
             elif geoPl.data.empty:
                 html = '<td width=' + width + '%>' + 'No Data:' + geoPl.geoX + ' ' + geoPl.geoY  + '</td>\n'
             elif geoPl.plot == 'compare':#there is no plot
                 ret = geoPl.plotToAxes(None,None)
                 htmlstring = ret
-                html = '<td width=' + width + '%>' + htmlstring + '</td>\n'
+                html = '<td width=' + width + '%>' + '<p>' + htmlstring + '</p></td>\n'
             else:
                 fig, ax = plt.subplots()
                 ret = geoPl.plotToAxes(fig, ax)
                 encoded = geoPl.getPlotImage(fig, ax)
                 htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
                 htmlstring += ret
-                html = '<td width=' + width + '%>' + htmlstring + '</td>\n'
+                html = '<td width=' + width + '%>' + '<p>' + htmlstring + '</p></td>\n'
         #except:
         #    html = '<td width=' + width + '%>' + 'Error:' + geoPl.geoX + ' ' + geoPl.geoY + '</td>\n'
 

@@ -287,7 +287,7 @@ class GeoPdb:
 
 
     def getGeoemtryCsv(self,geoListEntered, hues,bfactorFactor = -1,restrictedAa = 'ALL'):
-        print('PSY Geometry csv for - ', self.pdbCode)
+        print('PSU Geometry csv for - ', self.pdbCode)
         # geo in format C-1, C+1, C
         #print('PSU: creating geometry dataframe')
         dics = []
@@ -356,6 +356,7 @@ class GeoPdb:
         for ch in range(0, chrows):
             thisChain = chainList[ch]
             for occ in range(0,occs):
+                thisOcc = occList[occ]
                 thisOcc = occList[occ]
                 for rid in range(0, rows):
                     thisResid = ridList[rid]
