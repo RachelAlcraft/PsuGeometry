@@ -12,7 +12,7 @@ def createBadDensitySlices(pdbSet,atomCe,atomLi,atomPl):
     pdbOriginalPath = 'F:/Code/ProteinDataFiles/pdb_data/'
     pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_out/' + pdbSet + '/'
     edDataPath = 'F:/Code/ProteinDataFiles/ccp4_data/'
-    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/1.TauCorrelations/EvidencedSet/SlicesF/'
+    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/SlicesF/'
 
     # This gets the list of pdbs
     pdbdata = pd.read_csv('../../PdbLists/Pdbs_Evidenced.csv')  # This is a list of pdbs <= 1.1A non homologous to 90%
@@ -20,14 +20,17 @@ def createBadDensitySlices(pdbSet,atomCe,atomLi,atomPl):
     #pdbListIn = ['1p1x']
     for pdb in pdbListIn:
         slicesList = []
-        fileName = (pdbDataPath + 'pdb' + pdb + '_' + atomCe + atomLi + atomPl + '.bad').lower()
+        #fileName = (pdbDataPath + 'pdb' + pdb + '_' + atomCe + atomLi + atomPl + '.bad').lower()
+        fileNameIn = (pdbDataPath + 'pdb' + pdb + '.bad').lower()
+        print(fileNameIn)
         import os.path
-        if os.path.isfile(fileName):
-            text_file = open(fileName, "r")
+        if os.path.isfile(fileNameIn):
+            text_file = open(fileNameIn, "r")
             lines = text_file.read().split('\n')
             print(len(lines))
             text_file.close()
             for line in lines:
+
                 atom = line[12:14].lstrip().rstrip()
                 aa = line[14:20].lstrip().rstrip()
                 chain = line[20:22].lstrip().rstrip()
@@ -36,6 +39,7 @@ def createBadDensitySlices(pdbSet,atomCe,atomLi,atomPl):
                 if rid != '':
                     if [pdb,chain,rid] not in slicesList:
                         slicesList.append([pdb,chain,rid])
+
 
         bigstring = ""
 
@@ -76,7 +80,8 @@ def createBadDensitySlices(pdbSet,atomCe,atomLi,atomPl):
             print("")
             print(bigstring)
 
-            f = open(printPath + 'BadSlice_' + pdbSet + '_' + pdb + '.txt', "w")
+            tag = atomCe + atomLi + atomPl
+            f = open(printPath + 'BadSlice_' + pdbSet + '_' + pdb + '_' + tag + '.txt', "w")
             f.write(bigstring)
             f.close()
 

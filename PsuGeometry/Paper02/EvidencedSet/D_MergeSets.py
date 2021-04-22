@@ -6,11 +6,11 @@ from PsuGeometry import GeoReport as psu
 Compare sets and EH and Jaskolski
 '''
 
-def mergeSets(sets):
+def mergeSets(sets,tag):
 
-    loadPathEH = 'F:/Code/BbkProject/PhDThesis/0.Papers/1.TauCorrelations/EvidencedSet/Data/'
-    loadPathCsv = 'F:/Code/BbkProject/PhDThesis/0.Papers/1.TauCorrelations/EvidencedSet/DataB/'
-    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/1.TauCorrelations/EvidencedSet/DataD/'
+    loadPathEH = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/Data/'
+    loadPathCsv = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataB/'
+    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataD/'
 
     dics = []
     geos = ['N:CA', 'CA:C', 'C:O', 'C:N+1', 'TAU', 'C-1:N:CA', 'CA:C:N+1', 'CA:C:O', 'O:C:N+1', 'CA:C:N+1']
@@ -84,7 +84,7 @@ def mergeSets(sets):
                 dic['max'] = round(float(dataDescribed[7]),3)
                 dics.append(dic)
     dataFrame = pd.DataFrame.from_dict(dics)
-    filePath = printPath + 'Data_SetsSummaryMerged.csv'
+    filePath = printPath + tag + 'Data_SetsSummaryMerged.csv'
     print('...printing', filePath)
     dataFrame.to_csv(filePath, index=False)
     print(dataFrame)

@@ -1,6 +1,7 @@
 # -- ©Rachel Alcraft 2020, PsuGeometry --
 from PsuGeometry import GeoReport as psu
 from PsuGeometry import GeoPdb as geopdb
+import _Helpers as help
 import time
 import pandas as pd
 '''
@@ -11,9 +12,65 @@ Good - of all the residues above, those with a nearby density peak (good local d
 Best - of all those above, where the tau values are calculated as identical
 '''
 
-
-
 def createGeosFile(pdbSet, cutOff):
+    print('----------start create geos csv----------')
+    startx = time.time()
+
+    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataA/'
+    print('Running CreateGeosFile on',pdbSet)
+    allAtoms = False
+    bFactorFactor = 1.3
+    if pdbSet == 'UNRESTRICTED':
+        allAtoms = True
+        bFactorFactor = -1
+
+    geos = ['N:CA', 'CA:C', 'C:O', 'C-1:N', 'C:N+1']
+    print('Create csv 1', pdbSet)
+    csv1 = help.getCsv(pdbSet, geos,True, True,aa='ALL',includeCis=False,allAtoms=allAtoms, bFactorFactor=bFactorFactor,cutoff=cutOff)
+    csv1.to_csv(printPath + 'CsvGeos_BEST_' + 'Set1BONDALL_' + pdbSet + '.csv', index=False)
+
+    geos = ['TAU', 'C-1:N:CA', 'CA:C:N+1', 'CA:C:O', 'O:C:N+1', 'CA:C:N+1']
+    print('Create csv 2', pdbSet)
+    csv2 = help.getCsv(pdbSet, geos, False, True, aa='ALL', includeCis=False, allAtoms=allAtoms, bFactorFactor=bFactorFactor, cutoff=cutOff)
+    csv2.to_csv(printPath + 'CsvGeos_BEST_' + 'Set2ANGSALL_' + pdbSet + '.csv', index=False)
+
+    geos = ['PHI', 'PSI', 'OMEGA', 'CA-1:C-1:N:CA']
+    print('Create csv 3', pdbSet)
+    csv3 = help.getCsv(pdbSet, geos, False, True, aa='ALL', includeCis=False, allAtoms=allAtoms, bFactorFactor=bFactorFactor, cutoff=cutOff)
+    csv3.to_csv(printPath + 'CsvGeos_BEST_' + 'Set3DIHSALL_' + pdbSet + '.csv', index=False)
+
+    geos = ['N:N+1', 'N:C']
+    print('Create csv 4', pdbSet)
+    csv4 = help.getCsv(pdbSet, geos, False, True, aa='ALL', includeCis=False, allAtoms=allAtoms,bFactorFactor=bFactorFactor, cutoff=cutOff)
+    csv4.to_csv(printPath + 'CsvGeos_BEST_' + 'Set4DISTALL_' + pdbSet + '.csv', index=False)
+
+    geos = ['N:O-2', 'C:O-2', 'N:CA:C:O-2', 'N:CA:N+1:O-2']
+    print('Create csv 5', pdbSet)
+    csv5 = help.getCsv(pdbSet, geos, False, True, aa='ALL', includeCis=False, allAtoms=allAtoms,bFactorFactor=bFactorFactor, cutoff=cutOff)
+    csv5.to_csv(printPath + 'CsvGeos_BEST_' + 'Set5HBALL_' + pdbSet + '.csv', index=False)
+
+    geos = ['N:O-3', 'C:O-3', 'N:CA:C:O-3', 'N:CA:N+1:O-3']
+    print('Create csv 6', pdbSet)
+    csv6 = help.getCsv(pdbSet, geos, False, True, aa='ALL', includeCis=False, allAtoms=allAtoms,bFactorFactor=bFactorFactor, cutoff=cutOff)
+    csv6.to_csv(printPath + 'CsvGeos_BEST_' + 'Set6HBALL_' + pdbSet + '.csv', index=False)
+
+    print('----------Finished----------')
+    endx = time.time()
+    time_diff = endx - startx
+    timestring = str(int(time_diff / 60)) + "m " + str(int(time_diff % 60)) + "s"
+    print(timestring)
+
+
+
+
+
+
+
+
+
+
+
+def createGeosFileOld(pdbSet, cutOff):
     print('Running CreateGeosFile on',pdbSet)
 
     setName = 'BEST'
@@ -32,7 +89,7 @@ def createGeosFile(pdbSet, cutOff):
         bFactorFactor = -1
 
     edDataPath = 'F:/Code/ProteinDataFiles/ccp4_data/'
-    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/1.TauCorrelations/EvidencedSet/DataA/'
+    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataA/'
 
 
     #TIMER
@@ -64,17 +121,15 @@ def createGeosFile(pdbSet, cutOff):
     geoLists = []
     #geoLists.append(['TAU'])#for dssp from linux only
     #geoLists.append(['0', ['TAU']])
-
     #We currently have these
-    '''
     geoLists.append(['1BOND', ['N:CA','CA:C','C:O','C-1:N','C:N+1']])    
     geoLists.append(['2ANGS', ['TAU','C-1:N:CA','CA:C:N+1','CA:C:O','O:C:N+1','CA:C:N+1']])    
     geoLists.append(['3DIHS', ['PHI','PSI','OMEGA','CA-1:C-1:N:CA']])    
     geoLists.append(['4DIST', ['N:N+1','N:C']])    
     geoLists.append(['5HB', ['N:O-2','C:O-2','N:CA:C:O-2','N:CA:N+1:O-2']])
-    geoLists.append(['6HB', ['N:O-3', 'C:O-3', 'N:CA:C:O-3', 'N:CA:N+1:O-3']])        
-    geoLists.append(['9HBO', ['N:{O}','C:{O}','N:CA:C:{O}','N:CA:N+1:{O}']])
-    '''
+    geoLists.append(['6HB', ['N:O-3', 'C:O-3', 'N:CA:C:O-3', 'N:CA:N+1:O-3']])
+    #geoLists.append(['9HBO', ['N:{O}','C:{O}','N:CA:C:{O}','N:CA:N+1:{O}']])
+
     #geoLists.append(['10CIS', ['CA-1:C-1:N:CA', 'CA-1:CA']])
     # geoLists.append(['7HB', ['N:O-4', 'C:O-4', 'N:CA:C:O-4', 'N:CA:N+1:O-4']])
     # geoLists.append(['8HB', ['N:O-5', 'C:O-5', 'N:CA:C:O-5', 'N:CA:N+1:O-5']])
@@ -82,7 +137,6 @@ def createGeosFile(pdbSet, cutOff):
     #geoLists.append(['7WAT', ['N:HOH','C:HOH','N:CA:C:HOH','N:CA:N+1:HOH']])
     # Other!
     #geoLists.append(['8XTRA', ['N:HETATM']])
-
 
     hueList = ['aa', 'rid', 'bfactor','pdbCode','bfactorRatio','disordered']
     aas = ['ALL']

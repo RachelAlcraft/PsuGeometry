@@ -6,16 +6,16 @@ from PsuGeometry import GeoReport as psu
 Compare sets and EH and Jaskolski
 '''
 
-def compareSets(sets):
+def compareSets(tag):
 
     pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
     edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
-    loadPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/1.TauCorrelations/EvidencedSet/DataD/'
-    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/1.TauCorrelations/EvidencedSet/DataE/'
+    loadPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataD/'
+    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataE/'
 
     geos = ['N:CA', 'CA:C', 'C:O', 'C:N+1', 'TAU', 'C-1:N:CA', 'CA:C:N+1', 'CA:C:O', 'O:C:N+1', 'CA:C:N+1']
     aas = ['ALL', 'ALA', 'CYS', 'ASP', 'GLU', 'PHE', 'GLY', 'HIS', 'ILE', 'LYS', 'LEU', 'MET', 'ASN', 'PRO', 'GLN','ARG', 'SER', 'THR', 'VAL', 'TRP', 'TYR']
-    fileName = 'Data_SetsSummaryMerged.csv'
+    fileName = tag + 'Data_SetsSummaryMerged.csv'
     data = pd.read_csv(loadPath + fileName)
 
     georep = psu.GeoReport([], pdbDataPath, edDataPath, printPath, ed=False, dssp=False, includePdbs=False, keepDisordered=False)
@@ -38,5 +38,5 @@ def compareSets(sets):
 
 
 
-    georep.printToHtml('Best Supported and Engh&Huber Compare', 3, 'Compare_EH_Sets')
+    georep.printToHtml('Best Supported and Engh&Huber Compare', 3, tag + 'Compare_EH_Sets')
 

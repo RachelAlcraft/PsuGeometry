@@ -10,9 +10,9 @@ def EHCompare(pdbSet):
 
     pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_out/' + pdbSet + '/'
     edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
-    loadPathEH = 'F:/Code/BbkProject/PhDThesis/0.Papers/1.TauCorrelations/EvidencedSet/Data/'
-    loadPathCsv = 'F:/Code/BbkProject/PhDThesis/0.Papers/1.TauCorrelations/EvidencedSet/DataB/'
-    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/1.TauCorrelations/EvidencedSet/DataC/'
+    loadPathEH = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/Data/'
+    loadPathCsv = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataB/'
+    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataC/'
 
     #EH_SET,aa,N:CA,N:CA_SD,CA:C,CA:C_SD,C:O,C:O_SD,C:N+1,C:N+1_SD,N:CA:C,N:CA:C_SD,CA:C:N+1,CA:C:N+1_SD,CA:C:O,CA:C:O_SD,O:C:N+1,O:C:N+1_SD,C-1:N:CA,C-1:N:CA_SD
     EHFileName = 'Data_EH.csv'

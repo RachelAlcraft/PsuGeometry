@@ -8,7 +8,7 @@ TAU correlations
 '''
 ###############################################################################################
 
-def makeSlicesHtml(setName, title,titleType):
+def makeSlicesHtml(setName, title,titleType,tag):
     FileDir = setName
     firstRow = 1
     fileName = titleType + '_' + setName
@@ -17,7 +17,7 @@ def makeSlicesHtml(setName, title,titleType):
     pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_data/'
     edDataPath = 'F:/Code/ProteinDataFiles/ccp4_data/'
     edSlicePath = 'F:/Code/ProteinDataFiles/ccp4_out/'
-    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/1.TauCorrelations/EvidencedSet/SlicesH/'
+    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/SlicesH/'
 
     #We are going to load the data that has been created by density flight
     edSlicePath += FileDir + "/"
@@ -27,7 +27,15 @@ def makeSlicesHtml(setName, title,titleType):
     tags = inputdata['Tag'].values
     taus = inputdata['Angle'].values
 
+    valsPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/SlicesG/'
+    print(valsPath)
+    inputVals = pd.read_csv(valsPath + "GoodOutliers_" + tag + ".csv")
+    #print(inputVals)
+
     georep = psu.GeoReport([], pdbDataPath, edDataPath, printPath, ed=False, dssp=False)
+    vals = inputVals['value'].values
+    vpdbs = inputVals['pdbCode'].values
+    vaas = inputVals['aa'].values
 
     #origs = []
     #radiants = []
@@ -36,10 +44,23 @@ def makeSlicesHtml(setName, title,titleType):
         pdb = pdbs[i]
         tag = tags[i]
         tau = taus[i]
+        val = vals[i]
+        vpdb = vpdbs[i]
+        vaa = vaas[i]
+
         sliceOrigVal = georep.loadSlice(edSlicePath + pdb + tag + "value_slice.csv")
         sliceOrigRad = georep.loadSlice(edSlicePath + pdb + tag + "radiant_slice.csv")
-        georep.addSlice(sliceOrigVal, palette='cubehelix_r',title=pdb +' ' +  tag + ' value, angle=' + str(round(tau,3)))
+
+        #This takes the data from the electron density only
+        imtitle = pdb +' ' +  tag + ' value, angle=' + str(round(tau,3))
+        # This takes the data from seperately created outliers file
+        imtitle = pdb + ' ' + tag + ' value=' + str(round(val, 3))
+        if pdb != vpdb:
+            imtitle = title = pdb +' ' +  tag + ' value, angle=' + str(round(tau,3)) + ' Error loading outlier'
+
+        georep.addSlice(sliceOrigVal, palette='cubehelix_r', title=imtitle)
         georep.addSlice(sliceOrigRad, palette='bone',title=pdb + ' ' + tag + ' radiant',Contour=False)
+
         #origs.append(sliceOrigVal)
         #radiants.append(sliceOrigRad)
         firstRow += 1

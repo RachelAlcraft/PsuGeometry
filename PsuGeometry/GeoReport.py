@@ -42,6 +42,11 @@ class GeoReport:
         gp.descB = descB
         self.plots.append(gp)
 
+    def addStatsSummary(self, data=None, desc='',geoX='',geoY='', hue='', title=''):
+        gp = geop.GeoPlot(data, geoX, geoY=geoY, title=title,hue=hue,plot='summary')
+        gp.descA = desc
+        self.plots.append(gp)
+
     def addScatter(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',
                    centre=False,vmin=0,vmax=0,categorical=False,sort='ASC',restrictions={},exclusions={}):
         isNew = False
@@ -547,6 +552,10 @@ class GeoReport:
             elif geoPl.data.empty:
                 html = '<td width=' + width + '%>' + 'No Data:' + geoPl.geoX + ' ' + geoPl.geoY  + '</td>\n'
             elif geoPl.plot == 'compare':#there is no plot
+                ret = geoPl.plotToAxes(None,None)
+                htmlstring = ret
+                html = '<td width=' + width + '%>' + '<p>' + htmlstring + '</p></td>\n'
+            elif geoPl.plot == 'summary':#there is no plot
                 ret = geoPl.plotToAxes(None,None)
                 htmlstring = ret
                 html = '<td width=' + width + '%>' + '<p>' + htmlstring + '</p></td>\n'

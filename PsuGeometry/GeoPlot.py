@@ -78,6 +78,8 @@ class GeoPlot:
             return self.plotSurfaces(fig, ax)
         elif self.plot == 'compare':
             return self.plotCompare()
+        elif self.plot == 'summary':
+            return self.plotSummary()
 
     def plotSurface(self, fig, ax):
         afa = 1
@@ -197,6 +199,7 @@ class GeoPlot:
         histCol = self.palette
         alpha=1
         bins = min(max(int(len(data[self.geoX])/6),10),50)
+        #bins = int(bins/2)
         density = not self.count
 
         minV = self.data[self.geoX].min()
@@ -340,6 +343,51 @@ class GeoPlot:
         html += "</table>"
         html += "<p>" + evidence + "</p>"
         html += "<p>" + conclusion + "</p>"
+        return html
+
+    def plotSummary(self):
+        #Create outliers
+        #Data A
+
+        geoYs = self.data[self.geoY].values
+        geoYs = list(set(geoYs))
+        geoYs.sort()
+        #print(geoYs)
+
+        html = "<h3>" + self.title + "</h3>"
+        html += "<p>Data Set: " + self.descA + "</p>"
+        html += "<table class='innertable'>\n"
+        html += "<tr><td>GeoX</td><td>GeoY</td><td>MinHue</td><td>Min</td><td>MaxHue</td><td>Max</td><td>Mean</td><td>Sd</td><td>Count</td></tr>"
+
+        for geoY in geoYs:
+            qry = "" + self.geoY + " == '" + str(geoY) + "'"
+            #print(self.geoX,qry)
+            dataCut = self.data.query(qry)
+            dataCut = dataCut.sort_values(by=[self.geoX])
+            outliers =dataCut.iloc[[0,-1]]
+            #print(outliersA)
+            hues = outliers[self.hue].values
+            geos = outliers[self.geoX].values
+            minHue = ''
+            minVal = ''
+            maxHue = ''
+            maxVal = ''
+            if len(hues) > 1:
+                minHue = hues[0]
+                minVal = str(round(geos[0],3))
+                maxHue = hues[1]
+                maxVal = str(round(geos[1], 3))
+
+            geoVals = dataCut[self.geoX].values
+            geoVals.sort()
+            meanA = round(geoVals.mean(), 3)
+            sdA = round(geoVals.std(), 3)
+            count = len(dataCut[self.geoX].values)
+
+            html += "<tr><td>" + self.geoX + "</td><td>" + geoY + "</td><td>" + minHue + "</td><td>" + minVal +"</td><td>" + maxHue + "</td><td>" + maxVal + "</td><td>" + str(meanA) + "</td><td>" + str(sdA)+ "</td><td>" + str(count) + "</td></tr>"
+
+
+        html += "</table>"
         return html
 
 
