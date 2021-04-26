@@ -1,5 +1,4 @@
 
-
 import _Helpers as help
 import A_CreateGeosFile as create
 import B_MergeCsvs as merge
@@ -14,12 +13,12 @@ import G_CreateGoodOutlierSlicesCsv as good
 *** Paralleling ***
 '''
 
-#pdbSets = ['NCACO_B02','NCACO_B025','NCACO_B03','NCACO_B04','NCACO_B05','RESTRICTED','UNRESTRICTED']
-#pdbSets = ['NCACO_B02','NCACO_B025','NCACO_B03']
-#pdbSets = ['NCACO_B02','NCACO_B025','NCACO_B03','NCACO_B04','NCACO_B05']
-pdbSets = ['NCACOSG_A01']
-pdbSets = ['NCACOSG_A005','NCACOSG_A0025','NCACOSG_A01']
+# pdbSets = ['NCACO_B02','NCACO_B025','NCACO_B03','NCACO_B04','NCACO_B05','RESTRICTED','UNRESTRICTED']
+# pdbSets = ['NCACO_B02','NCACO_B025','NCACO_B03']
+# pdbSets = ['NCACO_B02','NCACO_B025','NCACO_B03','NCACO_B04','NCACO_B05']
+pdbSets = ['NCACOSG_A01' ,'NCACOSG_A0075' ,'NCACOSG_A005' ,'NCACOSG_A0025']
 pdbSets = ['NCACOSG_A0075']
+pdbSets = ['NCACO_ADJ01_QUARTIC_ADJ']
 
 for pdbSet in pdbSets:
     '''
@@ -48,20 +47,21 @@ for pdbSet in pdbSets:
                  ['PSI', 'N:N+1', 'TAU'],
                  ['SG:{SG}', 'CA:CB:SG', 'TAU']]
     scatter.scatterReports(pdbSet,data,geoTrios,pdbSet+'_CYS_tst')
-
+    '''
 
     # J. Stats compare
+
     stats.statsCompare(pdbSet,'RESTRICTED')
-    stats.statsCompare(pdbSet, 'UNRESTRICTED')
+    #stats.statsCompare(pdbSet, 'UNRESTRICTED')
 
     # K. Stats summary
-    geos = ['CA:CB', 'CB:SG', 'N:CA:CB', 'CB:CA:C', 'CA:CB:SG', 'SG:{SG}']
-    summary.statsSummary(pdbSet, data, geos, '_DISULFIDE')
+    # geos = ['CA:CB', 'CB:SG', 'N:CA:CB', 'CB:CA:C', 'CA:CB:SG', 'SG:{SG}']
+    # summary.statsSummary(pdbSet, data, geos, '_DISULFIDE')
     geos = ['N:CA', 'CA:C', 'C:O', 'C:N+1', 'TAU', 'CA:C:N+1', 'CA:C:O', 'O:C:N+1', 'C-1:N:CA']
     data = help.getCsv(pdbSet, geos, False, True, 'ALL')
-    summary.statsSummary(pdbSet, data,geos,'EH')
+    summary.statsSummary(pdbSet, data ,geos ,'EH')
 
-'''
+
 
 for pdbSet in pdbSets:
     '''
@@ -69,13 +69,20 @@ for pdbSet in pdbSets:
     '''
     # F. Create density slices for the rejected density
 
-    #if pdbSet not in ['RESTRICTED', 'UNRESTRICTED']:
-    #    print(pdbSet)
+    # if pdbSet not in ['RESTRICTED', 'UNRESTRICTED']:
     #    bad.createBadDensitySlices(pdbSet, 'CA', 'N', 'C')
     #    bad.createBadDensitySlices(pdbSet, 'C', 'CA', 'O')
     # G. Create density slcies for the good outliers
-    #good.createGoodDensitySlices(pdbSet, 'CA', 'N', 'C')
-    #good.createGoodDensitySlices(pdbSet, 'C', 'CA', 'O')
+    # geoset = []
+    # geoset.append([['CA', 'N', 'C'],['N:CA', 'CA:C', 'TAU']])
+    # geoset.append([['C', 'CA', 'O'], ['C:O', 'CA:C:O']])
+    # geoset.append([['CA', 'C-1', 'N'], ['C-1:N:CA']])
+    # geoset.append([['C', 'O', 'N+1'], ['O:C:N+1']])
+    # geoset.append([['C', 'CA', 'N+1'], ['C:N+1', 'CA:C:N+1']])
+    # good.createGoodDensitySlices(pdbSet, geoset)
+
+    # good.createGoodDensitySlices(pdbSet, 'CA', 'N', 'C')
+    # good.createGoodDensitySlices(pdbSet, 'C', 'CA', 'O')
 
 
 

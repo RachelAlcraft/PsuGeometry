@@ -3,19 +3,24 @@ from PsuGeometry import GeoReport as psu
 from PsuGeometry import GeoPdb as geopdb
 import random
 import pandas as pd
+import _Helpers as help
 '''
 TAU correlations
 '''
 ###############################################################################################
 def createGoodDensitySlices(pdbSet,geoset):
+    import matplotlib.pyplot as plt
+    plt.close('all')
+    plt.clf()
+    plt.cla()
 
-    pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_data/'
+    pdbDataPath = help.rootPath + '/ProteinDataFiles/pdb_data/'
     if not 'RESTRICTED' in pdbSet:
-        pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_out/' + pdbSet + '/'
+        pdbDataPath = help.rootPath + '/ProteinDataFiles/pdb_out/' + pdbSet + '/'
 
-    edDataPath = 'F:/Code/ProteinDataFiles/ccp4_data/'
-    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/SlicesG/'
-    loadPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataB/'
+    edDataPath = help.rootPath + '/ProteinDataFiles/ccp4_data/'
+    printPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/SlicesG/'
+    loadPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataB/'
 
     setFileName = 'Data_DefensibleWithGeosALL_' + pdbSet + '.csv'
     print('Loading',loadPath + setFileName)

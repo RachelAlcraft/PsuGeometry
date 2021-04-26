@@ -149,6 +149,7 @@ class GeoPlot:
             chainsA = outliers['chain'].values
             ridsA = outliers['rid'].values
             geoA = outliers[self.geoX].values
+
             outMin = 0
             outMax = 0
             if len(pdbsA) > 1:
@@ -158,6 +159,7 @@ class GeoPlot:
                 else:
                     outMin = pdbsA[0] + ' ' + chainsA[0] + str(ridsA[0]) + ' ' + str(geoA[0])[:6]
                     outMax = pdbsA[1] + ' ' + chainsA[1] + str(ridsA[1]) + ' ' + str(geoA[1])[:6]
+
         except:
             outMin = ''
             outMax = ''
@@ -182,18 +184,20 @@ class GeoPlot:
         except:
             pass
 
-        #title += '\nFirst:' + self.hue + ' ' + str(firstHue) + '=' + str(firstVal)
-        #title += '\nLast:' + self.hue + ' ' + str(lastHue) + '=' + str(lastVal)
-        #try:
-        #    strMin = str(outMin)
-        #    strMax = str(outMax)
-        #    strMin = strMin[:6]
-        #    strMax = strMax[:6]
-        #    title += '\nFirst = ' + strMin
-        #    title += '\n last = ' + strMax
-        #except:
-        title += '\nFirst = ' + outMin
-        title += '\n last = ' + outMax
+        if self.hue != 'DEFAULT':
+            title += '\nFirst:' + self.hue + ' ' + str(firstHue) + '=' + str(firstVal)
+            title += '\nLast:' + self.hue + ' ' + str(lastHue) + '=' + str(lastVal)
+        else:
+            try:
+                strMin = str(outMin)
+                strMax = str(outMax)
+                strMin = strMin[:6]
+                strMax = strMax[:6]
+                title += '\nFirst = ' + strMin
+                title += '\n last = ' + strMax
+            except:
+                title += '\nFirst = ' + outMin
+                title += '\n last = ' + outMax
 
         # sns.distplot(data[xName], norm_hist=True, bins=50, kde=False)
         histCol = self.palette
@@ -228,6 +232,7 @@ class GeoPlot:
             #    plt.legend()
             #else:
             #sns.distplot(data[self.geoX], label='', norm_hist=True, bins=bins, kde=False,hist_kws=dict(alpha=0.8,EdgeColor='silver'))
+
             if self.range == []:
                 plt.hist(data[self.geoX], EdgeColor='k', bins=bins, color=histCol, density=density,alpha=alpha)
             else:

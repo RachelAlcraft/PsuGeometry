@@ -18,7 +18,7 @@ class GeoReport:
         self.plots = []
         self.includePdbs=includePdbs
 
-    def addHistogram(self,geoX='',data=None,title='',ghost=False,operation='',splitKey='',hue='',
+    def addHistogram(self,geoX='',data=None,title='',ghost=False,operation='',splitKey='',hue='DEFAULT',
                      palette='crimson',count=False,range=[],restrictions={},exclusions={}):
         isNew = False
         if data is None:
@@ -542,6 +542,7 @@ class GeoReport:
                 htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
                 htmlstring += ret
                 html = '<td width=' + width + '%><p>' + geoPl.title + '</p>\n<p>' + htmlstring + '</p></td>\n'
+                fig.clear()
             elif geoPl.hasMatrix:
                 fig, ax = plt.subplots()
                 ret = geoPl.plotToAxes(fig, ax)
@@ -549,6 +550,7 @@ class GeoReport:
                 htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
                 htmlstring += ret
                 html = '<td width=' + width + '%>' + '<p>' + htmlstring + '</p></td>\n'
+                fig.clear()
             elif geoPl.data.empty:
                 html = '<td width=' + width + '%>' + 'No Data:' + geoPl.geoX + ' ' + geoPl.geoY  + '</td>\n'
             elif geoPl.plot == 'compare':#there is no plot
@@ -563,12 +565,15 @@ class GeoReport:
                 fig, ax = plt.subplots()
                 ret = geoPl.plotToAxes(fig, ax)
                 encoded = geoPl.getPlotImage(fig, ax)
+                fig.clear()
                 htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
                 htmlstring += ret
                 html = '<td width=' + width + '%>' + '<p>' + htmlstring + '</p></td>\n'
+                fig.clear()
         #except:
         #    html = '<td width=' + width + '%>' + 'Error:' + geoPl.geoX + ' ' + geoPl.geoY + '</td>\n'
 
+        plt.close('all')
         return (html)
 
 

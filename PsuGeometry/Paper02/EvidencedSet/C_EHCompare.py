@@ -2,17 +2,22 @@
 import time
 import pandas as pd
 from PsuGeometry import GeoReport as psu
+import _Helpers as help
 '''
 EH stats report coparison
 '''
 
 def EHCompare(pdbSet):
+    import matplotlib.pyplot as plt
+    plt.close('all')
+    plt.clf()
+    plt.cla()
 
-    pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_out/' + pdbSet + '/'
+    pdbDataPath = help.rootPath + '/ProteinDataFiles/pdb_out/' + pdbSet + '/'
     edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
-    loadPathEH = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/Data/'
-    loadPathCsv = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataB/'
-    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataC/'
+    loadPathEH = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/Data/'
+    loadPathCsv = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataB/'
+    printPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataC/'
 
     #EH_SET,aa,N:CA,N:CA_SD,CA:C,CA:C_SD,C:O,C:O_SD,C:N+1,C:N+1_SD,N:CA:C,N:CA:C_SD,CA:C:N+1,CA:C:N+1_SD,CA:C:O,CA:C:O_SD,O:C:N+1,O:C:N+1_SD,C-1:N:CA,C-1:N:CA_SD
     EHFileName = 'Data_EH.csv'

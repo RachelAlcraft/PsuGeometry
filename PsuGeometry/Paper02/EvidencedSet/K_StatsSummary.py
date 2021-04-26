@@ -2,6 +2,7 @@
 import time
 import pandas as pd
 from PsuGeometry import GeoReport as psu
+import _Helpers as help
 '''
 EH stats report summary
 '''
@@ -18,11 +19,15 @@ def applyCis(aa,preomega):
 
 
 def statsSummary(pdbSet, data, geos,tag):
+    import matplotlib.pyplot as plt
+    plt.close('all')
+    plt.clf()
+    plt.cla()
 
-    pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_out/' + pdbSet + '/'
+    pdbDataPath = help.rootPath + '/ProteinDataFiles/pdb_out/' + pdbSet + '/'
     edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
-    loadPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataB/'
-    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataK/'
+    loadPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataB/'
+    printPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataK/'
 
     fileName = 'Data_DefensibleWithGeosALL_' + pdbSet + '.csv'
 

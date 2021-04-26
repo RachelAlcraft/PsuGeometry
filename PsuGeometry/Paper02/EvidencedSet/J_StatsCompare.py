@@ -2,16 +2,18 @@
 import time
 import pandas as pd
 from PsuGeometry import GeoReport as psu
+import _Helpers as help
 '''
 EH stats report coparison
 '''
 
 def statsCompare(pdbSetA,pdbSetB):
 
-    pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_out/' + pdbSetA + '/'
+
+    pdbDataPath = help.rootPath + '/ProteinDataFiles/pdb_out/' + pdbSetA + '/'
     edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
-    loadPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataB/'
-    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataJ/'
+    loadPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataB/'
+    printPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataJ/'
 
     AFileName = 'Data_DefensibleWithGeosALL_' + pdbSetA + '.csv'
     BFileName = 'Data_DefensibleWithGeosALL_' + pdbSetB + '.csv'

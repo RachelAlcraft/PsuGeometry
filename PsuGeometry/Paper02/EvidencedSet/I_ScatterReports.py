@@ -2,15 +2,20 @@
 import time
 import pandas as pd
 from PsuGeometry import GeoReport as psu
+import _Helpers as help
 '''
 EH stats report coparison
 '''
 
 def scatterReports(pdbSet, data, trios, tag):
+    import matplotlib.pyplot as plt
+    plt.close('all')
+    plt.clf()
+    plt.cla()
 
-    pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_data/'
+    pdbDataPath = help.rootPath + '/ProteinDataFiles/pdb_data/'
     edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
-    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataI/'
+    printPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataI/'
 
     #BestFileName = 'Data_DefensibleWithGeosALL_' + pdbSet + '.csv'
     #dataBest = pd.read_csv(loadPath + BestFileName)

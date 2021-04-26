@@ -2,6 +2,8 @@
 import pandas as pd
 from PsuGeometry import GeoReport as psu
 
+rootPath = 'C:/Dev/Github/'
+
 def applyCis(aa,preomega):
     if aa != 'PRO':
         return aa
@@ -11,13 +13,24 @@ def applyCis(aa,preomega):
         return 'CISPRO'
 
 
+def getList(listName,cutoff):
+    pdbList = []
+    if listName == 'SMALLEST':
+        pdbList = ['6eex', '6mw1', '6mw2', '6mvz','2ol9','1akg','5vsg','6mw0']
+    elif listName == 'EVIDENCED':
+        pdbdata = pd.read_csv('../../PdbLists/Pdbs_Evidenced.csv')  # This is a list of pdbs <= 1.1A non homologous to 90%
+        pdbList = pdbdata['PDB'].tolist()[0:]
+
+    if cutoff > 0:
+        pdbList = pdbList[0:cutoff]
+    return pdbList
 
 def getCsv(pdbSet, geos,reloadPdb, reloadCsv,aa='ALL',includeCis=False,allAtoms=False, bFactorFactor=1.3,cutoff=0):
 
-    pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_out/' + pdbSet + '/'
+    pdbDataPath = rootPath + '/ProteinDataFiles/pdb_out/' + pdbSet + '/'
     edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
-    loadPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataB/'
-    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataK/'
+    loadPath = rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataB/'
+    printPath = rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataK/'
 
     fileName = 'Data_DefensibleWithGeosALL_' + pdbSet + '.csv'
 

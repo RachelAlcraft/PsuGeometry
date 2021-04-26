@@ -2,6 +2,7 @@
 from PsuGeometry import GeoReport as psu
 from PsuGeometry import GeoPdb as geopdb
 from PsuGeometry import Globals as glob
+import _Helpers as help
 import time
 import pandas as pd
 '''
@@ -12,8 +13,8 @@ TAU
 def mergeCsvs(pdbSet):
     print('Running MergeCsvs for', pdbSet)
 
-    loadPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataA/'
-    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataB/'
+    loadPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataA/'
+    printPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataB/'
 
     dataFirst = pd.read_csv(loadPath + 'CsvGeos_BEST_Set1BONDALL_' + pdbSet + '.csv')
     dataFirst['rid'] = dataFirst['rid'].astype(str)
@@ -46,7 +47,7 @@ def mergeCsvs(pdbSet):
         dataRow['rid'] = dataRow['rid'].astype(str)
         dataRow['ID'] = dataRow['pdbCode'] + dataRow['chain'] + dataRow['rid'] + dataRow['aa']
         dataRow = dataRow[fileList]
-        dataFirst = pd.merge(dataFirst,dataRow,left_on='ID',right_on='ID')
+        dataFiaorst = pd.merge(dataFirst,dataRow,left_on='ID',right_on='ID')
         dataFirst = dataFirst.dropna()
 
     filePath = printPath + 'Data_DefensibleWithGeosALL_' + pdbSet + '.csv'

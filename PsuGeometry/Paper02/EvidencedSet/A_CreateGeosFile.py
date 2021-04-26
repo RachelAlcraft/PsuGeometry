@@ -16,7 +16,7 @@ def createGeosFile(pdbSet, cutOff):
     print('----------start create geos csv----------')
     startx = time.time()
 
-    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataA/'
+    printPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataA/'
     print('Running CreateGeosFile on',pdbSet)
     allAtoms = False
     bFactorFactor = 1.3

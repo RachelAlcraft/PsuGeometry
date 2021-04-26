@@ -3,21 +3,27 @@ from PsuGeometry import GeoReport as psu
 from PsuGeometry import GeoPdb as geopdb
 import random
 import pandas as pd
+import _Helpers as help
 '''
 TAU correlations
 '''
 ###############################################################################################
 
 def makeSlicesHtml(setName, title,titleType,tag):
+    import matplotlib.pyplot as plt
+    plt.close('all')
+    plt.clf()
+    plt.cla()
+
     FileDir = setName
     firstRow = 1
     fileName = titleType + '_' + setName
 
 
-    pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_data/'
-    edDataPath = 'F:/Code/ProteinDataFiles/ccp4_data/'
-    edSlicePath = 'F:/Code/ProteinDataFiles/ccp4_out/'
-    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/SlicesH/'
+    pdbDataPath = help.rootPath + '/ProteinDataFiles/pdb_data/'
+    edDataPath = help.rootPath + '/ProteinDataFiles/ccp4_data/'
+    edSlicePath = help.rootPath + '/ProteinDataFiles/ccp4_out/'
+    printPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/SlicesH/'
 
     #We are going to load the data that has been created by density flight
     edSlicePath += FileDir + "/"
@@ -27,7 +33,7 @@ def makeSlicesHtml(setName, title,titleType,tag):
     tags = inputdata['Tag'].values
     taus = inputdata['Angle'].values
 
-    valsPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/SlicesG/'
+    valsPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/SlicesG/'
     print(valsPath)
     inputVals = pd.read_csv(valsPath + "GoodOutliers_" + tag + ".csv")
     #print(inputVals)

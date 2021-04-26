@@ -2,16 +2,21 @@
 import time
 import pandas as pd
 from PsuGeometry import GeoReport as psu
+import _Helpers as help
 '''
 Compare sets and EH and Jaskolski
 '''
 
 def compareSets(tag):
+    import matplotlib.pyplot as plt
+    plt.close('all')
+    plt.clf()
+    plt.cla()
 
-    pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
+    pdbDataPath = help.rootPath + '/ProteinDataFiles/pdb_data/'
     edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
-    loadPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataD/'
-    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataE/'
+    loadPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataD/'
+    printPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataE/'
 
     geos = ['N:CA', 'CA:C', 'C:O', 'C:N+1', 'TAU', 'C-1:N:CA', 'CA:C:N+1', 'CA:C:O', 'O:C:N+1', 'CA:C:N+1']
     aas = ['ALL', 'ALA', 'CYS', 'ASP', 'GLU', 'PHE', 'GLY', 'HIS', 'ILE', 'LYS', 'LEU', 'MET', 'ASN', 'PRO', 'GLN','ARG', 'SER', 'THR', 'VAL', 'TRP', 'TYR']

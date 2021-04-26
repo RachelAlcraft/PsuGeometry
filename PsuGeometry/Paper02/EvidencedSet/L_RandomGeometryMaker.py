@@ -5,12 +5,14 @@ import random
 import math
 import pandas as pd
 from PsuGeometry import GeoCalcs as calcs
+import _Helpers as help
 '''
 TAU correlations
 '''
-pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_data/'
-edDataPath = 'F:/Code/ProteinDataFiles/ccp4_data/'
-printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataL/'
+pdbDataPath = help.rootPath + '/ProteinDataFiles/pdb_data/'
+edDataPath = help.rootPath + '/ProteinDataFiles/ccp4_data/'
+printPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataL/'
+
 
 ######## DEFINE FUNCTIONS ########
 

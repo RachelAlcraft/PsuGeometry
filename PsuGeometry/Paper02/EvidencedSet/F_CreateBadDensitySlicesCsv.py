@@ -3,16 +3,21 @@ from PsuGeometry import GeoReport as psu
 from PsuGeometry import GeoPdb as geopdb
 import random
 import pandas as pd
+import _Helpers as help
 '''
 TAU correlations
 '''
 ###############################################################################################
 def createBadDensitySlices(pdbSet,atomCe,atomLi,atomPl):
+    import matplotlib.pyplot as plt
+    plt.close('all')
+    plt.clf()
+    plt.cla()
 
-    pdbOriginalPath = 'F:/Code/ProteinDataFiles/pdb_data/'
-    pdbDataPath = 'F:/Code/ProteinDataFiles/pdb_out/' + pdbSet + '/'
-    edDataPath = 'F:/Code/ProteinDataFiles/ccp4_data/'
-    printPath = 'F:/Code/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/SlicesF/'
+    pdbOriginalPath = help.rootPath + '/ProteinDataFiles/pdb_data/'
+    pdbDataPath = help.rootPath + '/ProteinDataFiles/pdb_out/' + pdbSet + '/'
+    edDataPath = help.rootPath + '/ProteinDataFiles/ccp4_data/'
+    printPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/SlicesF/'
 
     # This gets the list of pdbs
     pdbdata = pd.read_csv('../../PdbLists/Pdbs_Evidenced.csv')  # This is a list of pdbs <= 1.1A non homologous to 90%

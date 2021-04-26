@@ -19,7 +19,7 @@ import G_CreateGoodOutlierSlicesCsv as good
 #pdbSets = ['NCACO_B02','NCACO_B025','NCACO_B03','NCACO_B04','NCACO_B05']
 pdbSets = ['NCACOSG_A01','NCACOSG_A0075','NCACOSG_A005','NCACOSG_A0025']
 pdbSets = ['NCACOSG_A0075']
-pdbSets = ['NCACO_ADJ01_ADJ']
+pdbSets = ['NCACO_ADJ01_CUBIC_ADJ']
 
 for pdbSet in pdbSets:
     '''
@@ -83,8 +83,7 @@ for pdbSet in pdbSets:
     good.createGoodDensitySlices(pdbSet, geoset)
 
 
-    #good.createGoodDensitySlices(pdbSet, 'CA', 'N', 'C')
-    #good.createGoodDensitySlices(pdbSet, 'C', 'CA', 'O')
+
 
 
 
