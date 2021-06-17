@@ -1,3 +1,4 @@
+import gc
 
 import pandas as pd
 import numpy as np
@@ -14,7 +15,7 @@ kde = 0.1
 class GeoPlot:
     def __init__(self,data,geoX,geoY='',title='',hue='bfactor',splitKey='',palette='viridis_r',
                  centre=False,vmin=0,vmax=0,operation='',newData=False,plot='scatter',categorical=False,
-                 restrictions={},exclusions={},report=None,count=False,sort='ASC',gridsize=50,bins=100,Contour=True):
+                 restrictions={},exclusions={},report=None,count=False,sort='ASC',gridsize=50,bins=100,Contour=True,YellowDots=np.array([])):
         self.parent=report
         self.plot = plot
         self.data = data
@@ -43,6 +44,7 @@ class GeoPlot:
         self.exclusions = exclusions
         self.Contour=Contour
         self.range = []
+        self.YellowDots = YellowDots
         if self.geoY == '' and plot not in 'surfaces' and plot != 'compare':
             self.plot = 'histogram'
         self.count=count # only for histograms, probability or count
@@ -61,6 +63,7 @@ class GeoPlot:
     #        return self.plotProbability(True,fig, ax)
 
     def plotToAxes(self,fig, ax):
+
         if self.plot == 'histogram':
             return self.plotHistogram(fig, ax)
         elif self.plot == 'scatter' or self.plot=='contact':
@@ -91,7 +94,7 @@ class GeoPlot:
 
     def plotOneSurface(self, fig, ax,surface,afa,zero,palette,logged,lw):
         col='darkgrey'
-        lvls=10
+        lvls=5
         if logged:
             col='DarkSlateGray'
             x,y = surface.shape
@@ -114,12 +117,30 @@ class GeoPlot:
                     maxd = max(maxd, surface[i, j])
             maxs = max(maxd,abs(mind))
             mins=-1*maxs
-            image = plt.imshow(surface, cmap=palette, interpolation='nearest', origin='low', aspect='equal',vmin=mins,vmax=maxs,alpha=afa)
+            image = plt.imshow(surface, cmap=palette, interpolation='nearest', origin='lower', aspect='equal',vmin=mins,vmax=maxs,alpha=afa)
         else:
-            image = plt.imshow(surface, cmap=palette, interpolation='nearest', origin='low', aspect='equal',alpha=afa)
+            image = plt.imshow(surface, cmap=palette, interpolation='nearest', origin='lower', aspect='equal',alpha=afa)
 
         if self.Contour:
+            afa=0.6
+            lw=0.4
             image = plt.contour(surface, colors=col, alpha=afa, linewidths=lw, levels=lvls)
+        if self.YellowDots != np.array([]):
+            #my_cmap = plt.cm.get_cmap('plasma')
+            #my_cmap.set_under(('w'))
+            #print(my_cmap)
+            #https://matplotlib.org/3.1.0/tutorials/colors/colormap-manipulation.html
+            my_own_cmap = np.zeros((2,4))
+            my_own_cmap[1,0] = 1
+            my_own_cmap[1, 1] = 1
+            my_own_cmap[1, 2] = 0
+            my_own_cmap[1, 3] = 1
+            from matplotlib.colors import ListedColormap
+            newcmp = ListedColormap(my_own_cmap)
+
+            #print("We have yellow dots!")
+            image = plt.imshow(self.YellowDots, cmap=newcmp, interpolation='nearest', origin='lower', aspect='equal', alpha=1)
+
         #ax.grid(False)
         #cbar = fig.colorbar(image, ax=ax)
         plt.axis('off')
@@ -139,11 +160,12 @@ class GeoPlot:
 
     def plotHistogram(self,fig, ax):
         data = self.data.sort_values(by=self.geoX, ascending=True)
+        #data = self.data
         title = self.title
 
         #Create outlier tag
         outliers = data.iloc[[0, -1]]
-        # print(outliersA)
+        #print(outliers)
         try:
             pdbsA = outliers['pdbCode'].values
             chainsA = outliers['chain'].values
@@ -168,23 +190,22 @@ class GeoPlot:
         elif self.operation == 'SQUARE':
             data = data[data[self.geoX] == data[self.geoX] ** 2]
 
-        firstVal = data.head(1)[self.geoX].values[0]
-        lastVal = data.tail(1)[self.geoX].values[0]
-        firstHue = data.head(1)[self.hue].values[0]
-        lastHue = data.tail(1)[self.hue].values[0]
-
-        try:
-            firstVal = round(firstVal, 2)
-            lastVal = round(lastVal, 2)
-        except:
-            pass
-        try:
-            firstHue = round(firstHue, 2)
-            lastHue = round(lastHue, 2)
-        except:
-            pass
 
         if self.hue != 'DEFAULT':
+            firstVal = data.head(1)[self.geoX].values[0]
+            lastVal = data.tail(1)[self.geoX].values[0]
+            firstHue = data.head(1)[self.hue].values[0]
+            lastHue = data.tail(1)[self.hue].values[0]
+            try:
+                firstVal = round(firstVal, 2)
+                lastVal = round(lastVal, 2)
+            except:
+                pass
+            try:
+                firstHue = round(firstHue, 2)
+                lastHue = round(lastHue, 2)
+            except:
+                pass
             title += '\nFirst:' + self.hue + ' ' + str(firstHue) + '=' + str(firstVal)
             title += '\nLast:' + self.hue + ' ' + str(lastHue) + '=' + str(lastVal)
         else:
@@ -526,12 +547,12 @@ class GeoPlot:
         return ''
 
     def getPlotImage(self,fig, ax):
-        #fig, ax = plt.subplots()
         img = io.BytesIO()
         fig.savefig(img, format='png', bbox_inches='tight')
         img.seek(0)
         encoded = base64.b64encode(img.getvalue())
         plt.close('all')
+        gc.collect()
         return encoded
 
     def getAxes(self):

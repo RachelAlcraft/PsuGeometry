@@ -7,7 +7,7 @@ import _Helpers as help
 EH stats report coparison
 '''
 
-def scatterReports(pdbSet, data, trios, tag):
+def scatterReports(pdbSet, data, trios, perAA=True, tag=''):
     import matplotlib.pyplot as plt
     plt.close('all')
     plt.clf()
@@ -30,9 +30,12 @@ def scatterReports(pdbSet, data, trios, tag):
     georep = psu.GeoReport([], pdbDataPath, edDataPath, printPath, ed=False, dssp=False, includePdbs=False,keepDisordered=False)
 
     for trio in trios:
-        for aa in aas:
-            dataCut = data.query("aa ==  '" + aa + "'")
-            georep.addScatter(data=dataCut, geoX=trio[0], geoY=trio[1], hue=trio[2], title=aa + ':' + trio[0] + ':'+ trio[1] , palette='jet', sort='NON')
+        if perAA:
+            for aa in aas:
+                dataCut = data.query("aa ==  '" + aa + "'")
+                georep.addScatter(data=dataCut, geoX=trio[0], geoY=trio[1], hue=trio[2], title=aa + ':' + trio[0] + ':'+ trio[1] , palette='jet', sort='NON')
+        else:
+            georep.addScatter(data=data, geoX=trio[0], geoY=trio[1], hue=trio[2],title=trio[0] + ':' + trio[1], palette='jet', sort='NON')
 
 
     georep.printToHtml('Scatters , set=' + pdbSet, 4, 'Defensible_Scatters_' + tag)

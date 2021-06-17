@@ -1,3 +1,5 @@
+import gc
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -151,8 +153,11 @@ class GeoReport:
             apdb = pdbmanager.getPdb(pdb,allAtoms)
             data = apdb.getGeoemtryCsv(calcList, hueList,bfactorFactor,restrictedAa)
             dfs.append(data)
-        df = pd.concat(dfs, ignore_index=True)
-        return (df)
+        if len(dfs) > 0:
+            df = pd.concat(dfs, ignore_index=True)
+            return (df)
+        else:
+            return pd.DataFrame.empty
 
     def getReportCsv(self, reportName):
         hueList = ['2FoFc','FoFc','bfactor','aa','dssp']
@@ -430,6 +435,7 @@ class GeoReport:
         html = '<table>\n'
         row = 1
         for geoPl in self.plots:
+            #fig, ax = plt.subplots()
             if type(geoPl) is geop.GeoPlot:
                 #html += self.twoPlots(geoPl.plotA,geoPl.plotB,width)
 
@@ -525,7 +531,9 @@ class GeoReport:
         html += '<hr/>\n'
         return html
 
-    def onePlot(self,geoPl,width):
+    def onePlot(self,geoPl, width):
+        #matplotlib.use('Agg')
+        #plt.ioff()
         #try:
         if True:
             if geoPl.newData:
@@ -534,46 +542,46 @@ class GeoReport:
             geoPl.applyRestrictions()
             geoPl.applyExclusions()
 
+            #plt.close('all')
+            #gc.collect()
 
+            fig, ax = plt.subplots()
             if geoPl.plot=='surface' or geoPl.plot=='surfaces':
-                fig, ax = plt.subplots()
-                ret = geoPl.plotToAxes(fig, ax)
-                encoded = geoPl.getPlotImage(fig, ax)
+                ret = geoPl.plotToAxes(fig,ax)
+                encoded = geoPl.getPlotImage(fig,ax)
                 htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
                 htmlstring += ret
                 html = '<td width=' + width + '%><p>' + geoPl.title + '</p>\n<p>' + htmlstring + '</p></td>\n'
-                fig.clear()
             elif geoPl.hasMatrix:
-                fig, ax = plt.subplots()
-                ret = geoPl.plotToAxes(fig, ax)
-                encoded = geoPl.getPlotImage(fig, ax)
+                ret = geoPl.plotToAxes(fig,ax)
+                encoded = geoPl.getPlotImage(fig,ax)
                 htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
                 htmlstring += ret
                 html = '<td width=' + width + '%>' + '<p>' + htmlstring + '</p></td>\n'
-                fig.clear()
+                #fig.clear()
+                plt.close('all')
             elif geoPl.data.empty:
                 html = '<td width=' + width + '%>' + 'No Data:' + geoPl.geoX + ' ' + geoPl.geoY  + '</td>\n'
             elif geoPl.plot == 'compare':#there is no plot
-                ret = geoPl.plotToAxes(None,None)
+                ret = geoPl.plotToAxes(fig,ax)
                 htmlstring = ret
                 html = '<td width=' + width + '%>' + '<p>' + htmlstring + '</p></td>\n'
             elif geoPl.plot == 'summary':#there is no plot
-                ret = geoPl.plotToAxes(None,None)
+                ret = geoPl.plotToAxes(fig,ax)
                 htmlstring = ret
                 html = '<td width=' + width + '%>' + '<p>' + htmlstring + '</p></td>\n'
             else:
-                fig, ax = plt.subplots()
-                ret = geoPl.plotToAxes(fig, ax)
-                encoded = geoPl.getPlotImage(fig, ax)
-                fig.clear()
+                ret = geoPl.plotToAxes(fig,ax)
+                encoded = geoPl.getPlotImage(fig,ax)
                 htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
                 htmlstring += ret
                 html = '<td width=' + width + '%>' + '<p>' + htmlstring + '</p></td>\n'
-                fig.clear()
         #except:
         #    html = '<td width=' + width + '%>' + 'Error:' + geoPl.geoX + ' ' + geoPl.geoY + '</td>\n'
 
+
         plt.close('all')
+        #gc.collect()
         return (html)
 
 
@@ -629,11 +637,12 @@ class GeoReport:
         self.plots.append(gp)
         return mat
 
-    def addSlice(self, slice, palette='viridis', title='',logged=False,centre=False,Contour=True):
+    def addSlice(self, slice, palette='viridis', title='',logged=False,centre=False,Contour=True,YellowDots=np.array([])):
         gp = geop.GeoPlot(data=None,geoX='',title=title, palette=palette, plot='surface', report=self,centre=centre,Contour=Contour)
         gp.surface = slice
         gp.logged=logged
         gp.differ=0
+        gp.YellowDots = YellowDots
         self.plots.append(gp)
 
     def saveSlice(self,dataarray, filepath):

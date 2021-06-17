@@ -49,6 +49,7 @@ def EHCompare(pdbSet):
         bestALLCut = bestALLCut.query("aa !=  'PRO'")
         bestGLYCut = dataBest.query("aa ==  'GLY'")
         bestPROCut = dataBest.query("aa ==  'PRO'")
+        print(pdbSet,bestPROCut)
         bestPROCut['ABSOMEGA'] = abs(bestPROCut['CA-1:C-1:N:CA'])
         bestPROCis = bestPROCut.query("ABSOMEGA < 120")
         bestPROTrans = bestPROCut.query("ABSOMEGA >= 120")
@@ -86,7 +87,7 @@ def EHCompare(pdbSet):
             georepSummary.addHistogram(data=bestPROTrans, geoX=geo, title=titlePRO)
             georepSummary.addHistogram(data=bestPROCis, geoX=geo, title=titleCIS)
 
-
+        '''
         for aa in aas:
             #prepare E&H comparison values
             useaa = 'ALL'
@@ -107,6 +108,7 @@ def EHCompare(pdbSet):
                 georepAA.addHistogram(data=bestCut, geoX='TAU', title=title)
             else:
                 georepAA.addHistogram(data=bestCut, geoX=geo, title=title)
+        '''
 
     georepSummary.printToHtml('Best Supported Engh&Huber Compare, set=' + pdbSet, 4, 'Defensible_EH_' + pdbSet)
-    georepAA.printToHtml('Best Supported Engh&Huber Compare, set=' + pdbSet, 4, 'Defensible_EH_AA_' + pdbSet)
+    #georepAA.printToHtml('Best Supported Engh&Huber Compare, set=' + pdbSet, 4, 'Defensible_EH_AA_' + pdbSet)

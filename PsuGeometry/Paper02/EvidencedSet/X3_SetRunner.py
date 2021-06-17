@@ -37,16 +37,14 @@ for pdbSet in pdbSets:
     SCATTERS AND HISTOGRAMS
     '''
     # I. Scatters
-'''
+
     geos = ['N:N+1', 'TAU', 'PSI', 'PHI', 'CA:CB:SG', 'SG:{SG}','CA:CB', 'CB:SG', 'N:CA:CB', 'CB:CA:C']
-    data = help.getCsv(pdbSet, geos,True,False, 'CYS',0)
-    data = data[data['SG:{SG}'] < 2.8]
-    data = data[data['SG:{SG}'] > 0]
-    print(data)
-    geoTrios = [['PHI', 'PSI', 'TAU'],
-                 ['PSI', 'N:N+1', 'TAU'],
-                 ['SG:{SG}', 'CA:CB:SG', 'TAU']]
-    scatter.scatterReports(pdbSet,data,geoTrios,pdbSet+'_CYS_tst')
+    #data = help.getCsv(pdbSet, geos,True,False, 'CYS',0)
+    #data = data[data['SG:{SG}'] < 2.8]
+    #data = data[data['SG:{SG}'] > 0]
+    #print(data)
+    geoTrios = [['PHI', 'PSI', 'TAU'],  ['PSI', 'N:N+1', 'TAU'],    ['SG:{SG}', 'CA:CB:SG', 'TAU']]
+    #scatter.scatterReports(pdbSet,data,geoTrios,pdbSet+'_CYS_tst')
 
 
     # J. Stats compare
@@ -55,11 +53,11 @@ for pdbSet in pdbSets:
 
     # K. Stats summary
     geos = ['CA:CB', 'CB:SG', 'N:CA:CB', 'CB:CA:C', 'CA:CB:SG', 'SG:{SG}']
-    summary.statsSummary(pdbSet, data, geos, '_DISULFIDE')
+    #summary.statsSummary(pdbSet, data, geos, '_DISULFIDE')
     geos = ['N:CA', 'CA:C', 'C:O', 'C:N+1', 'TAU', 'CA:C:N+1', 'CA:C:O', 'O:C:N+1', 'C-1:N:CA']
     data = help.getCsv(pdbSet, geos, False, True, 'ALL')
-    summary.statsSummary(pdbSet, data,geos,'EH')
-'''
+    #summary.statsSummary(pdbSet, data,geos,'EH')
+
 
 
 for pdbSet in pdbSets:
@@ -69,13 +67,12 @@ for pdbSet in pdbSets:
     # F. Create density slices for the rejected density
 
     geoset = []
-    #geoset.append([['CA', 'N', 'C'],['N:CA', 'CA:C', 'TAU']])
-    #geoset.append([['C', 'CA', 'O'], ['C:O', 'CA:C:O']])
-    #geoset.append([['CA', 'C-1', 'N'], ['C-1:N:CA']])
-    #geoset.append([['C', 'O', 'N+1'], ['O:C:N+1']])
-    #geoset.append([['C', 'CA', 'N+1'], ['C:N+1', 'CA:C:N+1']])
-
-    good.createGoodDensitySlices(pdbSet, geoset)
+    geoset.append([['CA', 'N', 'C'],['N:CA', 'CA:C', 'TAU']])
+    geoset.append([['C', 'CA', 'O'], ['C:O', 'CA:C:O']])
+    geoset.append([['CA', 'C-1', 'N'], ['C-1:N:CA']])
+    geoset.append([['C', 'O', 'N+1'], ['O:C:N+1']])
+    geoset.append([['C', 'CA', 'N+1'], ['C:N+1', 'CA:C:N+1']])
+    #good.createGoodDensitySlices(pdbSet, geoset)
 
 
 '''

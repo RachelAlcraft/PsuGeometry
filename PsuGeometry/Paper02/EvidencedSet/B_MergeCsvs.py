@@ -47,7 +47,7 @@ def mergeCsvs(pdbSet):
         dataRow['rid'] = dataRow['rid'].astype(str)
         dataRow['ID'] = dataRow['pdbCode'] + dataRow['chain'] + dataRow['rid'] + dataRow['aa']
         dataRow = dataRow[fileList]
-        dataFiaorst = pd.merge(dataFirst,dataRow,left_on='ID',right_on='ID')
+        dataFirst = pd.merge(dataFirst,dataRow,left_on='ID',right_on='ID')
         dataFirst = dataFirst.dropna()
 
     filePath = printPath + 'Data_DefensibleWithGeosALL_' + pdbSet + '.csv'

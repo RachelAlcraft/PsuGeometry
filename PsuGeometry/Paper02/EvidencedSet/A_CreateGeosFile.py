@@ -26,32 +26,32 @@ def createGeosFile(pdbSet, cutOff):
 
     geos = ['N:CA', 'CA:C', 'C:O', 'C-1:N', 'C:N+1']
     print('Create csv 1', pdbSet)
-    csv1 = help.getCsv(pdbSet, geos,True, True,aa='ALL',includeCis=False,allAtoms=allAtoms, bFactorFactor=bFactorFactor,cutoff=cutOff)
+    csv1 = help.getCsv(pdbSet, geos,badAtoms,True, True,aa='ALL',includeCis=False,allAtoms=allAtoms, bFactorFactor=bFactorFactor,cutoff=cutOff)
     csv1.to_csv(printPath + 'CsvGeos_BEST_' + 'Set1BONDALL_' + pdbSet + '.csv', index=False)
 
     geos = ['TAU', 'C-1:N:CA', 'CA:C:N+1', 'CA:C:O', 'O:C:N+1', 'CA:C:N+1']
     print('Create csv 2', pdbSet)
-    csv2 = help.getCsv(pdbSet, geos, False, True, aa='ALL', includeCis=False, allAtoms=allAtoms, bFactorFactor=bFactorFactor, cutoff=cutOff)
+    csv2 = help.getCsv(pdbSet, geos, badAtoms,False, True, aa='ALL', includeCis=False, allAtoms=allAtoms, bFactorFactor=bFactorFactor, cutoff=cutOff)
     csv2.to_csv(printPath + 'CsvGeos_BEST_' + 'Set2ANGSALL_' + pdbSet + '.csv', index=False)
 
     geos = ['PHI', 'PSI', 'OMEGA', 'CA-1:C-1:N:CA']
     print('Create csv 3', pdbSet)
-    csv3 = help.getCsv(pdbSet, geos, False, True, aa='ALL', includeCis=False, allAtoms=allAtoms, bFactorFactor=bFactorFactor, cutoff=cutOff)
+    csv3 = help.getCsv(pdbSet, geos, badAtoms,False, True, aa='ALL', includeCis=False, allAtoms=allAtoms, bFactorFactor=bFactorFactor, cutoff=cutOff)
     csv3.to_csv(printPath + 'CsvGeos_BEST_' + 'Set3DIHSALL_' + pdbSet + '.csv', index=False)
 
     geos = ['N:N+1', 'N:C']
     print('Create csv 4', pdbSet)
-    csv4 = help.getCsv(pdbSet, geos, False, True, aa='ALL', includeCis=False, allAtoms=allAtoms,bFactorFactor=bFactorFactor, cutoff=cutOff)
+    csv4 = help.getCsv(pdbSet, geos, badAtoms,False, True, aa='ALL', includeCis=False, allAtoms=allAtoms,bFactorFactor=bFactorFactor, cutoff=cutOff)
     csv4.to_csv(printPath + 'CsvGeos_BEST_' + 'Set4DISTALL_' + pdbSet + '.csv', index=False)
 
     geos = ['N:O-2', 'C:O-2', 'N:CA:C:O-2', 'N:CA:N+1:O-2']
     print('Create csv 5', pdbSet)
-    csv5 = help.getCsv(pdbSet, geos, False, True, aa='ALL', includeCis=False, allAtoms=allAtoms,bFactorFactor=bFactorFactor, cutoff=cutOff)
+    csv5 = help.getCsv(pdbSet, geos, badAtoms,False, True, aa='ALL', includeCis=False, allAtoms=allAtoms,bFactorFactor=bFactorFactor, cutoff=cutOff)
     csv5.to_csv(printPath + 'CsvGeos_BEST_' + 'Set5HBALL_' + pdbSet + '.csv', index=False)
 
     geos = ['N:O-3', 'C:O-3', 'N:CA:C:O-3', 'N:CA:N+1:O-3']
     print('Create csv 6', pdbSet)
-    csv6 = help.getCsv(pdbSet, geos, False, True, aa='ALL', includeCis=False, allAtoms=allAtoms,bFactorFactor=bFactorFactor, cutoff=cutOff)
+    csv6 = help.getCsv(pdbSet, geos, badAtoms,False, True, aa='ALL', includeCis=False, allAtoms=allAtoms,bFactorFactor=bFactorFactor, cutoff=cutOff)
     csv6.to_csv(printPath + 'CsvGeos_BEST_' + 'Set6HBALL_' + pdbSet + '.csv', index=False)
 
     print('----------Finished----------')
@@ -59,14 +59,6 @@ def createGeosFile(pdbSet, cutOff):
     time_diff = endx - startx
     timestring = str(int(time_diff / 60)) + "m " + str(int(time_diff % 60)) + "s"
     print(timestring)
-
-
-
-
-
-
-
-
 
 
 
