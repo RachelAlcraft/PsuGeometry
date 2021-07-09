@@ -340,6 +340,66 @@ def createExtremeAdjustedSlices(pdbSet,slices,atoms,geo,dataFrame,tag):
     f.close()
 
 
+def produceExtremeValFile(pdbSet,slices, geo):
+    pdbDataPath = help.rootPath + '/ProteinDataFiles/pdb_out/' + pdbSet + '/'
+    if 'RESTRICTED' in pdbSet:
+        pdbDataPath = help.rootPath + '/ProteinDataFiles/pdb_data/'
+    loadPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/DataB/'
+    printPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/SlicesC/'
+    setFileName = 'Data_DefensibleWithGeosALL_' + pdbSet + '.csv'
+    print('Loading', loadPath + setFileName)
+    dataBest = pd.read_csv(loadPath + setFileName)
+    # we are now going to cut this down to the extremes
+    dics = []
+    for slice in slices:
+        pdb = slice[0]
+        chain = slice[1]
+        rid = slice[2]
+        aa = slice[3]
+        print(slice)
+
+
+        bestCut = dataBest.query("pdbCode ==  '" + pdb + "'")
+        #print("pdbCode ==  '" + pdb + "'",bestCut)
+        bestCut = bestCut.query("chain ==  '" + chain + "'")
+        #print("chain ==  '" + chain + "'",bestCut)
+        bestCut = bestCut.query("aa ==  '" + aa + "'")
+        #print("aa ==  '" + aa + "'",bestCut)
+        bestCut = bestCut.query("rid ==  " + str(rid))
+        #print("rid ==  '" + str(rid) + "'", bestCut)
+
+        vals = bestCut[geo].values
+        #print(vals)
+
+        if len(vals) == 1:
+            val = vals[0]
+        else:
+            val = 0
+            print('Error len vals =',len(vals))
+
+        print(pdb, rid,val)
+
+        dicH = {}
+        dicH['pdbCode'] = pdb
+        dicH['chain'] = chain
+        dicH['rid'] = rid
+        dicH['geo'] = geo
+        dicH['aa'] = aa
+        dicH['value'] = val
+
+        dics.append(dicH)
+
+    dataFrame = pd.DataFrame.from_dict(dics)
+    geoF = geo.replace('-', '')
+    geoF = geoF.replace('+', '')
+    geoF = geoF.replace(':', '')
+    filePath = printPath + 'OrigExtreme_' + pdbSet + '_' + geoF + '.csv'
+    print('...printing', filePath)
+    dataFrame.to_csv(filePath, index=False)
+    print(dataFrame)
+
+
+
 ########################################
 
 

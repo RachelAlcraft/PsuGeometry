@@ -265,7 +265,7 @@ def comparisonDataSet(dataA, dataB, geos,filePath):
     mergedDataSet['PDB'] =mergedDataSet['pdbCode']
 
     pdbdata = pd.read_csv('../../PdbLists/Pdbs_100.csv')
-    pdbdata = pdbdata[['PDB','SOFTWARE']]
+    pdbdata = pdbdata[['PDB','SOFTWARE','RES']]
 
     mergedDataSet = mergedDataSet.set_index('PDB').join(pdbdata.set_index('PDB'))
     mergedDataSet['SOFTWARE'] = mergedDataSet['SOFTWARE'].str[:8]

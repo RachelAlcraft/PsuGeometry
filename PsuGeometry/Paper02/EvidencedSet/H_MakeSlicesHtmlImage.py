@@ -9,7 +9,7 @@ TAU correlations
 '''
 ###############################################################################################
 
-def makeSlicesHtml(setName, fileName, title,titleType,tag):
+def makeSlicesHtml(setName, fileNameOrig,fileNameAdj, title,titleType,tag):
     import matplotlib.pyplot as plt
     plt.close('all')
     plt.clf()
@@ -17,7 +17,7 @@ def makeSlicesHtml(setName, fileName, title,titleType,tag):
 
     FileDir = setName
     firstRow = 1
-    #fileName = titleType + '_' + setName
+    outfileName = titleType + '_' + setName + "_" + tag
 
 
     pdbDataPath = help.rootPath + '/ProteinDataFiles/pdb_data/'
@@ -33,10 +33,11 @@ def makeSlicesHtml(setName, fileName, title,titleType,tag):
     tags = inputdata['Tag'].values
     taus = inputdata['Angle'].values
 
-    valsPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/SlicesG/'
+    valsPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/SlicesC/'
     print(valsPath)
 
-    inputVals = pd.read_csv(valsPath + fileName)
+    inputValsOrig = pd.read_csv(valsPath + fileNameOrig)
+    inputValsAdj = pd.read_csv(valsPath + fileNameAdj)
     #inputVals = pd.read_csv(valsPath + "GoodOutliers_" + tag + ".csv")
     #print(inputVals)
 
@@ -51,13 +52,15 @@ def makeSlicesHtml(setName, fileName, title,titleType,tag):
         tag = tags[i]
         tau = taus[i]
 
-        pdbInputVals = inputVals.query("pdbCode == '" + pdb + "'")
+        pdbInputValsOrig = inputValsOrig.query("pdbCode == '" + pdb + "'")
+        pdbInputValsAdj = inputValsAdj.query("pdbCode == '" + pdb + "'")
 
-        vals = pdbInputVals['value'].values
-        vpdbs = pdbInputVals['pdbCode'].values
-        vaas = pdbInputVals['aa'].values
-        rids = pdbInputVals['rid'].values
-        chains = pdbInputVals['chain'].values
+        valsOrig = pdbInputValsOrig['value'].values
+        valsAdj = pdbInputValsAdj['value'].values
+        vpdbs = pdbInputValsAdj['pdbCode'].values
+        vaas = pdbInputValsAdj['aa'].values
+        rids = pdbInputValsAdj['rid'].values
+        chains = pdbInputValsAdj['chain'].values
 
         for j in range(0,len(vpdbs)):
 
@@ -70,6 +73,7 @@ def makeSlicesHtml(setName, fileName, title,titleType,tag):
 
                 sliceOrigVal = georep.loadSlice(edSlicePath + pdb + tag + "value_slice.csv")
                 sliceOrigRad = georep.loadSlice(edSlicePath + pdb + tag + "radiant_slice.csv")
+                sliceOrigMag = georep.loadSlice(edSlicePath + pdb + tag + "magnitude_slice.csv")
                 '''
                 https://stackoverflow.com/questions/16400241/how-to-redefine-a-color-for-a-specific-value-in-a-matplotlib-colormap/16401183#16401183
                 '''
@@ -79,13 +83,17 @@ def makeSlicesHtml(setName, fileName, title,titleType,tag):
                 #This takes the data from the electron density only
                 imtitle = pdb +' ' +  tag + ' value, angle=' + str(round(tau,3))
                 # This takes the data from seperately created outliers file
-                imtitle = pdb + ' ' + tag + ' value=' + str(round(vals[j], 3))
+                if '_O' in tag:
+                    imtitle = pdb + ' ' + tag + ' value=' + str(round(valsOrig[j], 3))
+                else:
+                    imtitle = pdb + ' ' + tag + ' value=' + str(round(valsAdj[j], 3))
                 #if pdb != vpdb:
                 #    print(pdb,vpdb)
                 #    imtitle = title = pdb +' ' +  tag + ' value, angle=' + str(round(tau,3)) + ' Error loading outlier'
 
                 georep.addSlice(sliceOrigVal, palette='cubehelix_r', title=imtitle, YellowDots=sliceOrigPos,Contour=True)
                 georep.addSlice(sliceOrigRad, palette='bone',title=pdb + ' ' + tag + ' radiant',Contour=False,YellowDots=sliceOrigPos)
+                georep.addSlice(sliceOrigMag, palette='bone', title=pdb + ' ' + tag + ' magnitude', Contour=True,YellowDots=sliceOrigPos)
 
                 #origs.append(sliceOrigVal)
                 #radiants.append(sliceOrigRad)
@@ -93,9 +101,22 @@ def makeSlicesHtml(setName, fileName, title,titleType,tag):
 
     #georep.addSlices(origs, palette='cubehelix_r', title='Average values', logged=False, centre=False)
     #georep.addSlices(radiants, palette='bone', title='Average radiant', logged=False, centre=False,Contour=False)
-    georep.printToHtml(title,4,fileName)
+    georep.printToHtml(title,6,outfileName)
 
 
-###########
-#makeSlicesHtml('NCACO_B02_C_O','C:O Outliers, Set B02 (CA:C:O)')
-#makeSlicesHtml('NCACO_B02_CA_C','CA:C Outliers, Set B02 (CA:C:O)')
+def makeSlicesHtmlFromValues(mainTitle, dirName, lineRuns,row,tag):
+    printPath = help.rootPath + '/BbkProject/PhDThesis/0.Papers/3.DefensibleGeometry/EvidencedSet/SlicesI/'
+    georep = psu.GeoReport([], "", "", printPath, ed=False, dssp=False)
+    #We are going to load the data that has been created by density flight and pasted into a text file
+    for lineRun in lineRuns:
+        title = lineRun[0]
+        palette = lineRun[1]
+        fileName = lineRun[2]
+        posName = lineRun[3]
+        inputVals = georep.loadSlice(dirName + fileName)
+        inputPoses = georep.loadSlice(dirName + posName)
+        georep.addSlice(inputVals, palette=palette, title=title, YellowDots=inputPoses,Contour=True)
+
+    georep.printToHtml(mainTitle,row,tag)
+
+

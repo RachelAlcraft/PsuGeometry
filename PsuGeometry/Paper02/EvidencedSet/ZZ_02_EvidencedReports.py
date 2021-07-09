@@ -13,7 +13,7 @@ pdbSet = 'CUBIC'
 cutoff = 0
 reloadPDB = False
 reloadCSV = False
-extraTag = '3'
+extraTag = '3_50'
 
 pdbs = help.getList('70', cutoff, pdbSet + '_ADJ')
 #pdbs = ['1ucs','4zm7']

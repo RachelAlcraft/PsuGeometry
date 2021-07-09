@@ -94,9 +94,9 @@ class GeoPlot:
 
     def plotOneSurface(self, fig, ax,surface,afa,zero,palette,logged,lw):
         col='darkgrey'
-        lvls=5
+        lvls=20
         if logged:
-            col='DarkSlateGray'
+            col='SlateGray'
             x,y = surface.shape
             mind = 1000
             for i in range(0, x):
@@ -122,8 +122,8 @@ class GeoPlot:
             image = plt.imshow(surface, cmap=palette, interpolation='nearest', origin='lower', aspect='equal',alpha=afa)
 
         if self.Contour:
-            afa=0.6
-            lw=0.4
+            afa=0.55
+            lw=0.3
             image = plt.contour(surface, colors=col, alpha=afa, linewidths=lw, levels=lvls)
         if self.YellowDots != np.array([]):
             #my_cmap = plt.cm.get_cmap('plasma')
@@ -477,6 +477,15 @@ class GeoPlot:
             alpha = 0.4
             self.palette='Greys'
 
+        if self.hue == 'count':
+            alpha = 0.003
+            self.data['count'] = 0
+            self.palette = 'bone'
+            lw=0.1
+            self.vmin=0
+            self.vmax=0
+
+
         if self.centre:
             self.data[self.hue + '2'] = self.data[self.hue] ** 2
             data = self.data.sort_values(by=self.hue + '2', ascending=True)
@@ -519,6 +528,11 @@ class GeoPlot:
                 ax.set_xlabel('')
                 ax.set_ylabel('')
         else:
+            if self.range != []:
+                plt.xlim(xmin=self.range[0], xmax=self.range[1])
+                plt.ylim(ymin=self.range[0], ymax=self.range[1])
+                plt.gca().set_aspect("equal")
+
             if self.categorical:
                 im = sns.scatterplot(x=self.geoX, y=self.geoY, hue=self.hue, data=self.data, alpha=alpha,palette=self.palette
                                      ,edgecolor='aliceblue', linewidth=lw)
@@ -529,8 +543,9 @@ class GeoPlot:
             else:
                 g = ax.scatter(self.data[self.geoX], self.data[self.geoY], c=self.data[self.hue],
                                cmap=self.palette, edgecolor=ecol, alpha=alpha,linewidth=lw,s=20)
-                cb = plt.colorbar(g)
-                cb.set_label(self.hue)
+                if self.hue != 'count':
+                    cb = plt.colorbar(g)
+                    cb.set_label(self.hue)
 
         ax.set_xlabel(self.geoX)
         ax.set_ylabel(self.geoY)
@@ -580,6 +595,12 @@ class GeoPlot:
             minY = min(self.data[self.geoY])
             maxY = max(self.data[self.geoY])
 
+        if self.range!=[]:
+            minX = range[0]
+            maxX = range[1]
+            minY = range[0]
+            maxY = range[1]
+
 
         #fig, ax = plt.subplots()
         plt.axis([minX, maxX, minY, maxY])
@@ -593,8 +614,13 @@ class GeoPlot:
 
         # Don't allow the axis to be on top of your data
 
-        ax.grid(True, which='major', axis='both', linestyle='-', color=(0.5, 0.5, 0.5), alpha=0.1)
+        extent = []
+        if self.range != []:
+            extent = [self.range[0], self.range[1],self.range[0],self.range[1]]
+            plt.gca().set_aspect("equal")
+            print(extent)
 
+        ax.grid(True, which='major', axis='both', linestyle='-', color=(0.5, 0.5, 0.5), alpha=0.1)
 
         if self.centre:
             self.data[self.hue + '2'] = self.data[self.hue] ** 2
@@ -609,10 +635,19 @@ class GeoPlot:
 
         if self.vmin == self.vmax:
             im = plt.pcolormesh(xgrid, ygrid, zgrid, shading='gouraud', cmap=self.palette,alpha=alpha)
-            cs = plt.contour(xgrid, ygrid, zgrid, contours, colors='0.7', linewidths=0.4,alpha=alpha)
+            if self.range == []:
+                cs = plt.contour(xgrid, ygrid, zgrid, contours, colors='0.7', linewidths=0.4,alpha=alpha)
+            else:
+                print("1!!!")
+                cs = plt.contour(xgrid, ygrid, zgrid, contours, colors='0.7', linewidths=0.4, alpha=alpha,extent=extent)
+
         else:
             im = plt.pcolormesh(xgrid, ygrid, zgrid, shading='gouraud', cmap=self.palette, vmin=self.vmin, vmax=self.vmax,alpha=alpha)
-            cs = plt.contour(xgrid, ygrid, zgrid, contours, colors='tab:purple', linewidths=0.05,alpha=alpha)
+            if self.range == []:
+                cs = plt.contour(xgrid, ygrid, zgrid, contours, colors='tab:purple', linewidths=0.05,alpha=alpha)
+            else:
+                print("2!!!")
+                cs = plt.contour(xgrid, ygrid, zgrid, contours, colors='tab:purple', linewidths=0.05, alpha=alpha,extent=extent)
 
         ax.set_axisbelow(True)
         cbar = fig.colorbar(im, ax=ax)
@@ -649,8 +684,16 @@ class GeoPlot:
         x = self.data[self.geoX]#.ravel()
         y = self.data[self.geoY]#.ravel()
 
+        extent = []
+        if self.range != []:
+            extent = [self.range[0], self.range[1],self.range[0],self.range[1]]
+            plt.gca().set_aspect("equal")
+
         if self.hue.lower() == 'count':
-            hb = plt.hexbin(x, y, bins=self.bins, cmap=self.palette,gridsize=self.gridsize)
+            if self.range == []:
+                hb = plt.hexbin(x, y, bins=self.bins, cmap=self.palette,gridsize=self.gridsize)
+            else:
+                hb = plt.hexbin(x, y, bins=self.bins, cmap=self.palette, gridsize=self.gridsize,extent=extent)
 
             #cb = plt.colorbar()
             #cb.set_label('Count')
@@ -659,9 +702,11 @@ class GeoPlot:
             self.vmin = z.min()
             self.vmax = z.max()
             #ax = self.data.plot.hexbin(x=self.geoX,y=self.geoY,C=self.hue,gridsize=10,cmap=self.palette)
-            hb = plt.hexbin(x,y,C=z,bins=self.bins,
-                       cmap=self.palette,gridsize=self.gridsize,reduce_C_function=np.mean)
+            if range == []:
+                hb = plt.hexbin(x,y,C=z,bins=self.bins, cmap=self.palette,gridsize=self.gridsize,reduce_C_function=np.mean)
                         #,vmin = self.vmin, vmax = self.vmax)
+            else:
+                hb = plt.hexbin(x, y, C=z, bins=self.bins, cmap=self.palette, gridsize=self.gridsize,reduce_C_function=np.mean, extent=extent)
 
             cb = plt.colorbar()
             cb.set_label('Average ' + self.hue)
@@ -679,6 +724,12 @@ class GeoPlot:
                     lblsrounded.append(int(round(lbl, 0)))
             #cb.set_ticklabels(np.linspace(round(z.min(),2), round(z.max(),2), 10))
             cb.set_ticklabels(lblsrounded)
+
+        #if self.range != []:
+        #    plt.xlim(xmin=self.range[0], xmax=self.range[1])
+        #    plt.gca().set_aspect("equal")
+        #    ax.grid(b=True, which='major', color='Gainsboro', linestyle='-')
+        #    ax.set_axisbelow(True)
 
         plt.axis([x.min(), x.max(), y.min(), y.max()])
 

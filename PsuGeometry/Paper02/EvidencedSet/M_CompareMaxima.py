@@ -129,10 +129,21 @@ def compareAtomsPdbAdjusted(dataCombined, geos, pdbSet,tag):
 
     for geo in geos:
 
+        dataCombined[geo + '_Diff'] = dataCombined[geo + '_Orig'] - dataCombined[geo + '_Adj']
+
         georep.addHistogram(data=dataCombined, geoX=geo + '_Orig', title='Pdb Atoms', count=True, hue='pdbCode')
         georep.addHistogram(data=dataCombined, geoX=geo + '_Adj', title='Adjusted Atoms', count=True, hue='pdbCode')
-        georep.addScatter(data=dataCombined, geoX=geo + '_Orig', geoY=geo + '_Adj', hue='SOFTWARE', palette='jet_r',sort='RANDOM', categorical=True,title='Comparing atom positions ' + geo)
+        #georep.addScatter(data=dataCombined, geoX=geo + '_Diff', geoY='RES', hue='SOFTWARE', palette='jet_r', sort='RANDOM', categorical=True, title='Resolution and atom differences ' + geo)
+        #georep.addScatter(data=dataCombined, geoX=geo + '_Diff', geoY='SOFTWARE', hue='RES', palette='viridis_r', sort='DESC', categorical=False, title='Resolution and atom differences ' + geo)
+        georep.addHexBins(data=dataCombined, geoX=geo + '_Diff', geoY='RES', title='Count ' + geo, hue='count', palette='cubehelix_r')
+
+        georep.addScatter(data=dataCombined, geoX=geo + '_Orig', geoY=geo + '_Adj', hue='SOFTWARE', palette='jet_r',sort='RANDOM', categorical=True,title='Software and atom positions ' + geo)
+        georep.addScatter(data=dataCombined, geoX=geo + '_Orig', geoY=geo + '_Adj', hue='RES', palette='viridis_r', sort='DESC', categorical=False, title='Resolution and atom positions ' + geo)
         georep.addHexBins(data=dataCombined, geoX=geo + '_Orig', geoY=geo + '_Adj', title='Count ' + geo, hue='count', palette='cubehelix_r')
+
+
+
+
         #georep.addScatter(data=dataCombined, geoX=geo + '_Orig', geoY='SOFTWARE', hue=geo + '_Adj', palette='jet_r', sort='RANDOM', categorical=True, title='Comparing atom positions ' + geo)
 
     #for pdb in pdbList:
@@ -143,7 +154,7 @@ def compareAtomsPdbAdjusted(dataCombined, geos, pdbSet,tag):
     #    georep.addScatter(data=realCutDown, geoX='Difference', geoY='AtomType', hue='AtomNo', categorical=False, restrictions={'pdbCode': pdb}, palette=realCol, sort='RANDOM', title='')
 
 
-    georep.printToHtml('Comparing atom positions: PDB vs maxima, set=' + pdbSet, 4, 'Compare_' + pdbSet + tag)
+    georep.printToHtml('Comparing atom positions: PDB vs maxima, set=' + pdbSet, 3, 'Compare_' + pdbSet + tag)
 
 
 

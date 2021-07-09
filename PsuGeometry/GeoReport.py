@@ -50,7 +50,7 @@ class GeoReport:
         self.plots.append(gp)
 
     def addScatter(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',
-                   centre=False,vmin=0,vmax=0,categorical=False,sort='ASC',restrictions={},exclusions={}):
+                   centre=False,vmin=0,vmax=0,categorical=False,sort='ASC',restrictions={},exclusions={},range=[]):
         isNew = False
         if data is None:
             isNew = True
@@ -59,32 +59,35 @@ class GeoReport:
         gp = geop.GeoPlot(data, geoX, geoY=geoY, title=title, newData=isNew, operation=operation,splitKey=splitKey,
                           hue=hue,palette=palette,centre=centre,vmin=vmin,vmax=vmax,categorical=categorical,
                           plot='scatter',restrictions=restrictions,exclusions=exclusions,report=self,sort=sort)
+        gp.range= range
         if not ghost:
             self.plots.append(gp)
         else:
             self.plots.append(
                 geop.GeoOverlay(gp, '', title='ghost', report=self))
 
-    def addHexBins(self,geoX='',geoY='',data=None,title='',gridsize=50,bins=100,ghost=False,operation='',hue='bfactor',palette='viridis_r',restrictions={},exclusions={}):
+    def addHexBins(self,geoX='',geoY='',data=None,title='',gridsize=50,bins=100,ghost=False,operation='',hue='bfactor',palette='viridis_r',restrictions={},exclusions={},range=[]):
         isNew = False
         if data is None:
             isNew = True
         gp = geop.GeoPlot(data, geoX, geoY=geoY, title=title, newData=isNew, operation=operation,
                           hue=hue,palette=palette,plot='hexbin',restrictions=restrictions,exclusions=exclusions,report=self,gridsize=gridsize)
 
+        gp.range = range
         if not ghost:
             self.plots.append(gp)
         else:
             self.plots.append(
                 geop.GeoOverlay(gp, '', title='ghost', report=self))
 
-    def addProbability(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',centre=False,vmin=0,vmax=0,categorical=False,restrictions={},exclusions={}):
+    def addProbability(self,geoX='',geoY='',data=None,title='',ghost=False,operation='',splitKey='',hue='bfactor',palette='viridis_r',centre=False,vmin=0,vmax=0,categorical=False,restrictions={},exclusions={},range=[]):
         isNew = False
         if data is None:
             isNew = True
         gp = geop.GeoPlot(data, geoX, geoY=geoY, title=title, newData=isNew, operation=operation,splitKey=splitKey,
                           hue=hue,palette=palette,centre=centre,vmin=vmin,vmax=vmax,categorical=categorical,
                           plot='probability',restrictions=restrictions,exclusions=exclusions,report=self)
+        gp.range = range
         if not ghost:
             self.plots.append(gp)
         else:
