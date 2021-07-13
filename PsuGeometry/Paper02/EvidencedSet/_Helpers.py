@@ -258,6 +258,9 @@ def comparisonDataSet(dataA, dataB, geos,filePath):
 
     dataB = dataB[locs]
 
+    dataA.to_csv("c:/dataA.csv", index=False)
+    dataB.to_csv("c:/dataB.csv", index=False)
+
 
     mergedDataSet = dataA
     mergedDataSet = mergedDataSet.set_index('ID').join(dataB.set_index('ID'))

@@ -277,14 +277,21 @@ class GeoPlot:
             html += "</tr>\n"
             html += "<tr>"
             for r in range(0, rows):
+                header = colsNames[r]
                 html += "<td>"
+
                 try:
-                    if dfdesc[r] < 10:
-                        html += str(round(dfdesc[r], 3))
-                    elif dfdesc[r] < 100:
-                        html += str(round(dfdesc[r], 2))
-                    else:
-                        html += str(round(dfdesc[r], 1))
+                    number = float(dfdesc[r])
+                    strnumber = str(round(number, 1))
+                    if abs(number) < 10:
+                        strnumber = str(round(number, 3))
+                    elif abs(number) < 100:
+                        strnumber = str(round(number, 2))
+                    elif abs(number) > 1000:
+                        strnumber = str(int(round(number, 0)))
+                    #print(header, number,strnumber)
+                    html += strnumber
+
                 except:
                     html += str(dfdesc[r])
                 html += "</td>\n"
@@ -595,12 +602,6 @@ class GeoPlot:
             minY = min(self.data[self.geoY])
             maxY = max(self.data[self.geoY])
 
-        if self.range!=[]:
-            minX = range[0]
-            maxX = range[1]
-            minY = range[0]
-            maxY = range[1]
-
 
         #fig, ax = plt.subplots()
         plt.axis([minX, maxX, minY, maxY])
@@ -638,7 +639,6 @@ class GeoPlot:
             if self.range == []:
                 cs = plt.contour(xgrid, ygrid, zgrid, contours, colors='0.7', linewidths=0.4,alpha=alpha)
             else:
-                print("1!!!")
                 cs = plt.contour(xgrid, ygrid, zgrid, contours, colors='0.7', linewidths=0.4, alpha=alpha,extent=extent)
 
         else:
@@ -646,7 +646,6 @@ class GeoPlot:
             if self.range == []:
                 cs = plt.contour(xgrid, ygrid, zgrid, contours, colors='tab:purple', linewidths=0.05,alpha=alpha)
             else:
-                print("2!!!")
                 cs = plt.contour(xgrid, ygrid, zgrid, contours, colors='tab:purple', linewidths=0.05, alpha=alpha,extent=extent)
 
         ax.set_axisbelow(True)
@@ -676,6 +675,8 @@ class GeoPlot:
     def plotHexbin(self,fig, ax):
         # These shold be settings
         contours = 12
+        ax.grid(b=True, which='major', color='Gainsboro', linestyle='-',alpha=0.7,lw=0.7)
+        #ax.set_axisbelow(True)can't set the lines below as the whole data is 1 image not scatters
 
         if self.operation == 'ABS':
             self.data[self.geoX] == abs(self.data[self.geoX])
@@ -732,6 +733,10 @@ class GeoPlot:
         #    ax.set_axisbelow(True)
 
         plt.axis([x.min(), x.max(), y.min(), y.max()])
+        if self.range !=[]:
+            bnds = np.array([self.range[0], self.range[1]])
+            ax.set_xlim(bnds)
+            ax.set_ylim(bnds)
 
         #Labelling
         ax.set_xlabel(self.geoX)

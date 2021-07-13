@@ -171,7 +171,7 @@ class GeoPdb:
             except:
                 if '_ADJ' not in self.pdbDataPath:#never download the pdb to an adjusted directory
                     import time
-                    print('!!! Downloading from pdb: ',pdbCode)
+                    print('!!! Downloading from pdb: ',self.pdbDataPath,pdbCode)
                     biodl.download_pdb_files([pdbCode], pdir=self.pdbDataPath, file_format='pdb')
                     time.sleep(1)
                     try:
@@ -735,7 +735,10 @@ class GeoPdb:
                 'PHI':'C-1:N:CA:C',
                 'PSI':'N:CA:C:N+1',
                 'OMEGA': 'CA:C:N+1:CA+1',
+                'PREOMEGA': 'CA-1:C-1:N:CA',
                 'TAU':'N:CA:C',
+                'TAU-1': 'C-1:N:CA',
+                'TAU+1': 'CA:C:N+1',
                 'CHI1':'N:CA:CB:CG',
                 'CHI1_ILE':'N:CA:CB:CG1',
                 'CHI1_SER': 'N:CA:CB:OG',
