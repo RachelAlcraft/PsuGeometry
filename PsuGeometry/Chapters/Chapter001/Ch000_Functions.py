@@ -7,8 +7,10 @@ from PsuGeometry import GeoReport as psu
 ##### globals #############################
 loadPath = 'C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/CSV/'
 printPath = 'C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/Data/'
+printPathLx = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
 filesPDBRoot ='C:/Dev/Github/ProteinDataFiles/pdb_data/'
+pdbDataPathLx =  '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 #filesADJRoot ='C:/Dev/Github/ProteinDataFiles/pdb_out/Fo5_ADJ/' #adjusted on Fo at 5 degrees thevenaz (11.8.21)
 #filesADJRoot ='C:/Dev/Github/ProteinDataFiles/pdb_out/Fo3_ADJ/' #adjusted on Fo at 3 degrees thevenaz (18.8.21) fix to numerical gap
 filesADJRoot ='C:/Dev/Github/ProteinDataFiles/pdb_out/FO5_ADJ/' #adjusted on Fo at 5 degrees thevenaz (19.8.21) fix to numerical gap
@@ -23,6 +25,11 @@ def getBadAtomsListFromFile():
     pdboccList = pdboccdata['BAD'].tolist()[0:]
     expdbbadList = expdbbaddata['BAD'].tolist()[0:]
     return pdbbadList + expdbbadList + pdboccList
+
+def getPDBList100():
+    pdbdata = pd.read_csv('../../PdbLists/Pdbs_100.csv')
+    pdbList = pdbdata['PDB'].tolist()[0:]
+    return pdbList
 
 def getPDBList():
     pdbdata = pd.read_csv('../../PdbLists/Pdbs_70.csv')
