@@ -120,7 +120,12 @@ class GeoReport:
         gp = geop.GeoPlot(data=df, geoX='ridxA', geoY='ridxB', title=title, newData=False, hue=hue,
                           palette=palette, plot='contact',categorical=categorical,report=self)
         self.plots.append(gp)
+        return df
 
+
+    def addCsv(self, data, title=''):
+        gp = geop.GeoPlot(data=data,title=title,plot='csv',geoX='')
+        self.plots.append(gp)
 
     def addDataView(self, pdbCode, geoX, geoY, palette='viridis', hue='2FoFc', categorical=False, title='',centre=False,sort='ASC'):
         pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
@@ -439,7 +444,7 @@ class GeoReport:
         row = 1
         for geoPl in self.plots:
             #fig, ax = plt.subplots()
-            if type(geoPl) is geop.GeoPlot:
+            if type(geoPl) is geop.GeoPlot and geoPl.plot != 'csv':
                 #html += self.twoPlots(geoPl.plotA,geoPl.plotB,width)
 
                 title = geoPl.title
@@ -530,6 +535,7 @@ class GeoReport:
                 html += "<td><a href='https://www.ebi.ac.uk/pdbe/entry/pdb/" + pdb + "' title='PDB Link' target='_blank'>Link to PDBe</a></td>\n"
                 html += '</tr>\n'
             html += '</table>\n'
+            html += '</table>\n'
 
         html += '<hr/>\n'
         return html
@@ -548,14 +554,15 @@ class GeoReport:
             #plt.close('all')
             #gc.collect()
 
-            fig, ax = plt.subplots()
             if geoPl.plot=='surface' or geoPl.plot=='surfaces':
+                fig, ax = plt.subplots()
                 ret = geoPl.plotToAxes(fig,ax)
                 encoded = geoPl.getPlotImage(fig,ax)
                 htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
                 htmlstring += ret
                 html = '<td width=' + width + '%><p>' + geoPl.title + '</p>\n<p>' + htmlstring + '</p></td>\n'
             elif geoPl.hasMatrix:
+                fig, ax = plt.subplots()
                 ret = geoPl.plotToAxes(fig,ax)
                 encoded = geoPl.getPlotImage(fig,ax)
                 htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
@@ -566,14 +573,16 @@ class GeoReport:
             elif geoPl.data.empty:
                 html = '<td width=' + width + '%>' + 'No Data:' + geoPl.geoX + ' ' + geoPl.geoY  + '</td>\n'
             elif geoPl.plot == 'compare':#there is no plot
+                fig, ax = plt.subplots()
                 ret = geoPl.plotToAxes(fig,ax)
                 htmlstring = ret
                 html = '<td width=' + width + '%>' + '<p>' + htmlstring + '</p></td>\n'
-            elif geoPl.plot == 'summary':#there is no plot
-                ret = geoPl.plotToAxes(fig,ax)
+            elif geoPl.plot == 'summary' or geoPl.plot == 'csv':#there is no plot
+                ret = geoPl.plotNoAxes()
                 htmlstring = ret
                 html = '<td width=' + width + '%>' + '<p>' + htmlstring + '</p></td>\n'
             else:
+                fig, ax = plt.subplots()
                 ret = geoPl.plotToAxes(fig,ax)
                 encoded = geoPl.getPlotImage(fig,ax)
                 htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'

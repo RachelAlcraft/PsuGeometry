@@ -11,12 +11,14 @@ There are 4 ultimate sets
 ###########################################################
 import pandas as pd
 from PsuGeometry import GeoReport as psu
+import Ch000_Functions as help
 ################################################################
 
 runSetCreator = False
 runDiffMaker = False
 runChangeProToCis = False
-runMakeAverages = True
+runMakeAverages = False
+runAppendDssp = True
 
 ### The input data, the names of the output sets and the names of the input pdb files ##############
 ### INPUTS ###
@@ -36,70 +38,7 @@ printPath = 'C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/CSV/'
 ####################################################################################################
 
 ################ HELPER FUNCTIONS ##########################
-def getBadAtomsList(pdbDataPath, pdbList,maxDiff):
-    allRealPdbs = []
-    badRealPdbs = []
-    occRealPdbs = []
-    for pdb in pdbList:
-        #The differences that were found
-        realFileName = 'MaximaDifferences_' + pdb + '.csv'
-        print('Reading ',pdbDataPath + realFileName)
-        realData = pd.read_csv(pdbDataPath + realFileName)
-        allRealPdbs.append(realData)
-        #And the bad data that failed
-        badRealFileName = 'MaximaDifferences_' + pdb + '_BAD_.csv'
-        badRealData = pd.read_csv(pdbDataPath + badRealFileName)
-        badRealPdbs.append(badRealData)
-        # And the occupancy checker file
-        occRealFileName = 'OccupancyMaxima_' + pdb + '.csv'
-        print(pdbDataPath + occRealFileName)
-        occRealData = pd.read_csv(pdbDataPath + occRealFileName)
-        occRealData = occRealData.query('Fraction < 1')
-        occRealPdbs.append(occRealData)
-    # append them all
-    realCsv = pd.concat(allRealPdbs, axis=0, sort=False)
-    badRealCsv = pd.concat(badRealPdbs, axis=0, sort=False)
-    occRealCsv = pd.concat(occRealPdbs, axis=0, sort=False)
 
-    # Make the file into the format 5kwmA222HG23 and filter on maxDiff
-    badpdbs = []
-    # 1.  deal with the list of bad first
-    pdbsBad = badRealCsv['pdbCode'].values
-    chainsBad = badRealCsv['Chain'].values
-    resBad = badRealCsv['ResNo'].values
-    atomsBad = badRealCsv['AtomType'].values
-    # 2.  deal with the list of multiple occupants
-    pdbsOcc = occRealCsv['pdbCode'].values
-    chainsOcc = occRealCsv['Chain'].values
-    resOcc = occRealCsv['ResNo'].values
-    atomsOcc = occRealCsv['AtomType'].values
-    # 3. Create list of unwanted atoms
-    for i in range(0,len(pdbsOcc)):
-        badpdbs.append((pdbsOcc[i] + chainsOcc[i] + str(resOcc[i]) + str(atomsOcc[i])))
-    for i in range(0,len(pdbsBad)):
-        badpdbs.append((pdbsBad[i] + chainsBad[i] + str(resBad[i]) + str(atomsBad[i])))
-
-    pdbsBad = realCsv['pdbCode'].values
-    chainsBad = realCsv['Chain'].values
-    resBad = realCsv['ResNo'].values
-    atomsBad = realCsv['AtomType'].values
-    diffsBad = realCsv['Difference'].values
-    for i in range(0, len(pdbsBad)):
-        diff = diffsBad[i]
-        if diff > maxDiff:
-            badpdbs.append((pdbsBad[i] + chainsBad[i] + str(resBad[i]) + atomsBad[i]))
-
-    # print them
-    with open(printPath + 'badatoms.csv', 'w') as f:
-        for atm in badpdbs:
-            f.write(atm + '\n')
-
-    return badpdbs
-
-def applyRestrictions(dataCsv):
-    dataReduced = dataCsv.query("disordered=='N'")
-    dataReduced = dataReduced.query("bfactor <= 20")
-    return dataReduced
 
 #######################################################################################
 
@@ -130,10 +69,10 @@ if runSetCreator:
     if setName == 'ADJUSTED':
         filesRoot = filesADJRoot
         outPath = outAdjusted
-        badAtoms = getBadAtomsList(filesADJRoot, pdbList, 0.05)  # Get the bad atoms list we will use to reduce the list further
+        badAtoms = help.getBadAtomsList(filesADJRoot, pdbList, 0.05)  # Get the bad atoms list we will use to reduce the list further
     elif setName == 'REDUCED':
         outPath = outReduced
-        badAtoms = getBadAtomsList(filesADJRoot, pdbList, 0.05)  # Get the bad atoms list we will use to reduce the list further
+        badAtoms = help.getBadAtomsList(filesADJRoot, pdbList, 0.05)  # Get the bad atoms list we will use to reduce the list further
     elif setName == 'UNRESTRICTED':
         keepDisordered = True
 
@@ -155,11 +94,11 @@ if runSetCreator:
     dataCsv['Software'] = dataCsv['Software'].str[:8]
 
     if setName != 'UNRESTRICTED':
-        dataCsv = applyRestrictions(dataCsv)
+        dataCsv = help.applyRestrictions(dataCsv)
         dataCsv.to_csv(outPath, index=False)
     else:
         dataCsv.to_csv(outPath, index=False)
-        dataReduced = applyRestrictions(dataCsv)
+        dataReduced = help.applyRestrictions(dataCsv)
         dataReduced.to_csv(outRestricted, index=False)
 
 ##########################################################################################
@@ -234,3 +173,75 @@ if runMakeAverages:
     dataCsvRestrictedAv.to_csv(outRestricted + 'mean.csv', index=True)
     dataCsvUnrestrictedAv.to_csv(outUnrestricted + 'mean.csv', index=True)
     dataCsvMergedAv.to_csv(outMerged + 'mean.csv', index=True)
+
+if runAppendDssp:
+    pdbDataPath = 'C:/Dev/Github/ProteinDataFiles/pdb_data/'
+    edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
+    printPath = 'C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/Data/'
+
+    fileUnrestricted = 'C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/CSV/DataUnrestricted.csv'
+    fileRestricted = 'C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/CSV/DataRestricted.csv'
+    fileReduced = 'C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/CSV/DataMerged.csv'
+    fileAdjusted = 'C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/CSV/DataAdjusted.csv'
+
+    fileUnrestrictedAv = 'C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/CSV/DataUnrestricted.csvmean.csv'
+    fileRestrictedAv = 'C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/CSV/DataRestricted.csvmean.csv'
+    fileReducedAv = 'C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/CSV/DataReduced.csvmean.csv'
+    fileAdjustedAv = 'C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/CSV/DataAdjusted.csvmean.csv'
+
+    dataCsvAdjustedAv = pd.read_csv(fileAdjustedAv)
+    dataCsvReducedAv = pd.read_csv(fileReducedAv)
+    dataCsvRestrictedAv = pd.read_csv(fileRestrictedAv)
+    dataCsvUnrestrictedAv = pd.read_csv(fileUnrestrictedAv)
+
+    dataCsvAdjusted = pd.read_csv(fileAdjusted)
+    dataCsvReduced = pd.read_csv(fileReduced)
+    dataCsvRestricted = pd.read_csv(fileRestricted)
+    dataCsvUnrestricted = pd.read_csv(fileUnrestricted)
+
+    allList = []
+    allList.append([dataCsvAdjusted,fileAdjusted])
+    allList.append([dataCsvReduced,fileReduced])
+    allList.append([dataCsvRestricted,fileRestricted])
+    allList.append([dataCsvUnrestricted,fileUnrestricted])
+
+    avgList = []
+    avgList.append([dataCsvAdjustedAv,fileAdjustedAv])
+    avgList.append([dataCsvReducedAv,fileReducedAv])
+    avgList.append([dataCsvRestrictedAv,fileRestrictedAv])
+    avgList.append([dataCsvUnrestrictedAv,fileUnrestrictedAv])
+
+    # embellish with software and resolution
+    pdbdata = pd.read_csv('../../PdbLists/Pdbs_70.csv')
+    pdbdata = pdbdata[['PDB', 'SOFTWARE', 'RES']]
+    pdbdata.columns = ['PDB', 'Software', 'Resolution']
+
+    #for dataBlob in avgList:
+    #    dataCsv = dataBlob[0]
+    #    dataPath = dataBlob[1]
+    #    dataCsv['PDB'] = dataCsv['pdbCode']
+    #    dataCsv = dataCsv.set_index('PDB').join(pdbdata.set_index('PDB'))
+    #    dataCsv['Software'] = dataCsv['Software'].str[:8]
+    #    dataCsv.to_csv(dataPath, index=False)
+
+    #embellish with dssp - the dssp file was created ages ago from the linux laptop
+    pdbdssp = pd.read_csv('C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/CSV/CsvGeos_BEST_Set0DSSPALL.csv')
+    try:
+        pdbdssp['rid'] = pdbdssp['rid'].astype(str)
+        pdbdssp['DSSPID'] = pdbdssp['pdbCode'] + pdbdssp['chain'] + pdbdssp['rid']
+        pdbdssp = pdbdssp[['DSSPID', 'dssp']]
+
+    except:
+        print('empty csv')
+
+    for dataBlob in allList:
+        dataCsv = dataBlob[0]
+        dataPath = dataBlob[1]
+        try:
+            dataCsv['rid'] = dataCsv['rid'].astype(str)
+            dataCsv['DSSPID'] = dataCsv['pdbCode'] + dataCsv['chain'] + dataCsv['rid']
+        except:
+            print('empty csv')
+
+        dataCsv = dataCsv.set_index('DSSPID').join(pdbdssp.set_index('DSSPID'))
+        dataCsv.to_csv(dataPath, index=False)

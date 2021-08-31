@@ -166,6 +166,7 @@ class GeoPdb:
             structure = None
             gotPdb = False
             try:
+                #print('debug get pdb from',self.pdbDataPath + 'pdb' + pdbCode + '.ent')
                 structure = parser.get_structure(pdbCode, self.pdbDataPath + 'pdb' + pdbCode + '.ent')
                 gotPdb = True
             except:
@@ -211,6 +212,11 @@ class GeoPdb:
                                                 atom.disordered_select("A")
                                         else:
                                             useAtom = False
+
+                                    if not self.keepDisordered and useAtom:
+                                        if atom.get_occupancy() < 1:
+                                            useAtom = False
+                                            print('debug not passed disordered', atom,atom.get_occupancy())
 
                                     if useAtom:
                                         atomID=atom.get_full_id()[0] +chain + str(rid) +atom.get_name()
@@ -413,6 +419,8 @@ class GeoPdb:
                                     atomA = self.__getHetAtom(thisChain, ridA, thisOcc, firstAtom)
                                 elif '{' in geoAtom and '}' in geoAtom:
                                     atomA = self.__getNearestAtom(thisChain, ridA, thisOcc, firstAtom,geoAtom)
+                                #elif '*' in geoAtom and '*' in geoAtom:
+                                #    atomA = self.__getNumberAtom(thisChain, ridA, thisOcc, firstAtom,geoAtom)
                                 # There should be 1 atom
                                 if atomA != None:
                                     datasA.append(atomA)
@@ -464,6 +472,7 @@ class GeoPdb:
                                                              datasA[3].values['x'], datasA[3].values['y'], datasA[3].values['z'])
 
                                         motif = datasA[0].values['residue']+datasA[1].values['residue']+datasA[2].values['residue']+datasA[3].values['residue']
+                                        avbf = (datasA[0].values['bfactor'] + datasA[1].values['bfactor'] + datasA[2].values['bfactor']+ datasA[3].values['bfactor']) / 4
                                         ridmotif = str(datasA[0].values['rid'])  + '_' +  str(datasA[1].values['rid'])  + '_' +  str(datasA[2].values['rid'])  + '_' +  str(datasA[3].values['rid'])
 
                                         for hue in hues:
@@ -488,6 +497,7 @@ class GeoPdb:
                                                          datasA[1].values['x'], datasA[1].values['y'], datasA[1].values['z'],
                                                          datasA[2].values['x'], datasA[2].values['y'], datasA[2].values['z'])
                                     motif = datasA[0].values['residue'] + datasA[1].values['residue'] + datasA[2].values['residue']
+                                    avbf = (datasA[0].values['bfactor'] + datasA[1].values['bfactor']+ datasA[2].values['bfactor']) / 3
                                     ridmotif = str(datasA[0].values['rid']) + '_' + str(datasA[1].values['rid'])  + '_' +  str(datasA[2].values['rid'])
                                     for hue in hues:
                                         aHue = datasA[0].values[hue]
@@ -506,6 +516,7 @@ class GeoPdb:
                                     valA = calcs.distance(datasA[0].values['x'], datasA[0].values['y'], datasA[0].values['z'],
                                                          datasA[1].values['x'], datasA[1].values['y'], datasA[1].values['z'])
                                     motif = datasA[0].values['residue'] + datasA[1].values['residue']
+                                    avbf = (datasA[0].values['bfactor'] + datasA[1].values['bfactor'])/2
                                     ridmotif = str(datasA[0].values['rid']) + "_" + str(datasA[1].values['rid'])
 
                                     for hue in hues:
@@ -525,6 +536,7 @@ class GeoPdb:
                                 #geoData.loc[thisRow, geo] = valA
                                 dic[geo] = valA
                                 dic[geo+'_motif'] = motif
+                                dic[geo + '_avbfactor'] = avbf
                                 dic[geo + '_ridmotif'] = ridmotif
                                 # hue could be an average or an
                                 for hue in hues:
@@ -627,6 +639,7 @@ class GeoPdb:
 
     def __getNearestAtom(self, chain, rid, occ,atom,newatom):
         # The atom number cannot be less than 1
+
         atm = self.__getAtom(chain, rid, occ,atom)
         if atm == None:
             return None
@@ -634,12 +647,61 @@ class GeoPdb:
         nearatm = atm #return itself if there are none
         dis = 1000
         for at in self.atoms:
-            if at.values['atom'] in newatom and at.values['rid'] != rid and at.values['rid'] != rid-1 and at.values['rid'] != rid+1: #could pass in a list of atoms to look for in the case of oxygen sidechains
+            #print("," + at.values['atom'] + ",", newatom)
+            if "," + at.values['atom'] + "," in newatom and at.values['rid'] != rid and at.values['rid'] != rid-1 and at.values['rid'] != rid+1: #could pass in a list of atoms to look for in the case of oxygen sidechains
+                #print("," + at.values['atom'] + ",", newatom)
                 valDis = calcs.distance(atm.values['x'], atm.values['y'], atm.values['z'], at.values['x'], at.values['y'], at.values['z'])
                 if valDis < dis:
                     dis = valDis
                     nearatm = at
+
+        if ",HOH," in newatom:
+            for hoh in self.water:
+                valDis = calcs.distance(atm.values['x'], atm.values['y'], atm.values['z'], hoh.values['x'], hoh.values['y'], hoh.values['z'])
+                if valDis < dis:
+                    dis = valDis
+                    nearatm = hoh
+
+        if ",HETATM," in newatom:
+            for het in self.hetatms:
+                valDis = calcs.distance(atm.values['x'], atm.values['y'], atm.values['z'], het.values['x'], het.values['y'], het.values['z'])
+                if valDis < dis:
+                    dis = valDis
+                    nearatm = het
+
         return nearatm
+
+    def __getNumberAtom(self, chain, rid, occ,atom,newatom):
+        # The atom number cannot be less than 1
+
+        atm = self.__getAtom(chain, rid, occ,atom)
+        if atm == None:
+            return None
+
+        nearatm = atm #return itself if there are none
+        dis = 4
+        count = 0
+        for at in self.atoms:
+            #print("," + at.values['atom'] + ",", newatom)
+            if "," + at.values['atom'] + "," in newatom and at.values['rid'] != rid and at.values['rid'] != rid-1 and at.values['rid'] != rid+1: #could pass in a list of atoms to look for in the case of oxygen sidechains
+                #print("," + at.values['atom'] + ",", newatom)
+                valDis = calcs.distance(atm.values['x'], atm.values['y'], atm.values['z'], at.values['x'], at.values['y'], at.values['z'])
+                if valDis < dis:
+                    count +=1
+
+        if ",HOH," in newatom:
+            for hoh in self.water:
+                valDis = calcs.distance(atm.values['x'], atm.values['y'], atm.values['z'], hoh.values['x'], hoh.values['y'], hoh.values['z'])
+                if valDis < dis:
+                    count +=1
+
+        if ",HETATM," in newatom:
+            for het in self.hetatms:
+                valDis = calcs.distance(atm.values['x'], atm.values['y'], atm.values['z'], het.values['x'], het.values['y'], het.values['z'])
+                if valDis < dis:
+                    count += 1
+
+        return count
 
     def __getResidueBFactor(self, chain, rid, occ):
         # The atom number cannot be less than 1

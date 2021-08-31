@@ -45,7 +45,7 @@ class GeoPlot:
         self.Contour=Contour
         self.range = []
         self.YellowDots = YellowDots
-        if self.geoY == '' and plot not in 'surfaces' and plot != 'compare':
+        if self.geoY == '' and plot not in 'surfaces' and plot != 'compare' and plot != 'csv':
             self.plot = 'histogram'
         self.count=count # only for histograms, probability or count
             #if self.hue=='bfactor':gp.gridsize = 50
@@ -64,21 +64,32 @@ class GeoPlot:
 
     def plotToAxes(self,fig, ax):
 
-        if self.plot == 'histogram':
+        if self.plot == 'csv':
+            return self.plotCsv()
+        elif self.plot == 'histogram':
             return self.plotHistogram(fig, ax)
         elif self.plot == 'scatter' or self.plot=='contact':
             return self.plotScatter(fig, ax)
         elif self.plot == 'hexbin':
             return self.plotHexbin(fig, ax)
         elif self.plot == 'probability':
-            try:
-                return self.plotProbability(fig, ax)
-            except:
-                return 'Error in probability'
+            #try:
+            return self.plotProbability(fig, ax)
+            #except:
+            #    return 'Error in probability'
         elif self.plot == 'surface':
             return self.plotSurface(fig, ax)
         elif self.plot == 'surfaces':
             return self.plotSurfaces(fig, ax)
+        elif self.plot == 'compare':
+            return self.plotCompare()
+        elif self.plot == 'summary':
+            return self.plotSummary()
+
+    def plotNoAxes(self):
+
+        if self.plot == 'csv':
+            return self.plotCsv()
         elif self.plot == 'compare':
             return self.plotCompare()
         elif self.plot == 'summary':
@@ -303,6 +314,52 @@ class GeoPlot:
         else:
             return ''
 
+    def plotCsv(self):
+        html = '<p>' + self.title + '</p>'
+        html += "<table class='innertable'>\n"
+        try:
+            cols = self.data.columns
+        except:
+            dicd = {'-':self.data}
+            self.data = pd.DataFrame(dicd)
+            cols = ['-']
+
+        try:
+            idx = self.data.index
+
+            html += "<tr>\n"
+            html += "<td>" + "" + "</td>\n"
+            for col in cols:
+                html += "<td>" + str(col) + "</td>\n"
+            html += "</tr>\n"
+            rows = self.data.shape[0]
+            for r in range(0, rows):
+                html += "<tr>\n"
+                html += "<td>" + str(idx[r]) + "</td>\n"
+                for col in cols:
+                    coldata = self.data[col].tolist()
+                    cold = coldata[r]
+                    try:
+                        number = float(cold)
+                        cold = str(round(number, 1))
+                        if abs(number) < 10:
+                            cold = str(round(number, 3))
+                        elif abs(number) < 100:
+                            cold = str(round(number, 2))
+                        elif abs(number) > 1000:
+                            cold = str(int(round(number, 0)))
+                    except:
+                        cold = coldata[r]
+
+                    html += "<td>" + str(cold) + "</td>\n"
+                html += "</tr>\n"
+        except:
+            html += '<p>' + 'error' + '</p>'
+
+        html += "</table></p>\n"
+        return html
+
+
     def plotCompare(self):
         #Create outliers
         #Data A
@@ -338,10 +395,17 @@ class GeoPlot:
         dataA.sort()
         dataB.sort()
 
+        desc1A = self.data[self.geoX].describe()
+        desc1B = self.data2[self.geoX].describe()
+
         meanA = round(dataA.mean(), 3)
         meanB = round(dataB.mean(), 3)
+        medA = round(desc1A[5], 3)
+        medB = round(desc1B[5], 3)
         sdA = round(dataA.std(), 3)
         sdB = round(dataB.std(), 3)
+        countA = round(desc1A[0], 0)
+        countB = round(desc1B[0], 0)
 
         #https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_1samp.html
         from scipy import stats
@@ -367,7 +431,9 @@ class GeoPlot:
         html += "<br/>" + method + "</p>"
         html += "<table class='innertable'>\n"
         html += "<tr><td><red>Stats measure</red></td><td><red>" + self.geoX + " A</red></td><td><red>" + self.geoX + " B</red></td></tr>"
+        html += "<tr><td>count</td><td>" + str(countA) + "</td><td>" + str(countB) + "</td></tr>"
         html += "<tr><td>mean</td><td>" + str(meanA) + "</td><td>" + str(meanB) + "</td></tr>"
+        html += "<tr><td>median</td><td>" + str(medA) + "</td><td>" + str(medB) + "</td></tr>"
         html += "<tr><td>sd</td><td>" + str(sdA) + "</td><td>" + str(sdB) + "</td></tr>"
         html += "<tr><td>Min</td><td>" + outMinA + "</td><td>" + outMinB + "</td></tr>"
         html += "<tr><td>Max</td><td>" + outMaxA + "</td><td>" + outMaxB + "</td></tr>"
@@ -541,8 +607,13 @@ class GeoPlot:
                 plt.gca().set_aspect("equal")
 
             if self.categorical:
+                legend='brief'
+                try:
+                    self.data[self.hue] = pd.to_numeric(self.data[self.hue])
+                except:
+                    legend='full'
                 im = sns.scatterplot(x=self.geoX, y=self.geoY, hue=self.hue, data=self.data, alpha=alpha,palette=self.palette
-                                     ,edgecolor='aliceblue', linewidth=lw)
+                                     ,edgecolor='aliceblue', linewidth=lw,legend='brief')
                 if self.title!='ghost':
                     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)  # Put the legend out of the figure
                 else:
@@ -703,7 +774,7 @@ class GeoPlot:
             self.vmin = z.min()
             self.vmax = z.max()
             #ax = self.data.plot.hexbin(x=self.geoX,y=self.geoY,C=self.hue,gridsize=10,cmap=self.palette)
-            if range == []:
+            if self.range == []:
                 hb = plt.hexbin(x,y,C=z,bins=self.bins, cmap=self.palette,gridsize=self.gridsize,reduce_C_function=np.mean)
                         #,vmin = self.vmin, vmax = self.vmax)
             else:
@@ -761,6 +832,7 @@ class GeoPlot:
         Xgrid, Ygrid = np.meshgrid(xgrid, ygrid)
         grid_sized = np.vstack([Xgrid.ravel(), Ygrid.ravel()])
         # fit an array of size [Ndim, Nsamples]
+
 
         kde = gaussian_kde(data, bw_method=bandwidth)
         # evaluate on a regular grid
