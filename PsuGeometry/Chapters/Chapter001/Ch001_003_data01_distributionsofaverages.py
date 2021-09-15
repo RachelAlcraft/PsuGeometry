@@ -25,7 +25,8 @@ print('### LOADING csv files ###') # bit rubbish but we didn;t change the object
 descdataPdbUn = pd.read_csv(help.loadPath + "DescribeGeos_Unrestricted.csv")
 descdataPdbRes = pd.read_csv(help.loadPath + "DescribeGeos_Restricted.csv")
 descdataPdbCut = pd.read_csv(help.loadPath + "DescribeGeos_Cut.csv")
-descdataPdbAdj = pd.read_csv(help.loadPath + "DescribeGeos_Adjusted.csv")
+descdataPdbAdj = pd.read_csv(help.loadPath + "DescribeGeos_AdjustedMax.csv")
+descdataPdbLap = pd.read_csv(help.loadPath + "DescribeGeos_AdjustedLap.csv")
 
 
 print('### Creating scatter files ###')
@@ -42,11 +43,14 @@ geoTriosA = [
             ['C:O mean', 'N:CA mean', 'CA:C mean',False],
            ]
 
-help.trioReports(["Unrestricted",descdataPdbUn],
-                 ["Restricted",descdataPdbRes],
-                 ["Reduced05",descdataPdbCut],
-                 ["Adjusted05",descdataPdbAdj],
-                 geoTriosA, title,help.printPath,fileName + "")
+namesCsvs = []
+namesCsvs.append(["Unrestricted",descdataPdbUn])
+namesCsvs.append(["Restricted",descdataPdbRes])
+namesCsvs.append(["Reduced",descdataPdbCut])
+namesCsvs.append(["Density Adjusted",descdataPdbAdj])
+namesCsvs.append(["Laplacian Adjusted",descdataPdbLap])
+
+help.trioReports(namesCsvs, geoTriosA, title,help.printPath,fileName + "")
 
 
 

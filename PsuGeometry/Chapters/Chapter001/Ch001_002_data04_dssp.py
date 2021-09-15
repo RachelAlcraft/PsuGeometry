@@ -12,13 +12,14 @@ print('### LOADING csv files ###')
 dataPdbUn = pd.read_csv(help.loadPath + "bb_unrestricted.csv")
 dataPdbRes = pd.read_csv(help.loadPath + "bb_restricted.csv")
 dataPdbCut = pd.read_csv(help.loadPath + "bb_reduced.csv")
-dataPdbAdj = pd.read_csv(help.loadPath + "bb_adjusted.csv")
-
+dataPdbAdj = pd.read_csv(help.loadPath + "bbden_adjusted.csv")
+dataPdbLap = pd.read_csv(help.loadPath + "bblap_adjusted.csv")
 # ensure data is correctly restricted
-dataPdbUn = help.applyRestrictions(dataPdbUn,True,False,False,False)
-dataPdbCut = help.applyRestrictions(dataPdbCut,True,True,True,True)
-dataPdbRes = help.applyRestrictions(dataPdbRes,True,True,True,True)
-dataPdbAdj = help.applyRestrictions(dataPdbAdj,True,True,True,False)
+dataPdbUn = help.applyRestrictions(dataPdbUn,True,False,False,False,False)
+dataPdbRes = help.applyRestrictions(dataPdbRes,True,True,True,True,False)
+dataPdbCut = help.applyRestrictions(dataPdbCut,True,True,True,True,True)
+dataPdbAdj = help.applyRestrictions(dataPdbAdj,True,True,True,False,True)
+dataPdbLap = help.applyRestrictions(dataPdbLap,True,True,True,False,True)
 
 tag = ''
 #SHale we cut on bfactor factor?

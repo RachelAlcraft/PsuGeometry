@@ -127,6 +127,10 @@ class GeoReport:
         gp = geop.GeoPlot(data=data,title=title,plot='csv',geoX='')
         self.plots.append(gp)
 
+    def addComment(self, comment):
+        gp = geop.GeoPlot(data=pd.DataFrame(),title=comment,plot='comment',geoX='')
+        self.plots.append(gp)
+
     def addDataView(self, pdbCode, geoX, geoY, palette='viridis', hue='2FoFc', categorical=False, title='',centre=False,sort='ASC'):
         pdbmanager = geopdb.GeoPdbs(self.pdbDataPath, self.edDataPath, self.ed, self.dssp)
         apdb = pdbmanager.getPdb(pdbCode,True)
@@ -444,7 +448,7 @@ class GeoReport:
         row = 1
         for geoPl in self.plots:
             #fig, ax = plt.subplots()
-            if type(geoPl) is geop.GeoPlot and geoPl.plot != 'csv':
+            if type(geoPl) is geop.GeoPlot and geoPl.plot != 'csv' and geoPl.plot != 'comment':
                 #html += self.twoPlots(geoPl.plotA,geoPl.plotB,width)
 
                 title = geoPl.title
@@ -561,6 +565,8 @@ class GeoReport:
                 htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
                 htmlstring += ret
                 html = '<td width=' + width + '%><p>' + geoPl.title + '</p>\n<p>' + htmlstring + '</p></td>\n'
+            elif geoPl.plot == 'comment':  # Just a single comment
+                html = '<td width=' + width + '%>' + '<p>' + geoPl.title + '</p></td>\n'
             elif geoPl.hasMatrix:
                 fig, ax = plt.subplots()
                 ret = geoPl.plotToAxes(fig,ax)
@@ -577,7 +583,7 @@ class GeoReport:
                 ret = geoPl.plotToAxes(fig,ax)
                 htmlstring = ret
                 html = '<td width=' + width + '%>' + '<p>' + htmlstring + '</p></td>\n'
-            elif geoPl.plot == 'summary' or geoPl.plot == 'csv':#there is no plot
+            elif geoPl.plot == 'summary' or geoPl.plot == 'csv' or geoPl.plot=='comment':#there is no plot
                 ret = geoPl.plotNoAxes()
                 htmlstring = ret
                 html = '<td width=' + width + '%>' + '<p>' + htmlstring + '</p></td>\n'

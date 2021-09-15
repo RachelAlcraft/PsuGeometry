@@ -25,9 +25,10 @@ badAtoms = help.getBadAtomsListFromFile()  # Get the bad atoms list we will use 
 
 print("---- Making unrestricted--------")
 dataPdbUn = help.makeCsv('PDB', pdbListIn, geos, [],True)
+#dataPdbUn = pd.read_csv(help.loadPath + "bb_unrestricted_a.csv")
 dataPdbUn.to_csv(help.loadPath + "bb_unrestricted_a.csv", index=False)
 
-dataPdbUn = help.applyRestrictions(dataPdbUn,True,False,False,False)
+dataPdbUn = help.applyRestrictions(dataPdbUn,True,False,False,False,False)
 dataPdbUn.to_csv(help.loadPath + "bb_unrestricted_b.csv", index=False)
 
 dataPdbUn = help.embellishCsv(dataPdbUn)

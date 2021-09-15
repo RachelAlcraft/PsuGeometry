@@ -45,7 +45,7 @@ class GeoPlot:
         self.Contour=Contour
         self.range = []
         self.YellowDots = YellowDots
-        if self.geoY == '' and plot not in 'surfaces' and plot != 'compare' and plot != 'csv':
+        if self.geoY == '' and plot not in 'surfaces' and plot != 'compare' and plot != 'csv' and plot!= 'comment':
             self.plot = 'histogram'
         self.count=count # only for histograms, probability or count
             #if self.hue=='bfactor':gp.gridsize = 50
@@ -63,7 +63,6 @@ class GeoPlot:
     #        return self.plotProbability(True,fig, ax)
 
     def plotToAxes(self,fig, ax):
-
         if self.plot == 'csv':
             return self.plotCsv()
         elif self.plot == 'histogram':
@@ -94,6 +93,9 @@ class GeoPlot:
             return self.plotCompare()
         elif self.plot == 'summary':
             return self.plotSummary()
+        elif self.plot == 'comment':
+            print('comment=',self.title)
+            return self.title
 
     def plotSurface(self, fig, ax):
         afa = 1

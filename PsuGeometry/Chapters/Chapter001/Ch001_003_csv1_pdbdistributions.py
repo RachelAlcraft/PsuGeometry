@@ -13,13 +13,14 @@ print('### LOADING csv files ###') # bit rubbish but we didn;t change the object
 dataPdbUn = pd.read_csv(help.loadPath + "bb_unrestricted.csv")
 dataPdbRes = pd.read_csv(help.loadPath + "bb_restricted.csv")
 dataPdbCut = pd.read_csv(help.loadPath + "bb_reduced.csv")
-dataPdbAdj = pd.read_csv(help.loadPath + "bb_adjusted.csv")
-
+dataPdbAdj = pd.read_csv(help.loadPath + "bbden_adjusted.csv")
+dataPdbLap = pd.read_csv(help.loadPath + "bblap_adjusted.csv")
 # ensure data is correctly restricted
-dataPdbUn = help.applyRestrictions(dataPdbUn,True,False,False,False)
-dataPdbCut = help.applyRestrictions(dataPdbCut,True,True,True,True)
-dataPdbRes = help.applyRestrictions(dataPdbRes,True,True,True,True)
-dataPdbAdj = help.applyRestrictions(dataPdbAdj,True,True,True,False)
+dataPdbUn = help.applyRestrictions(dataPdbUn,True,False,False,False,False)
+dataPdbRes = help.applyRestrictions(dataPdbRes,True,True,True,True,False)
+dataPdbCut = help.applyRestrictions(dataPdbCut,True,True,True,True,True)
+dataPdbAdj = help.applyRestrictions(dataPdbAdj,True,True,True,False,True)
+dataPdbLap = help.applyRestrictions(dataPdbLap,True,True,True,False,True)
 
 pdbListIn = dataPdbUn["pdbCode"].unique()
 georep = psu.GeoReport([], "", "", help.printPath, ed=False, dssp=False, includePdbs=False, keepDisordered=False)
@@ -29,6 +30,7 @@ cutdataPdbUn = dataPdbUn[['pdbCode','C:O','N:CA','CA:C','C:N+1','TAU']]
 cutdataPdbRes = dataPdbRes[['pdbCode','C:O','N:CA','CA:C','C:N+1','TAU']]
 cutdataPdbCut = dataPdbCut[['pdbCode','C:O','N:CA','CA:C','C:N+1','TAU']]
 cutdataPdbAdj = dataPdbAdj[['pdbCode','C:O','N:CA','CA:C','C:N+1','TAU']]
+cutdataPdbLap = dataPdbLap[['pdbCode','C:O','N:CA','CA:C','C:N+1','TAU']]
 #cutdataPdbCut01 = dataPdbCut01[['pdbCode','C:O','N:CA','CA:C','C:N+1','TAU']]
 #cutdataPdbAdj01 = dataPdbAdj01[['pdbCode','C:O','N:CA','CA:C','C:N+1','TAU']]
 
@@ -37,6 +39,7 @@ descdataPdbUn = cutdataPdbUn.groupby('pdbCode').describe()
 descdataPdbRes = cutdataPdbRes.groupby('pdbCode').describe()
 descdataPdbCut = cutdataPdbCut.groupby('pdbCode').describe()
 descdataPdbAdj = cutdataPdbAdj.groupby('pdbCode').describe()
+descdataPdbLap = cutdataPdbLap.groupby('pdbCode').describe()
 #descdataPdbCut01 = cutdataPdbCut01.groupby('pdbCode').describe()
 #descdataPdbAdj01 = cutdataPdbAdj01.groupby('pdbCode').describe()
 
@@ -45,6 +48,7 @@ descdataPdbUn['pdbCode'] = descdataPdbUn.index
 descdataPdbRes['pdbCode'] = descdataPdbRes.index
 descdataPdbCut['pdbCode'] = descdataPdbCut.index
 descdataPdbAdj['pdbCode'] = descdataPdbAdj.index
+descdataPdbLap['pdbCode'] = descdataPdbLap.index
 #descdataPdbCut01['pdbCode'] = descdataPdbCut01.index
 #descdataPdbAdj01['pdbCode'] = descdataPdbAdj01.index
 
@@ -73,33 +77,25 @@ descdataPdbAdj.columns = [['C:O count','C:O mean','C:O std','C:O min','C:O 25%',
 'C:N+1 count','C:N+1 mean','C:N+1 std','C:N+1 min','C:N+1 25%','C:N+1 50%','C:N+1 75%','C:N+1 max',
 'TAU count','TAU mean','TAU std','TAU min','TAU 25%','TAU 50%','TAU 75%','TAU max','pdbCode']]
 
-'''
-descdataPdbCut01.columns = [['C:O count','C:O mean','C:O std','C:O min','C:O 25%','C:O 50%','C:O 75%','C:O max',
+descdataPdbLap.columns = [['C:O count','C:O mean','C:O std','C:O min','C:O 25%','C:O 50%','C:O 75%','C:O max',
 'N:CA count','N:CA mean','N:CA std','N:CA min','N:CA 25%','N:CA 50%','N:CA 75%','N:CA max',
 'CA:C count','CA:C mean','CA:C std','CA:C min','CA:C 25%','CA:C 50%','CA:C 75%','CA:C max',
 'C:N+1 count','C:N+1 mean','C:N+1 std','C:N+1 min','C:N+1 25%','C:N+1 50%','C:N+1 75%','C:N+1 max',
 'TAU count','TAU mean','TAU std','TAU min','TAU 25%','TAU 50%','TAU 75%','TAU max','pdbCode']]
-
-descdataPdbAdj01.columns = [['C:O count','C:O mean','C:O std','C:O min','C:O 25%','C:O 50%','C:O 75%','C:O max',
-'N:CA count','N:CA mean','N:CA std','N:CA min','N:CA 25%','N:CA 50%','N:CA 75%','N:CA max',
-'CA:C count','CA:C mean','CA:C std','CA:C min','CA:C 25%','CA:C 50%','CA:C 75%','CA:C max',
-'C:N+1 count','C:N+1 mean','C:N+1 std','C:N+1 min','C:N+1 25%','C:N+1 50%','C:N+1 75%','C:N+1 max',
-'TAU count','TAU mean','TAU std','TAU min','TAU 25%','TAU 50%','TAU 75%','TAU max','pdbCode']]
-'''
 
 descdataPdbUn['ID'] = descdataPdbUn['pdbCode']
 descdataPdbRes['ID'] = descdataPdbRes['pdbCode']
 descdataPdbCut['ID'] = descdataPdbCut['pdbCode']
 descdataPdbAdj['ID'] = descdataPdbAdj['pdbCode']
-#descdataPdbCut01['ID'] = descdataPdbCut01['pdbCode']
-#descdataPdbAdj01['ID'] = descdataPdbAdj01['pdbCode']
+descdataPdbLap['ID'] = descdataPdbLap['pdbCode']
+
 
 print('### Save csv files ###')#Turn the data into a describe for the volumns we are interested in
 descdataPdbUn.to_csv(help.loadPath + "DescribeGeos_Unrestricted.csv", index=False)
 descdataPdbRes.to_csv(help.loadPath + "DescribeGeos_Restricted.csv", index=False)
 descdataPdbCut.to_csv(help.loadPath + "DescribeGeos_Cut.csv", index=False)
-descdataPdbAdj.to_csv(help.loadPath + "DescribeGeos_Adjusted.csv", index=False)
-#descdataPdbCut01.to_csv(help.loadPath + "DescribeGeos_Cut01.csv", index=False)
-#descdataPdbAdj01.to_csv(help.loadPath + "DescribeGeos_Adj01.csv", index=False)
+descdataPdbAdj.to_csv(help.loadPath + "DescribeGeos_AdjustedMax.csv", index=False)
+descdataPdbLap.to_csv(help.loadPath + "DescribeGeos_AdjustedLap.csv", index=False)
+
 
 

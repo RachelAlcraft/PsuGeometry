@@ -13,4 +13,6 @@ georep = psu.GeoReport(pdblist, help.pdbDataPathLx, help.edDataPath, dsspPrintPa
 datacsv = georep.getGeoemtryCsv(['N:CA'],hueList)
 datacsv = datacsv[['pdbCode','chain','rid','aa','dssp']]
 print(datacsv)
-datacsv.to_csv(dsspPrintPath + 'dssp.csv', index=False)
+if False:#don;t accidentally run this and replace it
+    datacsv.to_csv(dsspPrintPath + 'dssp.csv', index=False)
+print(datacsv)

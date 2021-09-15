@@ -5,17 +5,23 @@ import pandas as pd
 from PsuGeometry import GeoReport as psu
 
 ##### globals #############################
-loadPath = 'C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/CSV/'
-printPath = 'C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/Data/'
+tag = ''
+loadPath = 'C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/Csv/' + tag
+printPath = 'C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/Data/' + tag
 printPathLx = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/'
 edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
 filesPDBRoot ='C:/Dev/Github/ProteinDataFiles/pdb_data/'
 pdbDataPathLx =  '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
 #filesADJRoot ='C:/Dev/Github/ProteinDataFiles/pdb_out/Fo5_ADJ/' #adjusted on Fo at 5 degrees thevenaz (11.8.21)
 #filesADJRoot ='C:/Dev/Github/ProteinDataFiles/pdb_out/Fo3_ADJ/' #adjusted on Fo at 3 degrees thevenaz (18.8.21) fix to numerical gap
-filesADJRoot ='C:/Dev/Github/ProteinDataFiles/pdb_out/FO5_ADJ/' #adjusted on Fo at 5 degrees thevenaz (19.8.21) fix to numerical gap
-filesADJRoot ='C:/Dev/Github/ProteinDataFiles/pdb_out/Fo509_ADJ/' #adjusted on Fo at 5 degrees thevenaz (27.8.21) with <=0.9 A and added side chain atoms for further O analysis
+#filesADJRoot ='C:/Dev/Github/ProteinDataFiles/pdb_out/FO5_ADJ/' #adjusted on Fo at 5 degrees thevenaz (19.8.21) fix to numerical gap
+#filesADJRoot ='C:/Dev/Github/ProteinDataFiles/pdb_out/Fo509_ADJ/' #adjusted on Fo at 5 degrees thevenaz (27.8.21) with <=0.9 A and added side chain atoms for further O analysis
+#filesAdjRoot ='C:/Dev/Github/ProteinDataFiles/pdb_out/Rad09_ADJ/' #adjusted on Fo at 5 degrees thevenaz (1.9.21) with <0.9 A and added side chain atoms for further O analysis
+#filesADJRoot ='C:/Dev/Github/ProteinDataFiles/pdb_out/Lap09_ADJ/' #as above but LAPLACIAN adjusted centres
+filesMainRoot ='C:/Dev/Github/ProteinDataFiles/pdb_out/LapDen_ADJ/' #13.9.21 - adjusted on Fo at 5 degrees thevenaz, dual set of laplacian and density adjusted pdbs
 ############################################
+filesDenRoot = filesMainRoot + "Density/"
+filesLapRoot = filesMainRoot + "Laplacian/"
 
 def getBadAtomsListFromFile():
     pdbbaddata = pd.read_csv(loadPath + 'AllBadAtoms_Maxima.csv')
@@ -37,82 +43,19 @@ def getPDBList():
     #pdbListA = ['5xvt', '6fmc', '4u9h', '4y9w']
     pdbListIn = []
     for pdb in pdbListA:
+        pdbF = (filesDenRoot + 'pdb' + pdb + '.ent').lower()
+        OccF = (loadPath + 'Max_Occ/OccupancyMaxima_' + pdb + '.csv').lower()
         import os.path
-        isFile = os.path.isfile((filesADJRoot + 'pdb' + pdb + '.ent').lower())
-        isOcc = os.path.isfile((filesADJRoot + 'OccupancyMaxima_' + pdb + '.csv').lower())
+        isFile = os.path.isfile(pdbF)
+        isOcc = os.path.isfile(OccF)
         if isFile and isOcc:
             pdbListIn.append(pdb.lower())
+            #print('Added:', pdbF, OccF)
         else:
-            print('No file:', (filesADJRoot + 'pdb' + pdb + '.ent').lower())
-    #pdbListIn.remove('1ot6')#2 models
-    #pdbListIn.remove('2ce2')#2 models
-    print(pdbListIn)
+            print('No file:',pdbF, OccF)
     return pdbListIn
 
-'''
-def getBadAtomsList(pdbDataPath, pdbList,maxDiff):
-    allRealPdbs = []
-    badRealPdbs = []
-    occRealPdbs = []
-    #printPath = 'C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/CSV/'
-    for pdb in pdbList:
-        #The differences that were found
-        realFileName = 'MaximaDifferences_' + pdb + '.csv'
-        print('Reading ',pdbDataPath + realFileName)
-        realData = pd.read_csv(pdbDataPath + realFileName)
-        allRealPdbs.append(realData)
-        #And the bad data that failed
-        badRealFileName = 'MaximaDifferences_' + pdb + '_BAD_.csv'
-        badRealData = pd.read_csv(pdbDataPath + badRealFileName)
-        badRealPdbs.append(badRealData)
-        # And the occupancy checker file
-        occRealFileName = 'OccupancyMaxima_' + pdb + '.csv'
-        print(pdbDataPath + occRealFileName)
-        occRealData = pd.read_csv(pdbDataPath + occRealFileName)
-        occRealData = occRealData.query('Fraction < 1')
-        occRealPdbs.append(occRealData)
-    # append them all
-    realCsv = pd.concat(allRealPdbs, axis=0, sort=False)
-    badRealCsv = pd.concat(badRealPdbs, axis=0, sort=False)
-    occRealCsv = pd.concat(occRealPdbs, axis=0, sort=False)
-
-    # Make the file into the format 5kwmA222HG23 and filter on maxDiff
-    badpdbs = []
-    # 1.  deal with the list of bad first
-    pdbsBad = badRealCsv['pdbCode'].values
-    chainsBad = badRealCsv['Chain'].values
-    resBad = badRealCsv['ResNo'].values
-    atomsBad = badRealCsv['AtomType'].values
-    # 2.  deal with the list of multiple occupants
-    pdbsOcc = occRealCsv['pdbCode'].values
-    chainsOcc = occRealCsv['Chain'].values
-    resOcc = occRealCsv['ResNo'].values
-    atomsOcc = occRealCsv['AtomType'].values
-    # 3. Create list of unwanted atoms
-    for i in range(0,len(pdbsOcc)):
-        badpdbs.append((pdbsOcc[i] + chainsOcc[i] + str(resOcc[i]) + str(atomsOcc[i])))
-    for i in range(0,len(pdbsBad)):
-        badpdbs.append((pdbsBad[i] + chainsBad[i] + str(resBad[i]) + str(atomsBad[i])))
-
-    pdbsBad = realCsv['pdbCode'].values
-    chainsBad = realCsv['Chain'].values
-    resBad = realCsv['ResNo'].values
-    atomsBad = realCsv['AtomType'].values
-    diffsBad = realCsv['Difference'].values
-    for i in range(0, len(pdbsBad)):
-        diff = diffsBad[i]
-        if diff > maxDiff:
-            badpdbs.append((pdbsBad[i] + chainsBad[i] + str(resBad[i]) + atomsBad[i]))
-
-    # print them
-    with open(printPath + 'badatoms.csv', 'w') as f:
-        f.write("BAD" + '\n')
-        for atm in badpdbs:
-            f.write(atm + '\n')
-
-    return badpdbs 
-'''
-def applyRestrictions(dataCsv,pdbs,bfactor,disorder,occupancy):
+def applyRestrictions(dataCsv,pdbs,bfactor,disorder,occupancy,lapdiff,res=0):
 
     dataReduced = dataCsv
     if disorder:
@@ -135,14 +78,22 @@ def applyRestrictions(dataCsv,pdbs,bfactor,disorder,occupancy):
     if occupancy:
         dataReduced = dataReduced.query("occupancy == 1")  # some occupnats are not marked as disordered
 
+    if lapdiff:
+        dataReduced = dataReduced.query("Dist_Den_Lap <= 0.02")  # topology restriction
+
+    if res > 0:
+        dataReduced = dataReduced.query("RES < " + res)  # topology restriction
+
 
     return dataReduced
 
 def makeCsv(pdbSet, pdbListIn,geos,badAtoms,disordered):
     print('Getting CSV for',pdbSet)
     pdbDataPath = filesPDBRoot
-    if pdbSet == 'ADJUSTED':
-        pdbDataPath = filesADJRoot
+    if pdbSet == 'ADJUSTEDDEN':
+        pdbDataPath = filesDenRoot
+    if pdbSet == 'ADJUSTEDLAP':
+        pdbDataPath = filesLapRoot
 
     from PsuGeometry import GeoPdb as geopdb
     pdbmanager = geopdb.GeoPdbs(pdbDataPath, edDataPath, False, False, disordered,badAtoms)
@@ -173,7 +124,7 @@ def makeCsv(pdbSet, pdbListIn,geos,badAtoms,disordered):
 def embellishCsv(csvData):
     #we assume the data is a csv data file and has fields dataBest['ID'] = dataBest['pdbCode'] + dataBest['chain'] + dataBest['rid'] + dataBest['aa']
     # the dssp file was created ages ago from the linux laptop
-    pdbdssp = pd.read_csv('C:/Dev/Github/BbkProject/PhDThesis/5.Chapters/1_Summer/CSV/CsvGeos_BEST_Set0DSSPALL.csv')
+    pdbdssp = pd.read_csv('../../PdbLists/dssp.csv')
     pdbdata = pd.read_csv('../../PdbLists/Pdbs_100.csv')
     atomdata = pd.read_csv(loadPath + "AllAtoms_Maxima.csv")
 
@@ -184,7 +135,7 @@ def embellishCsv(csvData):
         atomdata['ResNo'] = atomdata['ResNo'].astype(str)
         atomdata = atomdata.query("AtomType=='C'")
         atomdata['ROWID'] = atomdata['pdbCode'] + atomdata['Chain'] + atomdata['ResNo']
-        atomdata = atomdata[['ROWID', 'LapDiff']]
+        atomdata = atomdata[['ROWID', 'Dist_Den_Lap']]
         #atomdata.columns = [['ROWID', 'MaxaDiff']]
 
         # make the dssp data into the right shape
@@ -222,21 +173,13 @@ def embellishCsv(csvData):
     return csvData
 
 
-def trioReports(nameDataA, nameDataB, nameDataC, nameDataD ,trios, title,printPath,fileName, perCategory=''):
+def trioReports(namesCsvs ,trios, title,printPath,fileName, perCategory=''):
 
-    dataA = nameDataA[1]
-    dataB = nameDataB[1]
-    dataC = nameDataC[1]
-    dataD = nameDataD[1]
-
-    nameA = nameDataA[0]
-    nameB = nameDataB[0]
-    nameC = nameDataC[0]
-    nameD = nameDataD[0]
-
+    width = len(namesCsvs)
 
     cats = []
     if perCategory != '':
+        dataA = namesCsvs[0][1]
         dataA[perCategory] = dataA[perCategory].fillna('?')
         cats = dataA[perCategory].values
         cats = list(set(cats))
@@ -250,52 +193,39 @@ def trioReports(nameDataA, nameDataB, nameDataC, nameDataD ,trios, title,printPa
     georep = psu.GeoReport([],"", "", printPath, ed=False, dssp=False, includePdbs=False,keepDisordered=False)
 
     for trio in trios:
+        if len(trio) == 4:
+            pal = 'jet'
+            if trio[3]:
+                pal = 'jet_r'
         if perCategory!='':
             for cat in cats:
-                dataCutA = dataA.query(perCategory + " ==  '" + cat + "'")
-                dataCutB = dataB.query(perCategory + " ==  '" + cat + "'")
-                dataCutC = dataC.query(perCategory + " ==  '" + cat + "'")
-                dataCutD = dataD.query(perCategory + " ==  '" + cat + "'")
-                if len(trio) == 4:
-                    pal = 'jet'
-                    if trio[3]:
-                        pal = 'jet_r'
-
+                for nameCsv in namesCsvs:
+                    dataA = nameCsv[1]
+                    dataCutA = dataA.query(perCategory + " ==  '" + cat + "'")
                     georep.addScatter(data=dataCutA, geoX=trio[0], geoY=trio[1], hue=trio[2], title=cat + ':' + trio[0] + ':'+ trio[1] , categorical = trio[3],palette=pal, sort='NON')
-                    georep.addScatter(data=dataCutB, geoX=trio[0], geoY=trio[1], hue=trio[2], title=cat + ':' + trio[0] + ':' + trio[1], categorical = trio[3],palette=pal, sort='NON')
-                    georep.addScatter(data=dataCutC, geoX=trio[0], geoY=trio[1], hue=trio[2],title=cat + ':' + trio[0] + ':' + trio[1], categorical = trio[3],palette=pal, sort='NON')
-                    georep.addScatter(data=dataCutD, geoX=trio[0], geoY=trio[1], hue=trio[2], title=cat + ':' + trio[0] + ':' + trio[1], categorical = trio[3],palette=pal, sort='NON')
                 else:
-                    georep.addHistogram(data=dataCutA, geoX=trio[0],title=nameA + ' ' + cat + ':' + trio[0], hue='ID')
-                    georep.addHistogram(data=dataCutB, geoX=trio[0],title=nameB + ' ' + cat + ':' + trio[0], hue='ID')
-                    georep.addHistogram(data=dataCutC, geoX=trio[0],title=nameC + ' ' + cat + ':' + trio[0], hue='ID')
-                    georep.addHistogram(data=dataCutD, geoX=trio[0],title=nameD + ' ' + cat + ':' + trio[0], hue='ID')
+                    georep.addHistogram(data=dataCutA, geoX=trio[0],title=nameCsv[0] + ' ' + cat + ':' + trio[0], hue='ID')
         else:
             if len(trio) == 4:
                 cat = False
                 pal = 'jet'
                 if trio[3]:
                     cat = True
-                    pal = 'jet_r'
-                if trio[2] == "COUNT":
-                    georep.addHexBins(data=dataA, geoX=trio[0], geoY=trio[1], hue=trio[2], title=trio[0] + '|' + trio[1]+ ' ' + nameA, palette='cubehelix_r')
-                    georep.addHexBins(data=dataB, geoX=trio[0], geoY=trio[1], hue=trio[2], title=trio[0] + '|' + trio[1] + ' ' + nameB, palette='cubehelix_r')
-                    georep.addHexBins(data=dataC, geoX=trio[0], geoY=trio[1], hue=trio[2], title=trio[0] + '|' + trio[1] + ' ' + nameC, palette='cubehelix_r')
-                    georep.addHexBins(data=dataD, geoX=trio[0], geoY=trio[1], hue=trio[2], title=trio[0] + '|' + trio[1] + ' ' + nameD, palette='cubehelix_r')
-                else:
-                    georep.addScatter(data=dataA, geoX=trio[0], geoY=trio[1], hue=trio[2],title=trio[0] + '|' + trio[1]+ '|' + trio[2] + ' ' + nameA, categorical = cat,palette=pal, sort='NON')
-                    georep.addScatter(data=dataB, geoX=trio[0], geoY=trio[1], hue=trio[2], title=trio[0] + '|' + trio[1]+ '|' + trio[2] + ' ' + nameB, categorical = cat, palette=pal, sort='NON')
-                    georep.addScatter(data=dataC, geoX=trio[0], geoY=trio[1], hue=trio[2], title=trio[0] + '|' + trio[1]+ '|' + trio[2] + ' ' + nameC, categorical = cat, palette=pal, sort='NON')
-                    georep.addScatter(data=dataD, geoX=trio[0], geoY=trio[1], hue=trio[2], title=trio[0] + '|' + trio[1]+ '|' + trio[2] + ' ' + nameD, categorical = cat, palette=pal, sort='NON')
+                    pal = 'tab10'
+                for nameCsv in namesCsvs:
+                    dataA = nameCsv[1]
+                    nameA = nameCsv[0]
+                    if trio[2] == "COUNT":
+                        georep.addHexBins(data=dataA, geoX=trio[0], geoY=trio[1], hue=trio[2], title=trio[0] + '|' + trio[1]+ ' ' + nameA, palette='cubehelix_r')
+                    else:
+                        georep.addScatter(data=dataA, geoX=trio[0], geoY=trio[1], hue=trio[2],title=trio[0] + '|' + trio[1]+ '|' + trio[2] + ' ' + nameA, categorical = cat,palette=pal, sort='NON')
             else:
-                georep.addHistogram(data=dataA, geoX=trio[0], title=nameA + ' ' + trio[0], hue='ID')
-                georep.addHistogram(data=dataB, geoX=trio[0], title=nameB + ' ' + trio[0], hue='ID')
-                georep.addHistogram(data=dataC, geoX=trio[0], title=nameC + ' ' + trio[0], hue='ID')
-                georep.addHistogram(data=dataD, geoX=trio[0], title=nameD + ' ' + trio[0], hue='ID')
+                for nameCsv in namesCsvs:
+                    dataA = nameCsv[1]
+                    nameA = nameCsv[0]
+                    georep.addHistogram(data=dataA, geoX=trio[0], title=nameA + ' ' + trio[0], hue='ID')
 
-
-
-    georep.printToHtml(title, 4, fileName)
+    georep.printToHtml(title, width, fileName)
 
 def trioHexbins(nameDataA, nameDataB, nameDataC, nameDataD ,trios, title,printPath,fileName, perCategory=''):
 

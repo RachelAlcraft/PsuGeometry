@@ -21,21 +21,21 @@ geos = ['TAU','TAU+1','TAU-1','CA:C:O','O:C:N+1','CA-1:CA:CA+1',
         'CA-1:N','CA-1:O-1','O-1:N','C-1:CA','N:C','CA:O','CA:N+1','O:N+1','C:CA+1','N+1:C+1',
         'O-1:CA','N:O','O:CA+1','N+1:O+1','N-1:O-1']
 
-print('### CREATING cut csv file ###')
+print('### CREATING csv files ###')
 pdbListIn = help.getPDBList()
 print("---- Getting bad atom list--------")
 badAtoms = help.getBadAtomsListFromFile()  # Get the bad atoms list we will use to reduce the list further
 
-print("---- Making unrestricted--------")
-#dataPdbRes = help.makeCsv('PDB', pdbListIn, geos, [],False)
-dataPdbRes = pd.read_csv(help.loadPath + "bb_restricted_a.csv")
-dataPdbRes.to_csv(help.loadPath + "bb_restricted_a.csv", index=False)
+print("---- Making adjusted--------")
+#dataPdbAdj = help.makeCsv('ADJUSTEDDEN', pdbListIn, geos, badAtoms,False)
+dataPdbAdj = pd.read_csv(help.loadPath + "bbden_adjusted_a.csv")
+dataPdbAdj.to_csv(help.loadPath + "bbden_adjusted_a.csv", index=False)
 
-dataPdbRes = help.applyRestrictions(dataPdbRes,True,True,True,True,False)
-dataPdbRes.to_csv(help.loadPath + "bb_restricted_b.csv", index=False)
+dataPdbAdj = help.embellishCsv(dataPdbAdj)
 
-dataPdbRes = help.embellishCsv(dataPdbRes)
+dataPdbAdj = help.applyRestrictions(dataPdbAdj,True,True,True,True,False)
+dataPdbAdj.to_csv(help.loadPath + "bbden_adjusted_b.csv", index=False)
 
-print("---- Save to",help.loadPath + "bb_restricted.csv",'-------')
-dataPdbRes.to_csv(help.loadPath + "bb_restricted.csv", index=False)
+print("---- Save to",help.loadPath + "bbden_adjusted.csv",'-------')
+dataPdbAdj.to_csv(help.loadPath + "bbden_adjusted.csv", index=False)
 

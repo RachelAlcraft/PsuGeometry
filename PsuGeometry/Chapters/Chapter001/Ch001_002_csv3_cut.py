@@ -27,14 +27,14 @@ print("---- Getting bad atom list--------")
 badAtoms = help.getBadAtomsListFromFile()  # Get the bad atoms list we will use to reduce the list further
 
 print("---- Making reduced--------")
-dataPdbCut = help.makeCsv('PDB', pdbListIn, geos, badAtoms,False)
-#dataPdbCut = pd.read_csv(help.loadPath + "bb_reduced.csv")
+#dataPdbCut = help.makeCsv('PDB', pdbListIn, geos, badAtoms,False)
+dataPdbCut = pd.read_csv(help.loadPath + "bb_reduced_a.csv")
 dataPdbCut.to_csv(help.loadPath + "bb_reduced_a.csv", index=False)
 
-dataPdbCut = help.applyRestrictions(dataPdbCut,True,True,True,True)
-dataPdbCut.to_csv(help.loadPath + "bb_reduced_b.csv", index=False)
-
 dataPdbCut = help.embellishCsv(dataPdbCut)
+
+dataPdbCut = help.applyRestrictions(dataPdbCut,True,True,True,True,False)
+dataPdbCut.to_csv(help.loadPath + "bb_reduced_b.csv", index=False)
 
 print("---- Save to",help.loadPath + "bb_reduced.csv",'-------')
 dataPdbCut.to_csv(help.loadPath + "bb_reduced.csv", index=False)

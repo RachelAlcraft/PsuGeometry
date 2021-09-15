@@ -474,6 +474,7 @@ class GeoPdb:
                                         motif = datasA[0].values['residue']+datasA[1].values['residue']+datasA[2].values['residue']+datasA[3].values['residue']
                                         avbf = (datasA[0].values['bfactor'] + datasA[1].values['bfactor'] + datasA[2].values['bfactor']+ datasA[3].values['bfactor']) / 4
                                         ridmotif = str(datasA[0].values['rid'])  + '_' +  str(datasA[1].values['rid'])  + '_' +  str(datasA[2].values['rid'])  + '_' +  str(datasA[3].values['rid'])
+                                        atmmotif = str(datasA[0].values['atom'])  + '_' +  str(datasA[1].values['atom'])  + '_' +  str(datasA[2].values['atom'])  + '_' +  str(datasA[3].values['atom'])
 
                                         for hue in hues:
                                             aHue = datasA[0].values[hue]
@@ -499,6 +500,7 @@ class GeoPdb:
                                     motif = datasA[0].values['residue'] + datasA[1].values['residue'] + datasA[2].values['residue']
                                     avbf = (datasA[0].values['bfactor'] + datasA[1].values['bfactor']+ datasA[2].values['bfactor']) / 3
                                     ridmotif = str(datasA[0].values['rid']) + '_' + str(datasA[1].values['rid'])  + '_' +  str(datasA[2].values['rid'])
+                                    atmmotif = str(datasA[0].values['atom']) + '_' + str(datasA[1].values['atom']) + '_' + str(datasA[2].values['atom'])
                                     for hue in hues:
                                         aHue = datasA[0].values[hue]
                                         bHue = datasA[0].values[hue]
@@ -518,6 +520,7 @@ class GeoPdb:
                                     motif = datasA[0].values['residue'] + datasA[1].values['residue']
                                     avbf = (datasA[0].values['bfactor'] + datasA[1].values['bfactor'])/2
                                     ridmotif = str(datasA[0].values['rid']) + "_" + str(datasA[1].values['rid'])
+                                    atmmotif = str(datasA[0].values['atom']) + "_" + str(datasA[1].values['atom'])
 
                                     for hue in hues:
                                         aHue = datasA[0].values[hue]
@@ -538,6 +541,7 @@ class GeoPdb:
                                 dic[geo+'_motif'] = motif
                                 dic[geo + '_avbfactor'] = avbf
                                 dic[geo + '_ridmotif'] = ridmotif
+                                dic[geo + '_atmmotif'] = atmmotif
                                 # hue could be an average or an
                                 for hue in hues:
                                     #geoData.loc[thisRow, hue] = reshues[hue]

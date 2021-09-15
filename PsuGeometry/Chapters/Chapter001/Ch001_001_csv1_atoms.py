@@ -12,6 +12,7 @@ from PsuGeometry import GeoReport as psu
 #1. get the pdb list
 print('### CREATING csv files ###')
 pdbListIn = help.getPDBList()
+print(pdbListIn)
 
 georep = psu.GeoReport([], "", "", help.printPath, ed=False, dssp=False, includePdbs=False, keepDisordered=False)
 pdbdata = []
@@ -20,18 +21,20 @@ pdboccdata = []
 
 
 for pdb in pdbListIn:
-    pdbPath = help.filesADJRoot + 'MaximaDifferences_' + pdb + '.csv'
+    print(pdb)
+    pdbPath = help.filesMainRoot + 'MaximaDifferences_' + pdb + '.csv'
     onepdbmax = pd.read_csv(pdbPath)
     onepdbmax['ID'] = onepdbmax['pdbCode']
     pdbdata.append(onepdbmax)
 
-    pdbBadPath = help.filesADJRoot + 'MaximaDifferences_' + pdb + '_Bad_.csv'
+    pdbBadPath = help.filesMainRoot + 'MaximaDifferences_' + pdb + '_Bad_.csv'
     onepdbmaxbad = pd.read_csv(pdbBadPath)
     onepdbmaxbad['ResNo'] = onepdbmaxbad['ResNo'].astype(str)
+    onepdbmaxbad['Chain'] = onepdbmaxbad['Chain'].astype(str)
     onepdbmaxbad['BAD'] = onepdbmaxbad['pdbCode'] +onepdbmaxbad['Chain'] + onepdbmaxbad['ResNo'] + onepdbmaxbad['AtomType']
     pdbbaddata.append(onepdbmaxbad)
 
-    pdbOccPath = help.filesADJRoot + 'OccupancyMaxima_' + pdb + '.csv'
+    pdbOccPath = help.loadPath + 'Max_Occ/OccupancyMaxima_' + pdb + '.csv'
     onepdbmaxocc = pd.read_csv(pdbOccPath)
     onepdbmaxocc['ResNo'] = onepdbmaxocc['ResNo'].astype(str)
     onepdbmaxocc = onepdbmaxocc.query('Fraction < 1')
@@ -53,6 +56,8 @@ badonly.to_csv(help.loadPath + "AllBadAtoms_Maxima.csv", index=False)
 
 occonly =pdbocccsv['BAD']
 occonly.to_csv(help.loadPath + "AllBadAtoms_Occupant.csv", index=False)
+
+
 
 
 

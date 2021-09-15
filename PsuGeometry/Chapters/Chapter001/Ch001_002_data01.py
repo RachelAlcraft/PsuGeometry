@@ -30,22 +30,24 @@ print('### LOADING csv files ###') # bit rubbish but we didn;t change the object
 dataPdbUn = pd.read_csv(help.loadPath + "bb_unrestricted.csv")
 dataPdbRes = pd.read_csv(help.loadPath + "bb_restricted.csv")
 dataPdbCut = pd.read_csv(help.loadPath + "bb_reduced.csv")
-dataPdbAdj = pd.read_csv(help.loadPath + "bb_adjusted.csv")
-
+dataPdbAdj = pd.read_csv(help.loadPath + "bbden_adjusted.csv")
+dataPdbLap = pd.read_csv(help.loadPath + "bblap_adjusted.csv")
 # ensure data is correctly restricted
-dataPdbUn = help.applyRestrictions(dataPdbUn,True,False,False,False)
-dataPdbCut = help.applyRestrictions(dataPdbCut,True,True,True,True)
-dataPdbRes = help.applyRestrictions(dataPdbRes,True,True,True,True)
-dataPdbAdj = help.applyRestrictions(dataPdbAdj,True,True,True,False)
+dataPdbUn = help.applyRestrictions(dataPdbUn,True,False,False,False,False)
+dataPdbRes = help.applyRestrictions(dataPdbRes,True,True,True,True,False)
+dataPdbCut = help.applyRestrictions(dataPdbCut,True,True,True,True,True)
+dataPdbAdj = help.applyRestrictions(dataPdbAdj,True,True,True,False,True)
+dataPdbLap = help.applyRestrictions(dataPdbLap,True,True,True,False,True)
 
-tag = '_a'
+tag = '_lap'
 #SHale we cut on bfactor factor?
-BFactorFactor = True
+BFactorFactor = False
 if BFactorFactor:
     tag = '_bff'
     dataPdbCut = dataPdbCut.query('bfactorRatio <= 1.2')
     dataPdbRes = dataPdbRes.query('bfactorRatio <= 1.2')
     dataPdbAdj = dataPdbAdj.query('bfactorRatio <= 1.2')
+    dataPdbLap = dataPdbLap.query('bfactorRatio <= 1.2')
 
 
 print('### Creating scatter files ###')
@@ -79,9 +81,12 @@ geoTriosA = [['N:CA'],['CA:C'],['C:O'],['C:N+1'],
             ['C:O','bfactor', 'COUNT',False],
            ]
 
-help.trioReports(["Unrestricted",dataPdbUn],
-                 ["Restricted",dataPdbRes],
-                 ["Reduced",dataPdbCut],
-                 ["Adjusted",dataPdbAdj],
-                 geoTriosA, title,help.printPath,fileName + tag)
+namesCsvs = []
+namesCsvs.append(["Unrestricted",dataPdbUn])
+namesCsvs.append(["Restricted",dataPdbRes])
+namesCsvs.append(["Reduced",dataPdbCut])
+namesCsvs.append(["Density Adjusted",dataPdbAdj])
+namesCsvs.append(["Laplacian Adjusted",dataPdbLap])
+
+help.trioReports(namesCsvs,geoTriosA, title,help.printPath,fileName + tag)
 
