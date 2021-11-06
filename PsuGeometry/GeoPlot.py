@@ -98,12 +98,15 @@ class GeoPlot:
             return self.title
 
     def plotSurface(self, fig, ax):
-        afa = 1
-        lw = 0.7
-        if self.logged:
+        try:
             afa = 1
-        self.plotOneSurface(fig,ax,self.surface,afa,self.centre,self.palette,self.logged,lw)
-        return ''
+            lw = 0.7
+            if self.logged:
+                afa = 1
+            self.plotOneSurface(fig,ax,self.surface,afa,self.centre,self.palette,self.logged,lw)
+            return ''
+        except:
+            return ''
 
     def plotOneSurface(self, fig, ax,surface,afa,zero,palette,logged,lw):
         col='darkgrey'

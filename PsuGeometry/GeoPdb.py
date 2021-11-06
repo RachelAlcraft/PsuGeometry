@@ -515,7 +515,12 @@ class GeoPdb:
                                             reshues[hue] =reshues[hue]
 
                                 elif len(datasA) == 2:  # distance
-                                    valA = calcs.distance(datasA[0].values['x'], datasA[0].values['y'], datasA[0].values['z'],
+                                    if datasA[0] == datasA[1]:
+                                        valA = calcs.distance(datasA[0].values['x'], datasA[0].values['y'],
+                                                              datasA[0].values['z'],
+                                                              0,0,0) #we want just the magnitude of the position vector (fir differencing)
+                                    else:
+                                        valA = calcs.distance(datasA[0].values['x'], datasA[0].values['y'], datasA[0].values['z'],
                                                          datasA[1].values['x'], datasA[1].values['y'], datasA[1].values['z'])
                                     motif = datasA[0].values['residue'] + datasA[1].values['residue']
                                     avbf = (datasA[0].values['bfactor'] + datasA[1].values['bfactor'])/2
