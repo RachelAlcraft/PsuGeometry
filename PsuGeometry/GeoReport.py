@@ -570,12 +570,7 @@ class GeoReport:
             elif geoPl.hasMatrix:
                 fig, ax = plt.subplots()
                 ret = geoPl.plotToAxes(fig,ax)
-                encoded = geoPl.getPlotImage(fig,ax)
-                htmlstring = '<img src="data:image/png;base64, {}">'.format(encoded.decode('utf-8')) + '\n'
-                htmlstring += ret
-                html = '<td width=' + width + '%>' + '<p>' + htmlstring + '</p></td>\n'
-                #fig.clear()
-                plt.close('all')
+
             elif geoPl.data.empty:
                 html = '<td width=' + width + '%>' + 'No Data:' + geoPl.geoX + ' ' + geoPl.geoY  + '</td>\n'
             elif geoPl.plot == 'compare':#there is no plot

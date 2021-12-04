@@ -2,16 +2,19 @@
 from PsuGeometry import GeoReport as psu
 from PsuGeometry import GeoPdb as geopdb
 
-pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
-edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
-printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/procheck/'
+#pdbDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/pdb_data/'
+#edDataPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/ccp4_data/'
+#printPath = '/home/rachel/Documents/Bioinformatics/ProteinDataFiles/results_psu/procheck/'
+pdbDataPath = 'C:/Dev/Github/ProteinDataFiles/LeicippusTesting/PdbFiles/'
+edDataPath = 'C:/Dev/Github/ProteinDataFiles/ccp4_data/'
+printPath = 'C:/Dev/Github/ProteinDataFiles/LeicippusTesting/'
 
 pdbList = ['2cnq','1i1w'] # structures with errors
 pdbList = ['2cnq'] # structures with errors
 
 for pdbCode in pdbList:
 
-    georep = psu.GeoReport([pdbCode],pdbDataPath,edDataPath,printPath)
+    georep = psu.GeoReport([pdbCode],pdbDataPath,edDataPath,printPath,ed=False,dssp=False,includePdbs=False)
 
     #Create the geoplots
     printList = []
